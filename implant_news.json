@@ -1,152 +1,61 @@
 {
-  "updated": "2026年9月14日",
-  "updated_iso": "2026-09-14T06:30:00+09:00",
+  "updated": "2026年09月14日",
+  "updated_iso": "2026-09-14T16:36:30.976649+09:00",
   "companies": [
     {
       "company": "Stryker",
-      "rating": 3,
-      "items": [
-        {
-          "category": "新製品",
-          "title": "Mako RPS for TKA 国内展開",
-          "summary": "Strykerは新型ハンドヘルドロボティクスシステム「Mako RPS for Total Knee」の国内市場への本格展開を開始。従来のMako固定型ロボットと異なり手術室の制約が少なく、ASCへの導入を促進する。インプラント位置決め精度の向上とERAS適合性が訴求点。"
-        },
-        {
-          "category": "臨床データ",
-          "title": "Triathlon TKA 10年成績発表",
-          "summary": "国内多施設レジストリデータに基づくTriathlon TKA 10年累積生存率が日本整形外科学会で発表された。セメントレス群の成績が良好で、若年患者への適応拡大を支持するデータ。"
-        }
-      ]
+      "rating": 0,
+      "items": []
     },
     {
       "company": "Zimmer Biomet",
-      "rating": 2,
-      "items": [
-        {
-          "category": "新製品",
-          "title": "Persona iQ スマートニー国内承認",
-          "summary": "センサー内蔵型TKAインプラント「Persona iQ」がPMDA承認を取得し、国内販売を開始。術後の膝関節角度・歩行データをスマートフォンアプリで継続モニタリング可能。国内初のスマートインプラントとして注目されている。"
-        }
-      ]
+      "rating": 0,
+      "items": []
     },
     {
       "company": "DePuy Synthes（J&J）",
-      "rating": 2,
-      "items": [
-        {
-          "category": "薬事承認",
-          "title": "VELYS™ ロボティクス国内承認",
-          "summary": "DePuy Synthes VELYS™ Robotic-Assisted Solution（TKA用）がPMDA承認を取得。国内の主要整形外科施設での導入が始まっており、2026年度内に10施設以上への展開を目指す。Attune TKAシステムとの統合設計が特徴。"
-        },
-        {
-          "category": "臨床データ",
-          "title": "SYNTHES TFNA 転子部骨折成績",
-          "summary": "転子部骨折に対するTFNA（Trochanteric Fixation Nail Advanced）の国内多施設成績が公表。従来釘と比較して手術時間短縮・術後合併症低減が示され、骨粗鬆症合併例での有効性が確認された。"
-        }
-      ]
+      "rating": 0,
+      "items": []
     },
     {
       "company": "Smith+Nephew",
-      "rating": 1,
-      "items": [
-        {
-          "category": "提携・契約",
-          "title": "国内代理店網の再編",
-          "summary": "Smith+Nephewは国内整形外科部門の販売網を再編し、脊椎部門を強化。Navio™ロボティクスシステムの国内普及拡大を目指し、サポート体制を整備した。"
-        }
-      ]
+      "rating": 0,
+      "items": []
     },
     {
       "company": "帝人ナカシマメディカル",
-      "rating": 3,
-      "items": [
-        {
-          "category": "新製品",
-          "title": "OSS-100 骨補填材 PMDA承認",
-          "summary": "帝人ナカシマメディカルの新規β-TCP骨補填材「OSS-100」がPMDA承認を取得。脊椎固定術・骨欠損補填に適用され、国産骨補填材として製品ラインを拡充する。2026年秋より国内販売開始予定。"
-        },
-        {
-          "category": "臨床データ",
-          "title": "人工股関節 RINA 5年成績",
-          "summary": "国内多施設前向き研究による人工股関節RINAシステムの5年追跡データが日本人工関節学会にて発表。骨粗鬆症合併例での良好な固定性と低い周囲骨折率が示され、国内高齢者への適応の強みが確認された。"
-        }
-      ]
+      "rating": 0,
+      "items": []
     },
     {
       "company": "メディカルネクスト",
-      "rating": 1,
-      "items": [
-        {
-          "category": "その他",
-          "title": "スポーツ医学製品ライン拡充",
-          "summary": "メディカルネクストはスポーツ医学・関節鏡領域の製品ラインを拡充し、新規縫合アンカーシステムの国内販売を開始した。学会展示での医師評価は良好。"
-        }
-      ]
+      "rating": 0,
+      "items": []
     },
     {
       "company": "HOYAテクノサージカル",
-      "rating": 2,
-      "items": [
-        {
-          "category": "新製品",
-          "title": "人工骨補填材 新シリーズ展開",
-          "summary": "HOYAテクノサージカルは合成ハイドロキシアパタイト系人工骨「セラソルブ」新シリーズを発売。骨粗鬆症性骨折後の充填・脊椎固定術補助用途での使用が増加しており、国内シェア拡大を狙う。"
-        }
-      ]
+      "rating": 0,
+      "items": []
     },
     {
       "company": "Globus Medical",
-      "rating": 2,
-      "items": [
-        {
-          "category": "薬事承認",
-          "title": "EXCELSIUS GPS® 脊椎ロボット国内展開",
-          "summary": "Globus Medicalの脊椎ロボットナビゲーションシステム「EXCELSIUS GPS®」の国内施設導入が進んでいる。椎弓根スクリュー設置精度の改善と手術室内ナビゲーション統合が評価されており、国内大学病院への導入事例が報告された。"
-        }
-      ]
+      "rating": 0,
+      "items": []
     },
     {
       "company": "京セラメディカル",
-      "rating": 2,
-      "items": [
-        {
-          "category": "臨床データ",
-          "title": "LFA ロングテーパーステム 長期成績",
-          "summary": "京セラメディカルの股関節ステム「LFA」20年以上の長期成績が日本人工関節学会で発表。国内製品として骨粗鬆症合併高齢者での固定性・耐久性が示され、国内シェアを支持するデータとなった。"
-        },
-        {
-          "category": "新製品",
-          "title": "膝関節システム改良版発売",
-          "summary": "京セラメディカルはTKAシステム「JOURNEY II」改良版の国内販売を開始。インサートのポリエチレン材質改良により耐摩耗性が向上、若年患者への適応拡大を目指す。"
-        }
-      ]
+      "rating": 0,
+      "items": []
     },
     {
       "company": "日本MDM",
-      "rating": 1,
-      "items": [
-        {
-          "category": "その他",
-          "title": "外傷インプラント ラインナップ拡充",
-          "summary": "日本MDMは外傷用プレート・スクリューシステムのラインナップを拡充し、橈骨遠位端骨折・近位上腕骨骨折向けの新規プレートを発売。国内外傷整形外科学会での評価が始まっている。"
-        }
-      ]
+      "rating": 0,
+      "items": []
     },
     {
       "company": "Medtronic",
-      "rating": 2,
-      "items": [
-        {
-          "category": "新製品",
-          "title": "Mazor X Stealth Edition 国内展開加速",
-          "summary": "MedtronicはMazor X Stealth Editionの国内大学病院・基幹病院への導入を加速させており、O-armとの統合ナビゲーション環境が評価されている。国内脊椎ロボット市場でのシェア拡大が続く。"
-        },
-        {
-          "category": "臨床データ",
-          "title": "PEEK-OPTIMA cage 国内多施設成績",
-          "summary": "頸椎・腰椎固定用PEEK-OPTIMAケージの国内多施設後向き研究データが発表。融合率・術後合併症・ADL回復において良好な成績が示され、国内脊椎外科での採用継続を支持する結果となった。"
-        }
-      ]
+      "rating": 0,
+      "items": []
     }
   ]
 }
