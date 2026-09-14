@@ -2,7 +2,7 @@ name: 国内インプラントメーカーニュース取得（毎週月曜）
 
 on:
   schedule:
-    - cron: '30 21 * * 0'  # 毎週月曜 6:30 JST
+    - cron: '30 21 * * 0'
   workflow_dispatch:
 
 permissions:
@@ -16,7 +16,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install google-generativeai
       - env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: python fetch_implant_news.py

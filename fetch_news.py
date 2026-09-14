@@ -1,40 +1,55 @@
 """
-整形外科論文ニュース取得スクリプト（詳細解析も同時生成）
+整形外科論文ニュース取得スクリプト
 毎日 GitHub Actions から実行される。GOOGLE_API_KEY 環境変数が必要。
-Google Gemini API（無料枠）を使用。
+SDKを使わずHTTP直接呼び出しのため、パッケージバージョンに依存しない。
 """
-import google.generativeai as genai
-import json, re, os
+import json, re, os, urllib.request, urllib.error
 from datetime import datetime, timezone, timedelta
 
 JST = timezone(timedelta(hours=9))
 today = datetime.now(JST).strftime("%Y年%m月%d日")
+KEY = os.environ["GOOGLE_API_KEY"]
+BASE = "https://generativelanguage.googleapis.com/v1beta/models"
 
-genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
-model = genai.GenerativeModel("gemini-2.0-flash")
+def get_model():
+    """利用可能なモデルを取得して最適なものを返す"""
+    try:
+        url = f"{BASE}?key={KEY}"
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read())
+        all_models = [m["name"].replace("models/","") for m in data.get("models",[])]
+        flash = [m for m in all_models if "flash" in m and "tts" not in m and "embed" not in m]
+        if flash:
+            print(f"利用可能なモデル: {flash[:5]}")
+            return flash[0]
+    except Exception as e:
+        print(f"モデル一覧取得失敗: {e}")
+    # フォールバック
+    for m in ["gemini-2.5-flash","gemini-flash-latest","gemini-2.0-flash","gemini-1.5-flash"]:
+        print(f"フォールバック: {m}")
+        return m
 
-def ask(prompt):
-    return model.generate_content(prompt).text
+def ask(prompt, model):
+    """Gemini APIを呼び出してテキストを返す"""
+    url = f"{BASE}/{model}:generateContent?key={KEY}"
+    body = json.dumps({"contents":[{"role":"user","parts":[{"text":prompt}]}]}).encode()
+    req = urllib.request.Request(url, data=body, headers={"Content-Type":"application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            data = json.loads(r.read())
+        return data["candidates"][0]["content"]["parts"][0]["text"]
+    except urllib.error.HTTPError as e:
+        err = e.read().decode()
+        raise RuntimeError(f"HTTP {e.code}: {err[:200]}")
+
+model = get_model()
+print(f"📅 {today} の論文を取得中（モデル: {model}）...")
 
 # ─── 論文サマリー取得 ───
-print(f"📅 {today} の論文を取得中...")
+paper_prompt = f"整形外科の最新論文4件をJSON配列で返してください。各フィールド: specialty(脊椎/肩/股関節/膝/外傷/肘/手指のいずれか), title(日本語), journal(雑誌名と年月), overview(1〜2文), results(1〜2文), conclusion(1〜2文)。JSONのみ。前置き不要。"
 
-paper_prompt = f"""あなたは整形外科の研究アシスタントです。
-今日{today}の最新整形外科論文を各分野から（肩は2件、それ以外各1件）紹介してください。
-できるだけ2025〜2026年の論文を選んでください。
-
-8件の論文サマリーをJSON配列のみで返してください。
-各オブジェクトのフィールド:
-- specialty（脊椎/肩/肘/手指/股関節/膝/外傷のいずれか）
-- title（日本語タイトル）
-- journal（雑誌名と掲載年月）
-- overview（研究概要2〜3文）
-- results（主な結果2〜3文）
-- conclusion（結論と臨床的考察2〜3文）
-
-JSONのみを返し、前置きや説明文は絶対に含めないこと。"""
-
-text = ask(paper_prompt)
+text = ask(paper_prompt, model)
 m = re.search(r'\[[\s\S]*\]', text)
 if not m:
     raise ValueError("JSONが見つかりません:\n" + text[:400])
@@ -52,31 +67,16 @@ print("📖 詳細解析を生成中...")
 new_details = {}
 for p in papers:
     try:
-        detail_prompt = f"""あなたは整形外科の専門家です。以下の論文について整形外科医向けの詳細な解説をJSON形式のみで返してください。
-
-論文タイトル: {p['title']}
-雑誌: {p['journal']}
-概要: {p['overview']}
-結果: {p['results']}
-結論: {p['conclusion']}
-
-フィールド:
-- background（研究背景と臨床的課題、3〜4文）
-- methodology（研究デザイン・対象・方法の詳細、3〜4文）
-- keyFindings（主要な発見・数値の詳細、3〜4文）
-- clinicalImpact（日本の整形外科診療への臨床的インパクト、3〜4文）
-- limitations（研究の限界・課題、2〜3文）
-- relatedEvidence（関連エビデンスとの比較・文脈、2〜3文）
-
-JSONのみを返し、前置きや説明文は含めないこと。"""
-
-        dtext = ask(detail_prompt)
+        detail_prompt = f"""整形外科医向けに以下の論文の詳細解説をJSON形式のみで返してください。
+論文: {p['title']} ({p.get('journal','')})
+フィールド: background, methodology, keyFindings, clinicalImpact, limitations, relatedEvidence（各2〜3文）。JSONのみ。"""
+        dtext = ask(detail_prompt, model)
         dm = re.search(r'\{[\s\S]*\}', dtext)
         if dm:
             new_details[p["id"]] = json.loads(dm.group(0))
             print(f"  ✅ {p['title'][:35]}...")
     except Exception as e:
-        print(f"  ⚠ 詳細生成スキップ ({p['id']}): {e}")
+        print(f"  ⚠ 詳細生成スキップ: {e}")
 
 # ─── details.json に追記 ───
 existing_details = {}
@@ -88,7 +88,7 @@ except Exception:
 existing_details.update(new_details)
 with open("details.json", "w", encoding="utf-8") as f:
     json.dump(existing_details, f, ensure_ascii=False, indent=2)
-print(f"📁 details.json に {len(new_details)}件の詳細を保存（累計 {len(existing_details)}件）")
+print(f"📁 details.json 更新（累計 {len(existing_details)}件）")
 
 # ─── news.json を保存 ───
 with open("news.json", "w", encoding="utf-8") as f:
