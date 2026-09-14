@@ -118,19 +118,7 @@
     .fab:disabled{opacity:.6;cursor:not-allowed}
     .empty{text-align:center;padding:3rem 1rem;color:var(--text-muted);font-size:14px}
 
-    /* ── Settings modal ── */
-    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:1rem}
-    .modal{background:var(--surface);border-radius:var(--radius-lg);padding:1.5rem;width:100%;max-width:400px}
-    .modal h2{font-size:16px;font-weight:700;margin-bottom:.5rem}
-    .modal p{font-size:13px;color:var(--text-secondary);margin-bottom:1rem;line-height:1.6}
-    .modal label{display:block;font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:5px}
-    .modal input{width:100%;padding:9px 12px;border-radius:var(--radius);border:.5px solid var(--border-strong);background:var(--bg);color:var(--text-primary);font-size:13px;font-family:monospace;margin-bottom:1rem;outline:none}
-    .modal input:focus{border-color:var(--accent)}
-    .modal-actions{display:flex;gap:8px;justify-content:flex-end}
-    .btn{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:var(--radius);border:.5px solid var(--border-strong);background:var(--surface);color:var(--text-secondary);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
-    .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-    .modal-note{font-size:11px;color:var(--text-muted);margin-top:.75rem;padding:8px 10px;background:var(--bg);border-radius:7px;line-height:1.6}
-    .modal-note a{color:var(--accent)}
+    .detail-nodata{font-size:12px;color:var(--text-muted);padding:10px 0;display:flex;align-items:center;gap:6px}
 
     @keyframes spin{to{transform:rotate(360deg)}}
     .spin{display:inline-block;animation:spin .8s linear infinite}
@@ -149,9 +137,6 @@
     </div>
     <div class="header-right">
       <span class="update-badge" id="updateBadge"></span>
-      <button class="icon-btn" onclick="openSettings()" title="詳細解析のAPIキー設定" aria-label="APIキー設定">
-        <i class="ti ti-settings" aria-hidden="true"></i>
-      </button>
     </div>
   </div>
 </header>
@@ -189,20 +174,7 @@
   </button>
 </div>
 
-<!-- APIキー設定モーダル -->
-<div class="overlay" id="settingsOverlay" role="dialog" aria-modal="true">
-  <div class="modal">
-    <h2>詳細解析 APIキー設定</h2>
-    <p>「詳しく読む」機能を使うにはAnthropicのAPIキーが必要です。<br>毎日の自動更新はAPIキー不要のままです。</p>
-    <label for="apiKeyInput">Anthropic APIキー</label>
-    <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
-    <div class="modal-actions">
-      <button class="btn" onclick="closeSettings()">キャンセル</button>
-      <button class="btn btn-primary" onclick="saveKey()">保存</button>
-    </div>
-    <p class="modal-note">APIキーはこのブラウザにのみ保存されます。<a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a> から取得できます。</p>
-  </div>
-</div>
+
 
 <script>
 /* ─── 定数 ─── */
@@ -271,7 +243,7 @@ let newsPapers = [];
 let implantData = null;
 let papersUpdated = "";
 let implantsUpdated = "";
-const detailCache = {};  // paperId → 詳細解析テキスト
+let detailsData = {};  // details.json から読み込んだ詳細解析
 
 /* ─── データ読込 ─── */
 async function loadAll() {
@@ -281,6 +253,9 @@ async function loadAll() {
     }).catch(() => {}),
     fetch("implant_news.json?t=" + Date.now()).then(r => r.ok ? r.json() : null).then(d => {
       if (d && d.companies && d.companies.length > 0) { implantData = d; implantsUpdated = d.updated || ""; }
+    }).catch(() => {}),
+    fetch("details.json?t=" + Date.now()).then(r => r.ok ? r.json() : null).then(d => {
+      if (d) detailsData = d;
     }).catch(() => {})
   ]);
 }
@@ -297,79 +272,17 @@ function filteredPapers() {
   return [...f.filter(p => p.isNew), ...f.filter(p => !p.isNew)];
 }
 
-/* ─── API key ─── */
-const getApiKey = () => localStorage.getItem("ortho_apikey") || "";
-function openSettings() {
-  document.getElementById("apiKeyInput").value = getApiKey();
-  document.getElementById("settingsOverlay").style.display = "flex";
-  document.getElementById("apiKeyInput").focus();
-}
-function closeSettings() { document.getElementById("settingsOverlay").style.display = "none"; }
-function saveKey() {
-  const v = document.getElementById("apiKeyInput").value.trim();
-  v ? localStorage.setItem("ortho_apikey", v) : localStorage.removeItem("ortho_apikey");
-  closeSettings();
-}
-document.getElementById("settingsOverlay").addEventListener("click", e => { if (e.target.id === "settingsOverlay") closeSettings(); });
-
-/* ─── 詳細解析 ─── */
-async function fetchDetail(paperId) {
-  const paper = [...newsPapers, ...BASE_PAPERS].find(p => p.id === paperId);
-  if (!paper) return;
-
-  const key = getApiKey();
-  if (!key) {
-    openSettings();
-    showNotice("error", "「詳しく読む」には右上 ⚙ からAPIキーを設定してください", 4000);
-    return;
-  }
-
-  if (detailCache[paperId]) {
-    renderDetail(paperId, detailCache[paperId]);
-    return;
-  }
-
-  // ローディング表示
+/* ─── 詳細解析（details.json から読み込み済みのデータを表示） ─── */
+function fetchDetail(paperId) {
   const panel = document.getElementById("detail-" + paperId);
-  if (panel) panel.innerHTML = '<div class="detail-loading"><i class="ti ti-loader spin" aria-hidden="true"></i>詳細解析を生成中...</div>';
-
-  try {
-    const resp = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": key,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true"
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 1500,
-        system: `あなたは整形外科の専門家です。以下の論文について、整形外科医向けに詳細な解説をJSON形式のみで返してください。
-フィールド:
-- background: 研究背景と臨床的課題（3〜4文）
-- methodology: 研究デザイン・対象・方法の詳細（3〜4文）
-- keyFindings: 主要な発見・数値の詳細解説（3〜4文）
-- clinicalImpact: 日本の整形外科診療への臨床的インパクト（3〜4文）
-- limitations: 研究の限界・課題（2〜3文）
-- relatedEvidence: 関連するエビデンスとの比較・文脈（2〜3文）
-JSONのみを返し、前置きや説明文は含めないこと。`,
-        messages: [{
-          role: "user",
-          content: `論文タイトル: ${paper.title}\n雑誌: ${paper.journal}\n概要: ${paper.overview}\n結果: ${paper.results}\n結論: ${paper.conclusion}`
-        }]
-      })
-    });
-    if (!resp.ok) throw new Error("API error " + resp.status);
-    const data = await resp.json();
-    const text = data.content.filter(b => b.type === "text").map(b => b.text).join("");
-    const m = text.match(/\{[\s\S]*\}/);
-    if (!m) throw new Error("JSON parse error");
-    const detail = JSON.parse(m[0]);
-    detailCache[paperId] = detail;
+  if (!panel) return;
+  const detail = detailsData[paperId];
+  if (detail) {
+    panel.style.display = "";
     renderDetail(paperId, detail);
-  } catch(e) {
-    if (panel) panel.innerHTML = `<div class="detail-loading" style="color:var(--danger-text)"><i class="ti ti-alert-circle" aria-hidden="true"></i>取得に失敗しました。APIキーをご確認ください。</div>`;
+  } else {
+    panel.style.display = "";
+    panel.innerHTML = '<div class="detail-loading"><i class="ti ti-clock" aria-hidden="true"></i>詳細解析は次回の自動更新時（毎日 6:00）に生成されます</div>';
   }
 }
 
@@ -444,18 +357,19 @@ function renderPapers() {
         <div><p class="section-label">結論・考察</p><p class="section-text">${p.conclusion}</p></div>
         <button class="detail-btn" onclick="fetchDetail('${p.id}')">
           <i class="ti ti-microscope" aria-hidden="true"></i>詳しく読む
+          ${detailsData[p.id] ? '' : '<span style="font-size:10px;opacity:.7;margin-left:2px">（次回更新時生成）</span>'}
         </button>
-        <div id="detail-${p.id}" class="detail-panel" style="${detailCache[p.id] ? '' : 'display:none'}"></div>
+        <div id="detail-${p.id}" class="detail-panel" style="${detailsData[p.id] ? '' : 'display:none'}"></div>
       </div>` : ""}
     </article>`;
   });
   html += '</div>';
   document.getElementById("content").innerHTML = html;
 
-  // キャッシュ済みの詳細を復元
-  list.filter(p => expandedId === p.id && detailCache[p.id]).forEach(p => {
+  // 展開中のカードに詳細データがあれば復元
+  list.filter(p => expandedId === p.id && detailsData[p.id]).forEach(p => {
     const panel = document.getElementById("detail-" + p.id);
-    if (panel) { panel.style.display = ""; renderDetail(p.id, detailCache[p.id]); }
+    if (panel) { panel.style.display = ""; renderDetail(p.id, detailsData[p.id]); }
   });
 }
 
