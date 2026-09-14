@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>整形外科 情報ダイジェスト</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%231D4ED8'/><line x1='10.7' y1='10.7' x2='21.3' y2='21.3' stroke='white' stroke-width='5.3' stroke-linecap='round'/><circle cx='7.3' cy='7.3' r='4.8' fill='white'/><circle cx='11' cy='3.7' r='3' fill='white'/><circle cx='3.7' cy='3.7' r='3' fill='white'/><circle cx='24.7' cy='24.7' r='4.8' fill='white'/><circle cx='28.3' cy='28.3' r='3' fill='white'/><circle cx='21' cy='28.3' r='3' fill='white'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.0.0/tabler-icons.min.css">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#F0F4F8;--surface:#FFF;--border:#E2E8F0;--border-strong:#CBD5E1;
+      --text-primary:#0F172A;--text-secondary:#475569;--text-muted:#94A3B8;
+      --accent:#1D4ED8;--accent-bg:#EFF6FF;--accent-text:#1E40AF;
+      --success-bg:#ECFDF5;--success-text:#065F46;
+      --danger-bg:#FEF2F2;--danger-text:#991B1B;
+      --detail-bg:#F8FAFF;
+      --radius:10px;--radius-lg:14px;
+    }
+    @media(prefers-color-scheme:dark){
+      :root{
+        --bg:#0F172A;--surface:#1E293B;--border:#334155;--border-strong:#475569;
+        --text-primary:#F1F5F9;--text-secondary:#94A3B8;--text-muted:#64748B;
+        --accent-bg:#1E3A8A;--accent-text:#93C5FD;
+        --success-bg:#064E3B;--success-text:#6EE7B7;
+        --danger-bg:#7F1D1D;--danger-text:#FCA5A5;
+        --detail-bg:#1a2744;
+      }
+    }
+    body{font-family:'Noto Sans JP',-apple-system,BlinkMacSystemFont,'Hiragino Sans',sans-serif;background:var(--bg);color:var(--text-primary);font-size:14px;line-height:1.6;min-height:100vh}
+    .header{background:var(--surface);border-bottom:.5px solid var(--border);position:sticky;top:0;z-index:100}
+    .header-inner{max-width:760px;margin:0 auto;padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .logo{display:flex;align-items:center;gap:9px}
+    .logo-icon{width:34px;height:34px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .logo h1{font-size:14px;font-weight:700}
+    .logo p{font-size:10px;color:var(--text-muted);margin-top:1px}
+    .header-right{display:flex;align-items:center;gap:8px}
+    .update-badge{font-size:11px;color:var(--text-muted)}
+    .icon-btn{width:32px;height:32px;border-radius:8px;border:.5px solid var(--border);background:var(--surface);color:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px}
+    .mode-bar{background:var(--surface);border-bottom:.5px solid var(--border);position:sticky;top:62px;z-index:95}
+    .mode-inner{max-width:760px;margin:0 auto;padding:.5rem 1rem;display:flex;gap:8px}
+    .mode-btn{display:flex;align-items:center;gap:6px;padding:7px 16px;border-radius:20px;font-size:13px;font-weight:500;border:.5px solid var(--border);background:var(--surface);color:var(--text-secondary);cursor:pointer;font-family:inherit}
+    .mode-btn.active{background:var(--accent-bg);border-color:var(--accent);color:var(--accent-text)}
+    .subtabs-wrap{background:var(--surface);border-bottom:.5px solid var(--border);position:sticky;top:110px;z-index:90}
+    .subtabs{max-width:760px;margin:0 auto;padding:.5rem 1rem;display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .subtabs::-webkit-scrollbar{display:none}
+    .stab{padding:4px 11px;border-radius:14px;font-size:12px;font-weight:500;border:.5px solid var(--border);background:var(--surface);color:var(--text-secondary);cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit;display:inline-flex;align-items:center;gap:4px}
+    .stab.active{background:var(--accent-bg);border-color:var(--accent);color:var(--accent-text)}
+    .main{max-width:760px;margin:0 auto;padding:0 1rem 6rem}
+    .notice{display:none;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--radius);margin:1rem 0 0;font-size:13px}
+    .count-row{display:flex;align-items:center;justify-content:space-between;padding:.75rem 0 .5rem;font-size:12px;color:var(--text-muted)}
+    .paper-list{display:flex;flex-direction:column;gap:8px}
+    .new-divider,.old-divider{display:flex;align-items:center;gap:8px;margin:4px 0 8px;font-size:11px;font-weight:500}
+    .new-divider{color:var(--success-text)}.new-divider::after{content:'';flex:1;height:.5px;background:var(--success-text);opacity:.3}
+    .old-divider{color:var(--text-muted)}.old-divider::after{content:'';flex:1;height:.5px;background:var(--border)}
+    .card{background:var(--surface);border-radius:var(--radius-lg);border:.5px solid var(--border);overflow:hidden}
+    .card-header{padding:13px 15px;cursor:pointer;display:flex;flex-direction:column;gap:6px}
+    .card-header:hover{background:rgba(0,0,0,.018)}
+    @media(prefers-color-scheme:dark){.card-header:hover{background:rgba(255,255,255,.03)}}
+    .card-meta{display:flex;align-items:center;justify-content:space-between}
+    .badges{display:flex;gap:5px;flex-wrap:wrap}
+    .badge{padding:2px 9px;border-radius:10px;font-size:11px;font-weight:500;display:inline-flex;align-items:center;gap:4px}
+    .card-title{font-size:13px;font-weight:500;line-height:1.5}
+    .card-journal{font-size:11px;color:var(--text-muted)}
+    .card-body{border-top:.5px solid var(--border);padding:13px 15px;display:flex;flex-direction:column;gap:11px}
+    .section-label{font-size:10px;font-weight:700;letter-spacing:.07em;color:var(--text-muted);text-transform:uppercase;margin-bottom:3px}
+    .section-text{font-size:13px;line-height:1.65}
+    .card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+    .detail-btn,.fav-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+    .detail-btn{border:.5px solid var(--accent);background:var(--accent-bg);color:var(--accent-text)}
+    .detail-btn:hover{background:var(--accent);color:#fff}
+    .fav-btn{border:.5px solid var(--border-strong);background:var(--surface);color:var(--text-secondary)}
+    .fav-btn.on{border-color:#fecdd3;background:#fff1f2;color:#e11d48}
+    .detail-panel{margin-top:12px;border-radius:var(--radius);background:var(--detail-bg);border:.5px solid var(--border-strong);overflow:hidden;display:none}
+    .detail-panel-header{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:.5px solid var(--border);font-size:12px;font-weight:700;color:var(--accent-text)}
+    .detail-section{padding:10px 14px;border-bottom:.5px solid var(--border)}
+    .detail-section:last-child{border-bottom:none}
+    .detail-section-label{font-size:10px;font-weight:700;letter-spacing:.07em;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px}
+    .detail-section-text{font-size:12px;line-height:1.7}
+    .detail-loading{padding:20px;text-align:center;font-size:13px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;gap:8px}
+    .implant-list{display:flex;flex-direction:column;gap:10px}
+    .implant-card{background:var(--surface);border-radius:var(--radius-lg);border:.5px solid var(--border);overflow:hidden}
+    .implant-header{padding:12px 15px;display:flex;align-items:center;justify-content:space-between}
+    .implant-name{font-size:14px;font-weight:700}
+    .stars{font-size:16px;letter-spacing:1px}
+    .implant-items{border-top:.5px solid var(--border)}
+    .implant-item{padding:10px 15px;border-bottom:.5px solid var(--border);display:flex;flex-direction:column;gap:4px}
+    .implant-item:last-child{border-bottom:none}
+    .implant-item-head{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+    .cat-badge{padding:2px 8px;border-radius:8px;font-size:10px;font-weight:500}
+    .implant-item-title{font-size:13px;font-weight:500}
+    .implant-item-summary{font-size:12px;color:var(--text-secondary);line-height:1.6}
+    .no-news{padding:10px 15px;font-size:12px;color:var(--text-muted)}
+    .fab-wrap{position:fixed;bottom:1.5rem;right:1rem;z-index:90;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+    @media(min-width:820px){.fab-wrap{right:calc(50vw - 380px + 1rem)}}
+    .fab{display:flex;align-items:center;gap:7px;padding:13px 20px;background:var(--accent);color:#fff;border:none;border-radius:30px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 18px rgba(29,78,216,.38)}
+    .fab:hover{background:#1E40AF}.fab:disabled{opacity:.6;cursor:not-allowed}
+    .round-btn{width:42px;height:42px;border-radius:50%;background:var(--surface);border:.5px solid var(--border-strong);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;color:var(--accent);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+    .empty{text-align:center;padding:3rem 1rem;color:var(--text-muted);font-size:14px}
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:1rem}
+    .overlay.open{display:flex}
+    .modal{background:var(--surface);border-radius:var(--radius-lg);padding:1.5rem;width:100%;max-width:380px;max-height:90vh;overflow-y:auto}
+    .modal h2{font-size:15px;font-weight:700;margin-bottom:1rem}
+    .modal label{display:block;font-size:11px;font-weight:500;color:var(--text-muted);margin-bottom:4px}
+    .modal input{width:100%;padding:9px 12px;border-radius:var(--radius);border:.5px solid var(--border-strong);background:var(--bg);color:var(--text-primary);font-size:13px;font-family:monospace;outline:none}
+    .modal input:focus{border-color:var(--accent)}
+    .modal-note{font-size:11px;color:var(--text-muted);margin-top:.5rem;line-height:1.6}
+    .modal-note a{color:var(--accent)}
+    .modal-row{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem}
+    .btn{padding:8px 14px;border-radius:var(--radius);border:.5px solid var(--border-strong);background:var(--surface);color:var(--text-secondary);font-size:13px;cursor:pointer;font-family:inherit}
+    .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .btn-danger{color:#DC2626}
+    .theme-label{font-size:11px;font-weight:500;color:var(--text-muted);margin-bottom:10px}
+    .swatches{display:flex;gap:10px;flex-wrap:wrap}
+    .swatch{width:34px;height:34px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;display:flex;align-items:center;justify-content:center}
+    .swatch.active{border-color:var(--text-primary)}
+    .swatch-name{font-size:10px;color:var(--text-muted);text-align:center;margin-top:2px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .spin{display:inline-block;animation:spin .8s linear infinite}
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+          <line x1="8" y1="8" x2="16" y2="16" stroke="white" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="5.5" cy="5.5" r="3.6"/><circle cx="8.2" cy="2.8" r="2.3"/><circle cx="2.8" cy="2.8" r="2.3"/>
+          <circle cx="18.5" cy="18.5" r="3.6"/><circle cx="21.2" cy="21.2" r="2.3"/><circle cx="15.8" cy="21.2" r="2.3"/>
+        </svg>
+      </div>
+      <div>
+        <h1>整形外科 情報ダイジェスト</h1>
+        <p>論文エビデンス ＆ 国内インプラント動向</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="update-badge" id="updateBadge"></span>
+      <button class="icon-btn" onclick="openSettings()" title="設定" aria-label="設定">
+        <i class="ti ti-settings" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mode-bar">
+  <div class="mode-inner">
+    <button class="mode-btn active" id="btnPapers" onclick="setMode('papers')">
+      <i class="ti ti-file-text" aria-hidden="true"></i>論文
+    </button>
+    <button class="mode-btn" id="btnImplants" onclick="setMode('implants')">
+      <i class="ti ti-building-factory-2" aria-hidden="true"></i>インプラントニュース
+    </button>
+  </div>
+</div>
+
+<div class="subtabs-wrap" id="subtabsWrap">
+  <div class="subtabs" id="subtabs"></div>
+</div>
+
+<main class="main">
+  <div class="notice" id="noticeBar" role="status" aria-live="polite">
+    <i class="ti ti-loader spin" id="noticeIcon" aria-hidden="true"></i>
+    <span id="noticeText"></span>
+  </div>
+  <div class="count-row">
+    <span id="countLabel"></span>
+    <span id="subLabel"></span>
+  </div>
+  <div id="content"></div>
+</main>
+
+<div class="fab-wrap">
+  <button class="round-btn" onclick="openTheme()" title="テーマ変更" aria-label="テーマ変更">
+    <i class="ti ti-palette" aria-hidden="true"></i>
+  </button>
+  <button class="fab" id="fetchBtn" onclick="reloadAll()">
+    <i class="ti ti-refresh" aria-hidden="true"></i>最新情報を読込
+  </button>
+</div>
+
+<!-- 設定モーダル -->
+<div class="overlay" id="settingsOverlay" onclick="if(event.target===this)closeSettings()">
+  <div class="modal">
+    <h2>設定</h2>
+    <label for="geminiKeyInput">Gemini APIキー（手動取得用・任意）</label>
+    <input type="password" id="geminiKeyInput" placeholder="AIza...">
+    <p class="modal-note">
+      設定すると「最新情報を読込」で新しい論文をリアルタイム取得できます。<br>
+      <a href="https://aistudio.google.com" target="_blank" rel="noopener">aistudio.google.com</a>から無料で取得できます。
+    </p>
+    <div id="keyStatus" style="font-size:12px;color:var(--success-text);margin-top:.5rem;min-height:16px"></div>
+    <div class="modal-row">
+      <button class="btn btn-danger" onclick="clearKey()">削除</button>
+      <button class="btn" onclick="closeSettings()">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveKey()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- テーマモーダル -->
+<div class="overlay" id="themeOverlay" onclick="if(event.target===this)closeTheme()">
+  <div class="modal">
+    <h2>カラーテーマ</h2>
+    <div class="swatches" id="swatches"></div>
+    <div class="modal-row">
+      <button class="btn btn-primary" onclick="closeTheme()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ──── 定数 ──── */
+const SPECIALTIES = ["すべて","お気に入り","脊椎","肩","肘","手指","股関節","膝","外傷"];
+const SP_STYLE = {
+  "脊椎":{bg:"#F5F3FF",text:"#6D28D9"},"肩":{bg:"#EFF6FF",text:"#1E40AF"},
+  "肘":{bg:"#ECFEFF",text:"#155E75"},"手指":{bg:"#ECFDF5",text:"#065F46"},
+  "股関節":{bg:"#FFFBEB",text:"#92400E"},"膝":{bg:"#FEF2F2",text:"#991B1B"},
+  "外傷":{bg:"#F8FAFC",text:"#475569"}
+};
+const SP_ICONS = {
+  "脊椎":`<svg width="11" height="14" viewBox="0 0 11 14" fill="currentColor"><rect x=".5" y="0" width="10" height="3" rx="1"/><rect x=".5" y="4" width="10" height="3" rx="1"/><rect x=".5" y="8" width="10" height="3" rx="1"/><rect x=".5" y="11" width="10" height="3" rx="1"/></svg>`,
+  "肩":`<svg width="14" height="12" viewBox="0 0 14 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1 10 C4 3 12 2 13 7"/><circle cx="13" cy="7" r="2" fill="currentColor" stroke="none"/><circle cx="2.5" cy="9.5" r="1.5" fill="currentColor" stroke="none"/></svg>`,
+  "肘":`<svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="2" y1="1" x2="7" y2="8"/><line x1="7" y1="8" x2="12" y2="8"/><circle cx="7" cy="8" r="2.2" fill="currentColor" stroke="none"/></svg>`,
+  "手指":`<svg width="13" height="14" viewBox="0 0 13 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="2.5" y1="13" x2="2.5" y2="7"/><line x1="5.5" y1="13" x2="5.5" y2="4"/><line x1="8.5" y1="13" x2="8.5" y2="5"/><line x1="11" y1="13" x2="11" y2="7.5"/><line x1="1" y1="13" x2="12" y2="13"/></svg>`,
+  "股関節":`<svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="6" cy="5" r="3.2"/><circle cx="6" cy="5" r="1.3" fill="currentColor" stroke="none"/><path d="M8 8 Q10 10 11 13"/><path d="M4 8 Q2 10 1 13"/></svg>`,
+  "膝":`<svg width="11" height="15" viewBox="0 0 11 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="5.5" y1="0" x2="5.5" y2="5"/><ellipse cx="5.5" cy="8" rx="4" ry="3"/><circle cx="5.5" cy="8" r="1.5" fill="currentColor" stroke="none"/><line x1="5.5" y1="11" x2="5.5" y2="15"/></svg>`,
+  "外傷":`<svg width="13" height="13" viewBox="0 0 13 13" fill="currentColor"><rect x="5" y="1" width="3" height="11" rx="1.5"/><rect x="1" y="5" width="11" height="3" rx="1.5"/></svg>`
+};
+const RATING_COLORS = [
+  {text:"#94A3B8"},{text:"#A16207"},{text:"#92400E"},{text:"#991B1B"}
+];
+const CAT_STYLE = {
+  "新製品":{bg:"#EFF6FF",text:"#1E40AF"},"薬事承認":{bg:"#F0FDF4",text:"#166534"},
+  "臨床データ":{bg:"#F5F3FF",text:"#6D28D9"},"提携・契約":{bg:"#FFFBEB",text:"#92400E"},
+  "人事":{bg:"#F8FAFC",text:"#475569"},"その他":{bg:"#F8FAFC",text:"#64748B"}
+};
+const THEMES = [
+  {id:"blue",  name:"クール",    color:"#1D4ED8",accent:"#1D4ED8",accentBg:"#EFF6FF",accentText:"#1E40AF",bg:"#F0F4F8",surface:"#FFF",textPrimary:"#0F172A",textSecondary:"#475569",border:"#E2E8F0"},
+  {id:"green", name:"フォレスト",color:"#059669",accent:"#059669",accentBg:"#ECFDF5",accentText:"#065F46",bg:"#F0FAF6",surface:"#FFF",textPrimary:"#0F172A",textSecondary:"#475569",border:"#D1FAE5"},
+  {id:"purple",name:"ラベンダー",color:"#7C3AED",accent:"#7C3AED",accentBg:"#F5F3FF",accentText:"#5B21B6",bg:"#F7F5FF",surface:"#FFF",textPrimary:"#0F172A",textSecondary:"#475569",border:"#E9D5FF"},
+  {id:"amber", name:"サンセット",color:"#D97706",accent:"#D97706",accentBg:"#FFFBEB",accentText:"#92400E",bg:"#FDF8F0",surface:"#FFF",textPrimary:"#0F172A",textSecondary:"#475569",border:"#FDE68A"},
+  {id:"dark",  name:"ナイト",   color:"#1E293B",accent:"#3B82F6",accentBg:"#1E3A8A",accentText:"#93C5FD",bg:"#0F172A",surface:"#1E293B",textPrimary:"#F1F5F9",textSecondary:"#94A3B8",border:"#334155"}
+];
+
+/* ──── 論文データ ──── */
+const BASE_PAPERS = [
+  {id:"s1",specialty:"脊椎",title:"腰椎脊柱管狭窄症：除圧単独 vs 除圧＋固定 SSSS試験5年RCT",journal:"Bone & Joint, 2024",overview:"スウェーデン多施設RCT。変性すべりの有無にかかわらず247例を除圧+固定群 vs 除圧単独群に無作為化し5年追跡。",results:"固定追加による上乗せ効果なし。二次転帰3項目では除圧単独群が有意に優れた。2年MRIで固定群は再狭窄が有意に多かった。",conclusion:"変性すべり合併例でも固定の上乗せ効果がないことを示す一連のRCT（SLIP・Nordsten・SSSS）の中で、高侵襲・高コストな固定術の適応を厳格化すべきという国際的議論が続いている。"},
+  {id:"s2",specialty:"脊椎",title:"脊椎後方固定術への術野バンコマイシン粉末：6RCT 2140例でSSI予防効果なし",journal:"JBJS Specialty Update / Spine誌, 2026年",overview:"6件のRCT・2140例を解析したメタ解析。STRIVE試験の後向き再解析も同時期に発表。",results:"深部・浅部・総SSIのいずれにも有意差なし。別のRCTでは深部SSI有意減少も浅部SSIはIVP群で高い傾向。",conclusion:"ルーチン投与の根拠が乏しいことが改めて示された。スイスVANCO試験の最終結果待ちであり、リスクベースの選択的使用へのシフトが議論されている。"},
+  {id:"s3",specialty:"脊椎",title:"ロボット支援脊椎手術 vs CTナビゲーション：クラスIエビデンスでロボットの精度優位性が確立",journal:"EFORT Open Rev, 2026年",overview:"フリーハンド・ナビゲーション・ロボットをクラス別に評価した系統的レビュー・メタ解析＋アンブレラメタ解析。",results:"ロボットはフリーハンド比OR 2.74倍、ナビゲーション比OR 2.36倍の許容スクリュー設置率を達成。",conclusion:"クラスIエビデンスでロボット支援の精度優位性が確立。コスト・学習曲線という課題は残るが、精度・安全性・教育的価値の観点からロボット脊椎手術の適応拡大が正当化されつつある。"},
+  {id:"s4",specialty:"脊椎",title:"VBT（椎体テザリング）術後の肺合併症：60例中36.7%・気胸が最多（30.4%）",journal:"JBJS, 2026年6月",overview:"単施設でVBTを施行した60例（女性51例）の周術期肺合併症を後向き評価。",results:"36.7%に肺合併症が発生。最多は気胸（30.4%）。手術範囲・部位・矯正量が有意なリスク因子として同定。",conclusion:"VBTは前胸郭経由アプローチを要するため肺合併症が格段に高頻度。患者カウンセリングへのリスク明示と高ボリューム専門施設への集約化が不可欠。"},
+  {id:"s5",specialty:"脊椎",title:"胸腰椎バースト骨折：術前CT Hounsfield値（HU値）が術後3ヶ月の椎体再虚脱を予測",journal:"Int J Spine Surg, 2026年9月",overview:"後方固定術施行患者を対象とした後向きコホート研究。術前CTのHU値と術後3ヶ月椎体再虚脱の関連を解析。",results:"低HU値が術後3ヶ月椎体再虚脱の独立した予測因子として同定された。",conclusion:"CTのHU値は骨粗鬆症スクリーニングの簡便な代替指標として術前評価に活用可能。低HU値患者では椎体形成術追加・セメント補強の検討が必要。"},
+  {id:"sh1",specialty:"肩",title:"FIMPACT試験10年：肩峰下除圧術（ASD）は偽手術・運動療法と比較して臨床的に有意差なし",journal:"BMJ, 2025年12月",overview:"フィンランド多施設三群RCT（ASD群・診断的関節鏡群・運動療法群）210例の10年追跡。",results:"10年時点でのASDの疼痛・機能は偽手術・運動療法と比較して有意差なし。",conclusion:"ASDが孤立性インピンジメント症候群には有効でないという結論が最高レベルエビデンスで確定。"},
+  {id:"sh2",specialty:"肩",title:"腱板断裂：保存療法 vs 腱板修復 15年RCT追跡で同等転帰（Moosmayer et al.）",journal:"JBJS What's New, 2026年7月",overview:"小〜中等大全層腱板断裂103例対象RCTの15年追跡（81%フォローアップ継続）。",results:"15年時点でConstant・ASES・SF-36・患者満足度は両群間で有意差なし。",conclusion:"長期では保存療法でも同等転帰が得られうるというエビデンスが蓄積。"},
+  {id:"sh3",specialty:"肩",title:"Bankart修復＋Remplissage：単独と比べ再発率9分の1・前方挙上も有意増加",journal:"JBJS What's New, 2026年7月",overview:"Engaging Hill-Sachs病変を有する前方肩関節不安定症に対するBankart＋Remplissage vs Bankart単独の比較メタ解析。",results:"再発率が9分の1に低下。前方挙上が有意に増加（平均差1.97°、p<0.001）。",conclusion:"Hill-Sachs病変を伴う前方不安定症ではRemplissage追加が推奨される。"},
+  {id:"sh4",specialty:"肩",title:"aTSA/rTSA長期生存率：aTSA 15年91%・rTSA 10年94%（4国際レジストリ＋メタ解析）",journal:"SAGE誌, 2026年7月",overview:"4国際レジストリ＋7ケースシリーズを統合したaTSA/rTSA生存率メタ解析（≧13年追跡）。",results:"aTSA 13年生存率91.50%・15年生存率90.82%。rTSA 10年生存率94%。",conclusion:"両術式とも長期高生存率を達成するが、インプラントブランド・デザインが生存率を左右する。"},
+  {id:"sh5",specialty:"肩",title:"外傷性前方肩不安定症 ESSKA-ESA公式コンセンサス Part2：年齢・初回/再発別の治療・RTS推奨",journal:"KSSTA, 2026年6月",overview:"欧州9カ国15人のステアリンググループによる構造化デルファイ法。23の臨床質問を評価。",results:"20歳未満コンタクトアスリート（初回脱臼）：早期手術を強く推奨。RTS基準として「時間でなく機能・心理的準備度」を強調。",conclusion:"前方不安定症の年齢×初回/再発×活動性に基づく意思決定アルゴリズムが初めて標準化。"},
+  {id:"sh6",specialty:"肩",title:"Latarjet術後コラコイド骨吸収（CRDL分類）：高度吸収（Grade 3）で疼痛増加・機能低下",journal:"Am J Sports Med, 2026年3月",overview:"関節鏡的Latarjet術後コラコイドグラフト吸収の臨床的影響を再評価。新CRDL分類システムを開発。",results:"Grade 3（高度吸収）でASESスコアが有意に低く、VASスコアが有意に高かった。",conclusion:"「コラコイド吸収は臨床的に無意味」という従来の定説に疑問が投じられた。"},
+  {id:"sh7",specialty:"肩",title:"修復不能巨大腱板断裂：SCR vs rTSA 合併症率（SCR 3.5% vs rTSA 10.8%）で有意差",journal:"Clin Orthop Surg, 2026年6月",overview:"関節炎を伴わない修復不能腱板断裂に対するSCRとrTSAを比較した7件・430例のメタ解析。",results:"機能・疼痛・可動域は両群で有意差なし。SCRの全合併症率が有意に低かった（3.5% vs 10.8%）。",conclusion:"機能・疼痛は同等でありながらSCRの合併症率が低く、若年患者では関節温存的SCRが第一選択となりうる。"},
+  {id:"sh8",specialty:"肩",title:"rTSA revision後の再revision：NJR 685例で再revision率34%・術者中央値4例/10年",journal:"PMC, 2026年7月",overview:"英国NJR（26403例）からrTSA revision 685例を同定し、再revision率・術者別件数を分析。",results:"再revision率34%。revision手術を行った術者244名の中央値は4例/10年と極めて低量。",conclusion:"rTSA revisionは高難度手術でありながら多くの術者が少数例しか経験しない実態が判明。"},
+  {id:"el1",specialty:"肘",title:"SCIENCE試験：小児転位性肘内側上顆骨折への手術は機能的転帰を改善しない（The Lancet RCT）",journal:"The Lancet, 2026年1月",overview:"英国・豪州・NZ 59施設・334例（7〜15歳）の多施設RCT。ギプス固定群 vs 手術固定群を比較。",results:"12ヶ月PROMs（PROMIS上肢）に有意差なし。手術群で術中合併症14件・再手術7例。費用対効果確率0%。",conclusion:"「手術で骨を固定すべき」という積極派の意見を否定する初の大規模RCT。"},
+  {id:"el2",specialty:"肘",title:"SOFIE RCT：高齢者（75歳以上）肘頭骨折 手術 vs 保存療法 12ヶ月DASHスコアに差なし",journal:"JBJS, 2025年",overview:"豪州・NZ 24施設の多施設RCT。75歳以上の急性転位閉鎖性肘頭骨折を手術群 vs 保存療法群に割付。",results:"12ヶ月DASHスコアに手術群・保存療法群で有意差なし。",conclusion:"高齢者肘頭骨折では保存療法が手術と同等の12ヶ月機能転帰をもたらす合理的選択肢。"},
+  {id:"el3",specialty:"肘",title:"Tommy John手術失敗後のInternal Brace Revision修復：投手11例全員が術前レベル以上に復帰・平均9ヶ月",journal:"OJSM, 2026年4月",overview:"UCL再建術失敗後にRevision UCL repair with Internal Braceを施行したプロ・大学投手11例の後向き研究。",results:"全11例が術前レベル以上への競技復帰を達成。競技復帰までの平均期間は9ヶ月。",conclusion:"UCL再建術失敗後のRevision手術はもともと転帰不良とされてきたが、Internal Brace修復がこの常識を覆す可能性を示した。"},
+  {id:"el4",specialty:"肘",title:"遠位上腕二頭筋腱部分断裂（グレード<50%）：保存療法で6ヶ月83%が完全回復",journal:"JSES, 2026年1月",overview:"部分遠位上腕二頭筋腱断裂に対する保存療法の効果を評価したケースコントロール研究。",results:"グレード<50%の部分断裂への保存療法で6ヶ月時点に83%が完全回復を達成。",conclusion:"部分遠位上腕二頭筋腱断裂は断裂深度50%以上・保存療法6ヶ月無効例に手術適応を絞る基準が示された。"},
+  {id:"ha1",specialty:"手指",title:"指尖部切断再接着：7278断指メタ解析で生存率中央値85%・2本静脈吻合が成功予測因子",journal:"Eur J Plast Surg, 2026年3月",overview:"25研究・7278断指を対象としたメタ解析。生存率・機能転帰の予後因子を評価した。",results:"生存率50〜100%（中央値85%）。鋭利損傷・短い虚血時間・2本静脈吻合が高い生存率と関連。",conclusion:"「温虚血6時間」という従来の制限は実証的根拠が薄く、2本静脈吻合が重要技術として再確認された。"},
+  {id:"ha2",specialty:"手指",title:"舟状骨骨折：YOLOv8ベースAI診断が単一PA方向X線で高精度検出（mAP@0.75=0.98）",journal:"Electronics, 2026年6月",overview:"10年間の手関節X線データを用いてYOLOv8アルゴリズムで舟状骨を自動セグメンテーション・骨折検出するフレームワークを開発・検証した研究。",results:"舟状骨の自動セグメンテーション・骨折検出において高精度を達成（mAP@0.75=0.98）。",conclusion:"救急外来での多方向撮影困難例での見逃しリスクを大幅低減できる可能性がある。"},
+  {id:"ha3",specialty:"手指",title:"ゾーン2屈筋腱修復後：能動的早期運動（CAM）が受動的早期運動（EPM）より全時点で有意に優れる（RCT）",journal:"2026年",overview:"ゾーン2全層屈筋腱断裂40例をCAM群とEPM群に無作為割付し術後6週・12週でTAM・握力・DASHスコアを比較したRCT。",results:"CAM群がEPM群より全評価時点でTAM・握力・DASHにおいて有意に優れた。12週でCAM群の80%が「優」。",conclusion:"CAMはEPMより有意に優れた早期機能回復をもたらすことが初めてRCTで確認された。"},
+  {id:"ha4",specialty:"手指",title:"高齢者橈骨遠位端骨折（高麻酔リスク）：VLP固定とギプス固定で機能的転帰が同等",journal:"PMC, 2026年5月",overview:"麻酔ハイリスク高齢患者のDRFに対するVLP固定 vs ギプス固定の比較前向き観察研究。",results:"VLP固定群とギプス固定群で機能的転帰（DASH・PRWE・ROM・握力）に統計的有意差なし。",conclusion:"高齢者DRFは活動レベル・合併症・麻酔リスクの複合的評価に基づく個別化治療選択が必要。"},
+  {id:"hi1",specialty:"股関節",title:"DUALITY試験（RCT・1600例）：大腿骨頸部骨折THA後のデュアルモビリティカップで脱臼リスク70%低下",journal:"The Lancet, 2026年7月",overview:"英国・スウェーデン44施設・1600例の国際多施設RCT。転位性大腿骨頸部骨折へのDM-THR vs 標準THRを比較。",results:"DM-THRを受けた患者は術後脱臼リスクが70%低かった。",conclusion:"大腿骨頸部骨折THA後のデュアルモビリティ設計の標準化を後押しする2026年を代表するRCT。"},
+  {id:"hi2",specialty:"股関節",title:"HIP ATTACK試験サブ解析：トロポニン上昇例でも超早期手術が90日死亡率を57%低下",journal:"JBJS, 2024年",overview:"69施設・17カ国RCT（HIP ATTACK試験）のサブ解析。入院時トロポニン上昇322例を超早期手術群 vs 標準治療群に分けて比較。",results:"90日死亡率：超早期手術群10% vs 標準治療群23%、HR 0.43（p=0.005）で有意低下。",conclusion:"「MINSを伴う場合は手術を遅らせるべき」という従来の通念を覆すデータ。"},
+  {id:"hi3",specialty:"股関節",title:"寛骨臼回転骨切り術（PAO）：10年で80%以上がTHAを回避・機能スコア維持",journal:"Hip Int, 2026年",overview:"臼蓋形成不全に対するPAO施行後の10年転帰を評価した多施設コホート研究。",results:"10年時点で80%以上の患者がTHAを回避し機能スコアは維持・改善傾向。",conclusion:"PAOは適切に選択された患者で10年にわたる高い関節保存率を達成できることが多施設データで確認。"},
+  {id:"hi4",specialty:"股関節",title:"骨粗鬆症合併THA：術前ビスホスホネート長期使用で周囲骨折リスクが有意に増加（OR 1.29）",journal:"J Arthroplasty, 2023→2026年",overview:"骨粗鬆症合併一次THA 9844例・1:1マッチングを対象に術前ビスホスホネート使用と2年転帰を比較した後向き研究。",results:"ビスホスホネート使用群で2年周囲骨折率が有意に高い（OR 1.29、p=0.022）。THA後開始のBPは骨折リスクを低下。",conclusion:"長期使用による「凍りついた骨」がTHA時の周囲骨折リスクを逆に増加させる可能性があり、術前使用歴を考慮したインプラント選択が重要。"},
+  {id:"hi5",specialty:"股関節",title:"三重テーパーカラー付き非セメントステムで早期周囲骨折リスクを従来型比3分の1に低減",journal:"JAAOS, 2026年8月",overview:"米国AJRRデータを用いた大規模多施設解析。圧入型三重テーパーカラー付きセメントレスステムの早期周囲骨折率を評価。",results:"モダンな三重テーパーカラー付き非セメントステムが早期周囲骨折リスクを従来型比3倍低下させた。",conclusion:"「セメント vs 非セメント」の二項対立から「どの設計のステムを選ぶか」という議論へシフトが加速。"},
+  {id:"kn1",specialty:"膝",title:"内側区画型膝OAへのUKA vs HTO：56000例メタ解析でUKAが合併症・再置換率・術後疼痛で有意に優れる",journal:"Orthop Surg, 2025年7月",overview:"UKAとHTOを比較した39研究・56686例のメタ解析（random-effectsモデル、GRADE評価）。",results:"UKAはHTOと比較して合併症率（RR=0.37）・TKA再置換率（RR=0.64）・術後疼痛（MD=-0.33）のすべてで有意に優れた。",conclusion:"56000例規模のメタ解析としてUKAが内側区画型膝OAにおいてHTOより優れることが示された。"},
+  {id:"kn2",specialty:"膝",title:"セメントレスTKA（50歳未満）：平均30.3年超長期追跡で優秀な生存率",journal:"J Arthroplasty, 2026年6月",overview:"50歳以下の患者75例に対してセメントレスTKAを施行し、平均30.3年（範囲25〜38年）追跡した単施設超長期研究。",results:"セメントレスTKAは若年コホートで優秀な30年生存率を示した。主要失敗原因はγ線照射ポリエチレンの摩耗。",conclusion:"現代の高架橋ポリエチレンは耐摩耗性が格段に向上しており、若年患者へのセメントレスTKAの有効性を超長期で支持。"},
+  {id:"kn3",specialty:"膝",title:"変性内側半月板後根断裂への半月板切除：6.3年追跡で臨床転帰は保存療法と同等だがOA進行が有意に速い",journal:"後向き比較研究, 2026年",overview:"変性MMPRT 146例（切除群90・保存療法群56）を平均6.3年追跡した後向き比較研究。",results:"臨床転帰は両群で有意差なし。OA進行・内側関節裂隙幅の悪化は切除群で有意に高率（p=0.03〜0.04）。",conclusion:"変性MMPRTへの関節鏡的切除は臨床症状改善では保存療法と同等だがOA進行を有意に加速させる。"},
+  {id:"kn4",specialty:"膝",title:"ACL再建＋外側半月板後根（LMPR）修復：単独ACLRと機能・安定性が同等でMRI癒合良好",journal:"J Exp Orthop, 2026年4月",overview:"ACLR＋LMPR修復を施行した55歳未満・最低2年追跡患者と傾向スコアマッチした単独ACLR患者を比較。",results:"AP・回旋安定性・KOOSが単独ACLRと同等。MRIでは高い骨癒合率が確認された。",conclusion:"LMPR修復をACLRに同時付加しても機能転帰を悪化させず膝安定性改善に貢献する可能性が示された。"},
+  {id:"kn5",specialty:"膝",title:"変性性関節炎GWAS：196万人で962の独立した遺伝的関連・700エフェクター遺伝子・473承認薬が再目的化候補",journal:"Nature, 2025年4月",overview:"Helmholtz Munich主導の過去最大規模OA-GWAS。489975例 vs 1472094例。",results:"962の独立した遺伝的関連（うち513が新規）。700エフェクター遺伝子、うち69遺伝子の蛋白産物が473種承認薬の標的。",conclusion:"OAのdisease-modifying治療のない現状に対し、既承認薬の再目的化への道を開く画期的GWAS。"},
+  {id:"tr1",specialty:"外傷",title:"転位性関節内踵骨骨折：ORIF＋一期的距骨下関節固定術でORIF単独と同等以上の転帰",journal:"Bone Joint J, 2026年3月",overview:"サイナスタルジアアプローチを用いたORIF＋一期的距骨下関節固定術（PSA）を施行した64例を後向きに評価。",results:"ORIF＋PSAは良好な距骨下関節癒合率と機能転帰・QOLを達成。ORIF単独と同等以上の転帰が得られた。",conclusion:"Sanders III〜IV・高度粉砕・後部関節面重篤軟骨損傷例では一期的PSAが二次手術の必要性を低減しながら良好な転帰をもたらす。"},
+  {id:"tr2",specialty:"外傷",title:"開放性脛骨骨折：ゲンタマイシンコーティング髄内釘（GCN）が2年時点でもFRI発生率を有意に低減",journal:"Antibiotics, 2025年5月",overview:"開放性脛骨骨折139例（Gustilo-Anderson分類）に対してGCNを使用し最低24ヶ月追跡した前向きコホート研究。",results:"GCNはGA分類によらず非コーティング釘と比較してFRI発生率を有意に低減。2年追跡でも効果の持続が確認。",conclusion:"局所抗菌薬含浸インプラントが開放性骨折管理における標準的選択肢として確立しつつある。"},
+  {id:"tr3",specialty:"外傷",title:"上腕骨近位端骨折31761例スウェーデンレジストリ：保存療法後の手術移行率3.7%・80歳以上＋単純骨折では2%未満",journal:"JBJS What's New, 2026年7月",overview:"スウェーデン骨折レジストリ2013〜2021年データ。全年齢成人31761例の上腕骨近位端骨折保存療法後の早期手術移行率を評価。",results:"保存療法後の手術移行率は全体3.7%。80歳以上かつ単純骨折型では移行率2%未満。C型骨折・骨折脱臼では5〜20%。",conclusion:"高齢者の単純型上腕骨近位端骨折に対して保存療法が安全な第一選択であることが世界最大規模のレジストリデータで確認。"},
+  {id:"tr4",specialty:"外傷",title:"大腿骨骨幹部骨折：拡髄髄内釘が非拡髄より骨癒合・骨不癒合率・二次手術率で有意に優れる（8RCTメタ解析）",journal:"Medicine, 2026年",overview:"大腿骨骨幹部骨折への拡髄髄内釘（RIN）vs 非拡髄（URIN）を比較した前向きRCTのメタ解析（8RCT）。",results:"RINは非拡髄群と比較して骨癒合期間が有意に短く（SMD=-0.62）、二次手術率（OR=0.25）・骨不癒合率（OR=0.14）が有意に低かった。",conclusion:"閉鎖骨折では拡髄髄内釘が第一選択というコンセンサスがさらに強固になった。"},
+  {id:"tr5",specialty:"外傷",title:"足関節下脛腓固定：スーチャーボタン vs シンデスモーシスネジ 機能スコア差はMCIDを超えない可能性（アンブレラレビュー）",journal:"Injury, 2026年1月",overview:"SB vs SS比較の19件系統的レビュー・メタ解析を対象としたアンブレラレビュー。AOFAS・OMASスコアをMCID閾値と照合して再評価。",results:"SBはSSよりAOFAS・OMASで統計的に高いスコアを示す研究が大多数。しかし多くのケースでその差がMCIDを超えなかった。",conclusion:"「統計的有意差≠臨床的意義」という重要な問題を提起。整復精度・再手術率ではSBが優れ、コスト・シンプルさではSSが有利。"}
+];
+
+/* ──── アプリ状態 ──── */
+let currentMode = "papers";
+let currentSp = "すべて";
+let expandedId = null;
+let newsPapers = [], implantData = null, detailsData = {};
+let papersUpdated = "", implantsUpdated = "";
+const detailShown = new Set();
+let favorites = new Set();
+let manualPapers = [];
+let currentThemeId = "blue";
+
+/* ──── 永続化 ──── */
+function loadFavorites(){ try{ favorites = new Set(JSON.parse(localStorage.getItem("ortho_fav")||"[]")); }catch(e){} }
+function saveFavorites(){ localStorage.setItem("ortho_fav", JSON.stringify([...favorites])); }
+function loadManualPapers(){ try{ manualPapers = JSON.parse(localStorage.getItem("ortho_manual")||"[]"); }catch(e){} }
+function saveManualPapers(){ try{ localStorage.setItem("ortho_manual", JSON.stringify(manualPapers.slice(0,100))); }catch(e){} }
+
+/* ──── テーマ ──── */
+function applyTheme(id){
+  const t = THEMES.find(x=>x.id===id) || THEMES[0];
+  currentThemeId = t.id;
+  const r = document.documentElement;
+  r.style.setProperty("--accent",t.accent); r.style.setProperty("--accent-bg",t.accentBg);
+  r.style.setProperty("--accent-text",t.accentText); r.style.setProperty("--bg",t.bg);
+  r.style.setProperty("--surface",t.surface); r.style.setProperty("--text-primary",t.textPrimary);
+  r.style.setProperty("--text-secondary",t.textSecondary); r.style.setProperty("--border",t.border);
+  localStorage.setItem("ortho_theme", id);
+  renderSwatches();
+}
+function renderSwatches(){
+  document.getElementById("swatches").innerHTML = THEMES.map(t=>`
+    <div style="text-align:center">
+      <div class="swatch${t.id===currentThemeId?" active":""}" style="background:${t.color}"
+        onclick="applyTheme('${t.id}')" role="button" aria-label="${t.name}">
+        ${t.id===currentThemeId?'<i class="ti ti-check" style="color:#fff;font-size:16px"></i>':""}
+      </div>
+      <div class="swatch-name">${t.name}</div>
+    </div>`).join("");
+}
+function openTheme(){ renderSwatches(); document.getElementById("themeOverlay").classList.add("open"); }
+function closeTheme(){ document.getElementById("themeOverlay").classList.remove("open"); }
+
+/* ──── 設定モーダル ──── */
+function openSettings(){
+  const key = localStorage.getItem("ortho_gemini_key")||"";
+  document.getElementById("geminiKeyInput").value = key;
+  document.getElementById("keyStatus").textContent = key ? "✅ APIキーが保存されています" : "";
+  document.getElementById("settingsOverlay").classList.add("open");
+}
+function closeSettings(){ document.getElementById("settingsOverlay").classList.remove("open"); }
+function saveKey(){
+  const v = document.getElementById("geminiKeyInput").value.trim();
+  if(v){ localStorage.setItem("ortho_gemini_key", v); }
+  else { localStorage.removeItem("ortho_gemini_key"); }
+  document.getElementById("keyStatus").textContent = v ? "✅ 保存しました" : "";
+  setTimeout(closeSettings, 700);
+}
+function clearKey(){
+  localStorage.removeItem("ortho_gemini_key");
+  document.getElementById("geminiKeyInput").value = "";
+  document.getElementById("keyStatus").textContent = "🗑 削除しました";
+}
+
+/* ──── データ読込 ──── */
+async function loadAll(){
+  await Promise.all([loadPapers(), loadImplants(), loadDetails()]);
+}
+async function loadPapers(){
+  try{
+    const r = await fetch("news.json?t="+Date.now());
+    if(!r.ok) return;
+    const d = await r.json();
+    if(d && d.papers && d.papers.length){ newsPapers = d.papers; papersUpdated = d.updated||""; }
+  }catch(e){}
+}
+async function loadImplants(){
+  try{
+    const r = await fetch("implant_news.json?t="+Date.now());
+    if(!r.ok){ console.warn("implant_news.json:",r.status); return; }
+    const d = await r.json();
+    if(d && d.companies && d.companies.length){ implantData = d; implantsUpdated = d.updated||""; }
+  }catch(e){ console.warn("implant fetch error:",e); }
+}
+async function loadDetails(){
+  try{
+    const r = await fetch("details.json?t="+Date.now());
+    if(!r.ok) return;
+    const d = await r.json();
+    if(d) detailsData = d;
+  }catch(e){}
+}
+
+/* ──── Gemini手動取得 ──── */
+async function fetchManual(){
+  const key = localStorage.getItem("ortho_gemini_key");
+  if(!key) return null;
+
+  const today = new Date().toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric"});
+  const prompt = `今日${today}の最新整形外科論文を各分野から（肩は2件、それ以外各1件）紹介してください。できるだけ2025〜2026年の論文を選んでください。8件の論文サマリーをJSON配列のみで返してください。各オブジェクトのフィールド: specialty（脊椎/肩/肘/手指/股関節/膝/外傷のいずれか）, title（日本語タイトル）, journal（雑誌名と掲載年月）, overview（研究概要2〜3文）, results（主な結果2〜3文）, conclusion（結論と臨床的考察2〜3文）。JSONのみを返し、前置きや説明文は含めないこと。`;
+
+  // 利用可能なモデルを取得してから最適なものを選ぶ
+  let modelName = null;
+  try {
+    const listResp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models?key=${key}&pageSize=50`
+    );
+    if(listResp.ok){
+      const listData = await listResp.json();
+      const models = (listData.models || [])
+        .map(m => m.name.replace("models/",""))
+        .filter(n => n.includes("flash") || n.includes("pro"));
+      // flash系を優先
+      const flashModels = models.filter(n => n.includes("flash"));
+      modelName = flashModels[0] || models[0] || null;
+      console.log("利用可能なモデル:", models.join(", "));
+      console.log("使用モデル:", modelName);
+    }
+  } catch(e) {}
+
+  // リスト取得失敗時のフォールバック候補
+  const FALLBACKS = [
+    "gemini-2.5-flash","gemini-2.5-flash-preview-05-20",
+    "gemini-2.0-flash","gemini-2.0-flash-lite",
+    "gemini-1.5-flash","gemini-1.5-flash-latest"
+  ];
+  const ENDPOINTS = ["v1","v1beta"];
+  const modelsToTry = modelName ? [modelName, ...FALLBACKS] : FALLBACKS;
+
+  let resp = null;
+  let network_error = false;
+  outer:
+  for(const endpoint of ENDPOINTS){
+    for(const model of modelsToTry){
+      try {
+        const r = await fetch(
+          `https://generativelanguage.googleapis.com/${endpoint}/models/${model}:generateContent?key=${key}`,
+          {method:"POST",headers:{"Content-Type":"application/json"},
+           body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})}
+        );
+        if(r.status !== 404){ resp = r; break outer; }
+      } catch(e) { network_error = true; break outer; }
+    }
+  }
+
+  if(network_error) throw new Error("ネットワークエラー。インターネット接続を確認してください。");
+  if(!resp) throw new Error("利用可能なモデルが見つかりませんでした。APIキーを確認してください。");
+
+  if(!resp.ok){
+    let errMsg = "エラー " + resp.status;
+    try {
+      const e = await resp.json();
+      const detail = e.error?.message || "";
+      if(resp.status===400) errMsg = "リクエストエラー（400）。APIキーを確認してください。";
+      else if(resp.status===403) errMsg = "アクセス拒否（403）。APIキーが無効か権限がありません。";
+      else if(resp.status===429) errMsg = "リクエスト制限（429）。しばらく待ってから再試行してください。";
+      else if(detail) errMsg = detail;
+    } catch(e) {}
+    throw new Error(errMsg);
+  }
+
+  const data = await resp.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  if(!text) throw new Error("APIからの応答が空でした。");
+  const m = text.match(/\[[\s\S]*\]/);
+  if(!m) throw new Error("JSONの解析に失敗しました。");
+  const ts = Date.now();
+  return JSON.parse(m[0]).map((p,i)=>({...p, id:`manual_${ts}_${i}`, isNew:true}));
+}
+
+  const data = await resp.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  if(!text) throw new Error("APIからの応答が空でした。");
+  const m = text.match(/\[[\s\S]*\]/);
+  if(!m) throw new Error("JSONの解析に失敗しました。");
+  const ts = Date.now();
+  return JSON.parse(m[0]).map((p,i)=>({...p, id:`manual_${ts}_${i}`, isNew:true}));
+}
+
+/* ──── 論文リスト ──── */
+function allPapers(){
+  const all = [...manualPapers, ...newsPapers, ...BASE_PAPERS];
+  const seen = new Set();
+  return all.filter(p=>{ if(seen.has(p.id)) return false; seen.add(p.id); return true; });
+}
+function filteredPapers(){
+  const all = allPapers();
+  let f;
+  if(currentSp==="すべて")         f = all;
+  else if(currentSp==="お気に入り") f = all.filter(p=>favorites.has(p.id));
+  else                              f = all.filter(p=>p.specialty===currentSp);
+  return [...f.filter(p=>p.isNew), ...f.filter(p=>!p.isNew)];
+}
+
+/* ──── お気に入り ──── */
+function toggleFav(id, e){
+  e.stopPropagation();
+  favorites.has(id) ? favorites.delete(id) : favorites.add(id);
+  saveFavorites();
+  const on = favorites.has(id);
+  const hbtn = document.getElementById("fav-h-"+id);
+  if(hbtn){ hbtn.innerHTML=`<i class="ti ${on?"ti-heart-filled":"ti-heart"}"></i>`; hbtn.style.color=on?"#e11d48":"var(--text-muted)"; }
+  const fbtn = document.getElementById("fav-b-"+id);
+  if(fbtn){ fbtn.className="fav-btn"+(on?" on":""); fbtn.innerHTML=`<i class="ti ${on?"ti-heart-filled":"ti-heart"}"></i>${on?"お気に入り解除":"お気に入りに追加"}`; }
+  if(currentSp==="お気に入り") renderPapers();
+  else renderSubtabs();
+}
+
+/* ──── 詳細解析 ──── */
+function toggleDetail(id){
+  const panel = document.getElementById("dp-"+id);
+  const btn = document.getElementById("db-"+id);
+  if(!panel) return;
+  if(detailShown.has(id)){
+    panel.style.display="none"; detailShown.delete(id);
+    if(btn) btn.innerHTML='<i class="ti ti-microscope"></i>詳しく読む';
+    return;
+  }
+  const d = detailsData[id];
+  if(d){
+    panel.innerHTML = '<div class="detail-panel-header"><i class="ti ti-microscope"></i>詳細解析</div>' +
+      [["background","研究背景・臨床的課題"],["methodology","研究デザイン・方法の詳細"],
+       ["keyFindings","主要な発見・数値の詳細"],["clinicalImpact","日本の臨床現場へのインパクト"],
+       ["limitations","研究の限界・課題"],["relatedEvidence","関連エビデンスとの比較"]
+      ].filter(s=>d[s[0]]).map(s=>`<div class="detail-section"><div class="detail-section-label">${s[1]}</div><div class="detail-section-text">${d[s[0]]}</div></div>`).join("");
+    panel.style.display="";
+    detailShown.add(id);
+    if(btn) btn.innerHTML='<i class="ti ti-chevron-up"></i>詳細を閉じる';
+  } else {
+    panel.innerHTML='<div class="detail-loading"><i class="ti ti-clock"></i>詳細は毎日 6:00 の自動更新時に生成されます</div>';
+    panel.style.display="";
+  }
+}
+
+/* ──── レンダリング ──── */
+function updateBadge(){
+  const upd = currentMode==="papers" ? papersUpdated : implantsUpdated;
+  document.getElementById("updateBadge").textContent = upd ? upd+"更新" : "";
+}
+function renderSubtabs(){
+  const all = allPapers();
+  document.getElementById("subtabs").innerHTML = SPECIALTIES.map(s=>{
+    let cnt = s==="すべて" ? all.length : s==="お気に入り" ? favorites.size : all.filter(p=>p.specialty===s).length;
+    const active = s===currentSp;
+    const isFav = s==="お気に入り";
+    const sp = SP_STYLE[s]||{};
+    const style = isFav
+      ? (active?"border-color:#e11d48;background:#fff1f2;color:#e11d48;":"border-color:#fecdd3;color:#e11d48;")
+      : (active && sp.text ? `border-color:${sp.text};background:${sp.bg};color:${sp.text};` : "");
+    const icon = isFav
+      ? `<i class="ti ti-heart-filled" style="font-size:11px"></i>`
+      : (SP_ICONS[s]||"");
+    return `<button class="stab${active?" active":""}" onclick="selectSp('${s}')" style="${style}">${icon}${s} <small style="opacity:.7">${cnt}</small></button>`;
+  }).join("");
+}
+function renderPapers(){
+  const list = filteredPapers();
+  const nc = list.filter(p=>p.isNew).length;
+  document.getElementById("countLabel").textContent = list.length+"件";
+  const sl = document.getElementById("subLabel");
+  sl.textContent = nc>0 ? "うち新着 "+nc+"件" : "";
+  sl.style.color = "#059669";
+  if(!list.length){ document.getElementById("content").innerHTML='<div class="empty">この分野の論文はありません</div>'; return; }
+  let html = '<div class="paper-list">';
+  let shownNew=false, shownOld=false;
+  list.forEach(p=>{
+    const sp = SP_STYLE[p.specialty]||{bg:"#F8FAFC",text:"#475569"};
+    const exp = expandedId===p.id;
+    const on = favorites.has(p.id);
+    const dShown = detailShown.has(p.id);
+    if(p.isNew && !shownNew){ html+=`<div class="new-divider"><i class="ti ti-sparkles"></i>今週の新着</div>`; shownNew=true; }
+    if(!p.isNew && !shownOld && nc>0){ html+=`<div class="old-divider">アーカイブ</div>`; shownOld=true; }
+    html += `<article class="card">
+      <div class="card-header" onclick="togglePaper('${p.id}')">
+        <div class="card-meta">
+          <div class="badges">
+            <span class="badge" style="background:${sp.bg};color:${sp.text}">${SP_ICONS[p.specialty]||""}${p.specialty}</span>
+            ${p.isNew?'<span class="badge" style="background:#ECFDF5;color:#065F46">新着</span>':""}
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button id="fav-h-${p.id}" onclick="toggleFav('${p.id}',event)"
+              style="background:none;border:none;cursor:pointer;padding:2px;font-size:18px;color:${on?"#e11d48":"var(--text-muted)"}" aria-label="お気に入り">
+              <i class="ti ${on?"ti-heart-filled":"ti-heart"}"></i>
+            </button>
+            <i class="ti ${exp?"ti-chevron-up":"ti-chevron-down"}" style="font-size:15px;color:var(--text-muted)"></i>
+          </div>
+        </div>
+        <p class="card-title">${p.title}</p>
+        <p class="card-journal">${p.journal}</p>
+      </div>
+      ${exp ? `<div class="card-body">
+        <div><div class="section-label">概要</div><div class="section-text">${p.overview}</div></div>
+        <div><div class="section-label">結果</div><div class="section-text">${p.results}</div></div>
+        <div><div class="section-label">結論・考察</div><div class="section-text">${p.conclusion}</div></div>
+        <div class="card-actions">
+          <button class="detail-btn" id="db-${p.id}" onclick="toggleDetail('${p.id}')">
+            <i class="ti ${dShown?"ti-chevron-up":"ti-microscope"}"></i>${dShown?"詳細を閉じる":"詳しく読む"}
+          </button>
+          <button class="fav-btn${on?" on":""}" id="fav-b-${p.id}" onclick="toggleFav('${p.id}',event)">
+            <i class="ti ${on?"ti-heart-filled":"ti-heart"}"></i>${on?"お気に入り解除":"お気に入りに追加"}
+          </button>
+        </div>
+        <div id="dp-${p.id}" class="detail-panel" style="${dShown?"":"display:none"}"></div>
+      </div>` : ""}
+    </article>`;
+  });
+  html += '</div>';
+  document.getElementById("content").innerHTML = html;
+  // 開いているカードの詳細を復元
+  detailShown.forEach(id=>{
+    const panel = document.getElementById("dp-"+id);
+    const btn = document.getElementById("db-"+id);
+    if(!panel) return;
+    const d = detailsData[id];
+    if(d){
+      panel.innerHTML = '<div class="detail-panel-header"><i class="ti ti-microscope"></i>詳細解析</div>' +
+        [["background","研究背景・臨床的課題"],["methodology","研究デザイン・方法の詳細"],
+         ["keyFindings","主要な発見・数値の詳細"],["clinicalImpact","日本の臨床現場へのインパクト"],
+         ["limitations","研究の限界・課題"],["relatedEvidence","関連エビデンスとの比較"]
+        ].filter(s=>d[s[0]]).map(s=>`<div class="detail-section"><div class="detail-section-label">${s[1]}</div><div class="detail-section-text">${d[s[0]]}</div></div>`).join("");
+      panel.style.display="";
+      if(btn) btn.innerHTML='<i class="ti ti-chevron-up"></i>詳細を閉じる';
+    }
+  });
+}
+function renderImplants(){
+  document.getElementById("countLabel").textContent="";
+  document.getElementById("subLabel").textContent="";
+  if(!implantData){
+    document.getElementById("content").innerHTML=`<div class="empty">
+      <i class="ti ti-alert-circle" style="font-size:36px;display:block;margin-bottom:12px"></i>
+      インプラントニュースを読み込めませんでした<br>
+      <small>implant_news.json がリポジトリに存在するか確認してください</small><br><br>
+      <button onclick="retryImplants()" class="btn">再試行</button></div>`;
+    return;
+  }
+  const companies = implantData.companies||[];
+  const active = companies.filter(c=>c.rating>0).length;
+  document.getElementById("countLabel").textContent = companies.length+"社";
+  const sl = document.getElementById("subLabel");
+  sl.textContent = active+"社に動きあり";
+  sl.style.color = active>0 ? "#92400E" : "var(--text-muted)";
+  const sorted = [...companies].sort((a,b)=>(b.rating||0)-(a.rating||0));
+  document.getElementById("content").innerHTML = '<div class="implant-list">'+sorted.map(c=>{
+    const r = c.rating||0;
+    const rc = RATING_COLORS[r]||RATING_COLORS[0];
+    const stars = "★".repeat(r)+"☆".repeat(3-r);
+    const items = c.items||[];
+    return `<div class="implant-card">
+      <div class="implant-header"><span class="implant-name">${c.company}</span><span class="stars" style="color:${rc.text}">${stars}</span></div>
+      ${items.length?`<div class="implant-items">${items.map(item=>{
+        const cs=CAT_STYLE[item.category]||CAT_STYLE["その他"];
+        return `<div class="implant-item"><div class="implant-item-head"><span class="cat-badge" style="background:${cs.bg};color:${cs.text}">${item.category}</span><span class="implant-item-title">${item.title}</span></div><p class="implant-item-summary">${item.summary}</p></div>`;
+      }).join("")}</div>`:`<p class="no-news">今週は特筆すべき動きなし</p>`}
+    </div>`;
+  }).join("")+'</div>';
+}
+async function retryImplants(){
+  showNotice("loading","再読み込み中...");
+  await loadImplants();
+  document.getElementById("noticeBar").style.display="none";
+  renderImplants();
+}
+function render(){
+  updateBadge();
+  if(currentMode==="papers"){
+    document.getElementById("subtabsWrap").style.display="";
+    renderSubtabs(); renderPapers();
+  } else {
+    document.getElementById("subtabsWrap").style.display="none";
+    renderImplants();
+  }
+}
+async function setMode(mode){
+  currentMode = mode; expandedId = null;
+  document.getElementById("btnPapers").classList.toggle("active", mode==="papers");
+  document.getElementById("btnImplants").classList.toggle("active", mode==="implants");
+  if(mode==="implants" && !implantData){
+    showNotice("loading","インプラントニュースを読み込み中...");
+    await loadImplants();
+    document.getElementById("noticeBar").style.display="none";
+  }
+  render();
+}
+function selectSp(sp){ currentSp=sp; expandedId=null; renderSubtabs(); renderPapers(); }
+function togglePaper(id){ expandedId = expandedId===id ? null : id; renderPapers(); }
+
+/* ──── 通知 ──── */
+let noticeTimer = null;
+function showNotice(type, msg, autoHide){
+  const bar=document.getElementById("noticeBar");
+  const s={loading:{bg:"#EFF6FF",color:"#1E40AF",icon:"ti-loader spin"},success:{bg:"#ECFDF5",color:"#065F46",icon:"ti-check"},error:{bg:"#FEF2F2",color:"#991B1B",icon:"ti-alert-circle"}}[type];
+  bar.style.cssText=`display:flex;background:${s.bg};color:${s.color};`;
+  document.getElementById("noticeIcon").className="ti "+s.icon;
+  document.getElementById("noticeText").textContent=msg;
+  if(noticeTimer) clearTimeout(noticeTimer);
+  if(autoHide) noticeTimer=setTimeout(()=>{ bar.style.display="none"; }, autoHide);
+}
+
+/* ──── 最新情報を読込 ──── */
+async function reloadAll(){
+  const btn = document.getElementById("fetchBtn");
+  btn.disabled = true;
+  const hasKey = !!localStorage.getItem("ortho_gemini_key");
+  btn.innerHTML = `<i class="ti ti-loader spin"></i>${hasKey?"論文を取得中...":"読込中..."}`;
+  if(hasKey){
+    showNotice("loading","Gemini API で新しい論文を取得中...");
+    try{
+      const papers = await fetchManual();
+      if(papers && papers.length){
+        manualPapers = [...papers, ...manualPapers];
+        saveManualPapers();
+        showNotice("success", papers.length+"件の新着論文を取得しました", 3000);
+      }
+    } catch(e){
+      showNotice("error","取得に失敗しました："+e.message, 4000);
+    }
+  } else {
+    showNotice("loading","最新情報を取得中...");
+  }
+  await loadAll();
+  render();
+  if(!hasKey) showNotice("success","最新情報を読み込みました", 3000);
+  btn.disabled=false;
+  btn.innerHTML='<i class="ti ti-refresh"></i>最新情報を読込';
+}
+
+/* ──── 初期化 ──── */
+(async ()=>{
+  loadFavorites();
+  loadManualPapers();
+  applyTheme(localStorage.getItem("ortho_theme")||"blue");
+  showNotice("loading","データを読み込み中...");
+  await loadAll();
+  document.getElementById("noticeBar").style.display="none";
+  render();
+})();
+</script>
+</body>
+</html>
