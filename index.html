@@ -390,55 +390,74 @@ async function fetchManual(){
   const today = new Date().toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric"});
   const prompt = `今日${today}の最新整形外科論文を各分野から（肩は2件、それ以外各1件）紹介してください。できるだけ2025〜2026年の論文を選んでください。8件の論文サマリーをJSON配列のみで返してください。各オブジェクトのフィールド: specialty（脊椎/肩/肘/手指/股関節/膝/外傷のいずれか）, title（日本語タイトル）, journal（雑誌名と掲載年月）, overview（研究概要2〜3文）, results（主な結果2〜3文）, conclusion（結論と臨床的考察2〜3文）。JSONのみを返し、前置きや説明文は含めないこと。`;
 
-  const body = JSON.stringify({contents:[{parts:[{text:prompt}]}]});
-  const attempts = [
-    ["v1beta","gemini-2.5-flash-preview-05-20"],
-    ["v1beta","gemini-2.5-flash"],
-    ["v1","gemini-2.0-flash"],
-    ["v1beta","gemini-2.0-flash"],
-    ["v1","gemini-1.5-flash"],
-    ["v1beta","gemini-1.5-flash"],
-    ["v1beta","gemini-1.5-flash-latest"]
-  ];
+  const body = JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}]});
 
-  let lastStatus = null;
-  let lastError = null;
-
-  for(const [ver, model] of attempts){
-    showNotice("loading", `試行中: ${model}...`);
-    let r;
-    try {
-      r = await fetch(
-        `https://generativelanguage.googleapis.com/${ver}/models/${model}:generateContent?key=${key}`,
-        {method:"POST", headers:{"Content-Type":"application/json"}, body}
-      );
-    } catch(e) {
-      throw new Error("ネットワークエラー。インターネット接続を確認してください。（" + e.message + "）");
+  // 保存済みモデルを使う、なければ一覧から取得
+  let model = localStorage.getItem("ortho_gemini_model") || "";
+  if(!model){
+    for(const ver of ["v1beta","v1"]){
+      try{
+        const r = await fetch(`https://generativelanguage.googleapis.com/${ver}/models?key=${key}`);
+        if(r.ok){
+          const d = await r.json();
+          const all = (d.models||[]).map(m=>m.name.replace("models/",""));
+          const flash = all.filter(n=>n.includes("flash"));
+          model = flash[0] || all[0] || "";
+          if(model){ localStorage.setItem("ortho_gemini_model", model); break; }
+        }
+      }catch(e){}
     }
-    lastStatus = r.status;
-    if(r.status === 404){ lastError = "404"; continue; }
+  }
+  if(!model) throw new Error("利用可能なモデルが見つかりませんでした。⚙設定の「接続テスト」を実行してください。");
 
-    if(!r.ok){
-      let msg = "エラー " + r.status;
-      try {
-        const e = await r.json();
-        msg = e.error?.message || msg;
-      } catch(ex){}
-      if(r.status===403) throw new Error("アクセス拒否（403）。APIキーが正しいか、Generative Language APIが有効か確認してください。");
-      if(r.status===429) throw new Error("リクエスト制限（429）。1〜2分後に再試行してください。");
-      throw new Error(msg);
-    }
-
-    const data = await r.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    if(!text) throw new Error("APIからの応答が空でした。");
-    const m = text.match(/\[[\s\S]*\]/);
-    if(!m) throw new Error("JSONの解析に失敗しました。");
-    const ts = Date.now();
-    return JSON.parse(m[0]).map((p,i)=>({...p, id:`manual_${ts}_${i}`, isNew:true}));
+  let r;
+  try{
+    const ctrl = new AbortController();
+    const timer = setTimeout(()=>ctrl.abort(), 30000); // 30秒タイムアウト
+    r = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+      {method:"POST", headers:{"Content-Type":"application/json"}, body, signal:ctrl.signal}
+    );
+    clearTimeout(timer);
+  }catch(e){
+    if(e.name==="AbortError") throw new Error("タイムアウト（30秒）。再試行してください。");
+    throw new Error("ネットワークエラー: "+e.message);
   }
 
-  throw new Error(`すべてのモデルが見つかりませんでした（すべて404）。APIキーが正しく、Generative Language APIが有効になっているか確認してください。→ https://console.cloud.google.com/apis/library/generativelanguage.googleapis.com`);
+  if(!r.ok){
+    let msg = "エラー "+r.status;
+    try{ const e=await r.json(); msg=e.error?.message||msg; }catch(ex){}
+    // 混雑・過負荷・モデル未対応 → 保存済みモデルをクリアして別モデルで再試行
+    if(r.status===503 || r.status===429 || r.status===404 || msg.includes("high demand") || msg.includes("overloaded")){
+      localStorage.removeItem("ortho_gemini_model");
+      // 別モデルで1回だけ再試行
+      const fallbacks = ["gemini-2.5-flash","gemini-2.5-flash-lite","gemini-pro-latest"];
+      for(const fb of fallbacks){
+        try{
+          const ctrl2=new AbortController();
+          const t2=setTimeout(()=>ctrl2.abort(),30000);
+          const r2=await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${fb}:generateContent?key=${key}`,
+            {method:"POST",headers:{"Content-Type":"application/json"},body,signal:ctrl2.signal}
+          );
+          clearTimeout(t2);
+          if(r2.ok){
+            localStorage.setItem("ortho_gemini_model",fb);
+            const data2=await r2.json();
+            const text2=data2.candidates?.[0]?.content?.parts?.[0]?.text||"";
+            const m2=text2.match(/\[[\s\S]*\]/);
+            if(m2){
+              const ts=Date.now();
+              return JSON.parse(m2[0]).map((p,i)=>({...p,id:`manual_${ts}_${i}`,isNew:true}));
+            }
+          }
+        }catch(ex){}
+      }
+      throw new Error("混雑中のため取得できませんでした。1〜2分後に再試行してください。");
+    }
+    if(r.status===403) throw new Error("アクセス拒否（403）。APIキーまたはGenerative Language APIの有効化を確認してください。");
+    throw new Error(msg);
+  }
 }
 
 /* ──── 論文リスト ──── */
@@ -668,31 +687,59 @@ async function testApi(){
   const res = document.getElementById("testResult");
   res.style.display="block";
   res.style.background="var(--accent-bg)";
-  res.textContent="テスト中...";
+  res.textContent="モデル一覧を取得中...";
   if(!key){ res.textContent="❌ APIキーが未入力です"; res.style.background="var(--danger-bg)"; return; }
 
-  const tests = [
-    ["v1beta","gemini-2.5-flash-preview-05-20"],
-    ["v1beta","gemini-2.5-flash"],
-    ["v1","gemini-2.0-flash"],
-    ["v1beta","gemini-2.0-flash"],
-    ["v1","gemini-1.5-flash"],
-    ["v1beta","gemini-1.5-flash"],
-  ];
+  // モデル一覧を取得
+  let availableModels = [];
+  for(const ver of ["v1beta","v1"]){
+    try{
+      const r = await fetch(`https://generativelanguage.googleapis.com/${ver}/models?key=${key}`);
+      if(r.ok){
+        const d = await r.json();
+        availableModels = (d.models||[]).map(m=>m.name.replace("models/",""));
+        break;
+      }
+    }catch(e){}
+  }
+
+  if(availableModels.length === 0){
+    res.style.background="var(--danger-bg)";
+    res.innerHTML="❌ モデル一覧を取得できませんでした。APIキーを確認してください。";
+    return;
+  }
+
+  // flash系 → pro系 → その他の順で試す
+  const flash = availableModels.filter(n=>n.includes("flash"));
+  const ordered = [...flash, ...availableModels.filter(n=>!n.includes("flash"))];
   const results = [];
-  for(const [ver, model] of tests){
+
+  for(const model of ordered.slice(0, 6)){
     try{
       const r = await fetch(
-        `https://generativelanguage.googleapis.com/${ver}/models/${model}:generateContent?key=${key}`,
-        {method:"POST",headers:{"Content-Type":"application/json"},
-         body:JSON.stringify({contents:[{parts:[{text:"hello"}]}]})}
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+        {method:"POST", headers:{"Content-Type":"application/json"},
+         body:JSON.stringify({contents:[{role:"user",parts:[{text:"hello"}]}]})}
       );
-      results.push(`${model}(${ver}): ${r.status}`);
-      if(r.ok){ res.style.background="var(--success-bg)"; res.textContent="✅ 成功！ 使用モデル: "+model; return; }
-    } catch(e){ results.push(`${model}: network error`); break; }
+      results.push(`${model}: ${r.status}`);
+      if(r.ok){
+        localStorage.setItem("ortho_gemini_model", model);
+        res.style.background="var(--success-bg)";
+        res.textContent="✅ 成功！ 使用モデル: "+model;
+        return;
+      }
+      if(r.status===400){
+        // 400はキー有効・モデル有効だがリクエスト形式問題の可能性
+        try{
+          const e = await r.json();
+          results[results.length-1] += " ("+(e.error?.message||"").slice(0,50)+")";
+        }catch(ex){}
+      }
+    }catch(e){ results.push(`${model}: ネットワークエラー`); }
   }
+
   res.style.background="var(--danger-bg)";
-  res.innerHTML="❌ 結果:<br>" + results.join("<br>");
+  res.innerHTML="各モデルの結果:<br><b>"+results.join("<br>")+"</b>";
 }
 
 async function reloadAll(){
