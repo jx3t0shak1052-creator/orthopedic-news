@@ -22,52 +22,62 @@ def call_api(url, body=None):
         req = urllib.request.Request(url)
     try:
         with urllib.request.urlopen(req, timeout=60) as r:
-            return json.loads(r.read())
+            return json.loads(r.read()), None
     except urllib.error.HTTPError as e:
-        raise RuntimeError(f"HTTP {e.code}: {e.read().decode()[:300]}")
+        err_body = e.read().decode()[:300]
+        return None, f"HTTP {e.code}: {err_body}"
     except urllib.error.URLError as e:
-        raise RuntimeError(f"URLError: {e.reason}")
+        return None, f"URLError: {e.reason}"
 
-def get_model():
-    # モデル一覧を取得して最適なものを選ぶ
-    try:
-        data = call_api(f"{BASE}?key={KEY}")
-        all_models = [m["name"].replace("models/", "") for m in data.get("models", [])]
-        print(f"取得したモデル一覧: {all_models[:8]}")
-        # latest系エイリアスを優先
-        for m in all_models:
-            if "flash" in m and "latest" in m and "tts" not in m:
-                return m
-        # バージョン指定モデルを試す
-        for m in all_models:
-            if "flash" in m and "tts" not in m and "embed" not in m:
-                return m
-    except Exception as e:
-        print(f"モデル一覧取得失敗: {e}")
-    # フォールバック
-    return "gemini-3.6-flash"
+def get_models():
+    """利用可能なモデル一覧を取得。テキスト生成に使えるものを返す"""
+    data, err = call_api(f"{BASE}?key={KEY}")
+    if err or not data:
+        print(f"モデル一覧取得失敗: {err}")
+        return ["gemini-flash-latest", "gemini-flash-lite-latest", "gemini-3.6-flash"]
+    all_models = [m["name"].replace("models/", "") for m in data.get("models", [])]
+    print(f"取得したモデル一覧: {all_models}")
+    # TTS・embed系を除外、latest系を優先
+    skip = ["tts", "embed", "vision"]
+    candidates = [m for m in all_models if not any(s in m for s in skip)]
+    # latest系を先頭に
+    latest = [m for m in candidates if "latest" in m]
+    others = [m for m in candidates if "latest" not in m]
+    return latest + others
 
 def ask(prompt, model):
+    """指定モデルでAPIを呼ぶ。成功時はテキスト、失敗時は(None, エラー文字列)"""
     url = f"{BASE}/{model}:generateContent?key={KEY}"
-    result = call_api(url, {"contents": [{"role": "user", "parts": [{"text": prompt}]}]})
+    result, err = call_api(url, {"contents": [{"role": "user", "parts": [{"text": prompt}]}]})
+    if err:
+        return None, err
     text = result.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
     if not text:
-        raise RuntimeError(f"空の応答: {json.dumps(result)[:200]}")
-    return text
+        return None, f"空の応答: {json.dumps(result)[:100]}"
+    return text, None
 
-# モデル選択
-model = get_model()
-print(f"使用モデル: {model}")
+def ask_with_fallback(prompt, models):
+    """全モデルを試して最初に成功したものを返す"""
+    for model in models:
+        print(f"  試行: {model}")
+        text, err = ask(prompt, model)
+        if text:
+            print(f"  成功: {model}")
+            return text, model
+        print(f"  失敗: {err[:100]}")
+    return None, None
+
+# モデル一覧取得
+models = get_models()
+print(f"候補モデル数: {len(models)}")
 print(f"論文を取得中（{today}）...")
 
 # 論文取得
 paper_prompt = "整形外科の最新論文4件をJSON配列で返してください。各フィールド: specialty(脊椎/肩/股関節/膝/外傷/肘/手指のいずれか), title(日本語), journal(雑誌名と年月), overview(1〜2文), results(1〜2文), conclusion(1〜2文)。JSONのみ。前置き不要。"
 
-try:
-    text = ask(paper_prompt, model)
-    print(f"レスポンス先頭: {text[:200]}")
-except Exception as e:
-    print(f"論文取得失敗: {e}")
+text, used_model = ask_with_fallback(paper_prompt, models)
+if not text:
+    print("すべてのモデルで失敗しました")
     sys.exit(1)
 
 m = re.search(r'\[[\s\S]*\]', text)
@@ -80,22 +90,23 @@ papers = json.loads(m.group(0))
 for i, p in enumerate(papers):
     p["id"] = f"auto_{date_str}_{i}"
     p["isNew"] = True
-print(f"{len(papers)}件の論文を取得しました")
+print(f"{len(papers)}件の論文を取得しました（使用モデル: {used_model}）")
 
 # 詳細解析
 new_details = {}
 for p in papers:
     try:
         dp = f"整形外科医向けに以下の論文の詳細解説をJSON形式のみで返してください。論文: {p['title']} ({p.get('journal', '')}) フィールド: background, methodology, keyFindings, clinicalImpact, limitations, relatedEvidence（各2〜3文）。JSONのみ。"
-        dtext = ask(dp, model)
-        dm = re.search(r'\{[\s\S]*\}', dtext)
-        if dm:
-            new_details[p["id"]] = json.loads(dm.group(0))
-            print(f"詳細生成: {p['title'][:35]}")
+        dtext, _ = ask_with_fallback(dp, [used_model] + [m for m in models if m != used_model][:2])
+        if dtext:
+            dm = re.search(r'\{[\s\S]*\}', dtext)
+            if dm:
+                new_details[p["id"]] = json.loads(dm.group(0))
+                print(f"詳細生成: {p['title'][:35]}")
     except Exception as e:
         print(f"詳細スキップ: {e}")
 
-# details.json 更新
+# ファイル保存
 existing = {}
 try:
     with open("details.json", encoding="utf-8") as f:
@@ -107,7 +118,6 @@ with open("details.json", "w", encoding="utf-8") as f:
     json.dump(existing, f, ensure_ascii=False, indent=2)
 print(f"details.json 更新（累計 {len(existing)}件）")
 
-# news.json 保存
 with open("news.json", "w", encoding="utf-8") as f:
     json.dump({
         "updated": today,
