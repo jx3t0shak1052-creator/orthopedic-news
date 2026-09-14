@@ -22,7 +22,7 @@ def get_model():
             return flash[0]
     except Exception as e:
         print(f"モデル取得失敗: {e}")
-    return "gemini-2.5-flash"
+    return "gemini-3.6-flash"
 
 def ask(prompt, model):
     url = f"{BASE}/{model}:generateContent?key={KEY}"
