@@ -1,0 +1,28 @@
+name: 整形外科論文ニュース取得（毎日）
+
+on:
+  schedule:
+    - cron: '0 21 * * *'   # 毎日 6:00 JST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-papers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install anthropic
+      - env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python fetch_news.py
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add news.json
+          git diff --staged --quiet || git commit -m "📰 論文ニュース更新 $(TZ=Asia/Tokyo date '+%Y-%m-%d')"
+          git push
