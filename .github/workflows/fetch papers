@@ -2,7 +2,7 @@ name: 整形外科論文ニュース取得（毎日）
 
 on:
   schedule:
-    - cron: '0 21 * * *'
+    - cron: '0 19 * * *'   # 毎日 4:00 JST（8時までに余裕をもって完了）
   workflow_dispatch:
 
 permissions:
@@ -12,8 +12,8 @@ jobs:
   fetch-papers:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
       - env:

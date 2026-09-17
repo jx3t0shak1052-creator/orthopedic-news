@@ -195,6 +195,16 @@
       <a href="https://aistudio.google.com" target="_blank" rel="noopener">aistudio.google.com</a>から無料で取得できます。
     </p>
     <div id="keyStatus" style="font-size:12px;color:var(--success-text);margin-top:.5rem;min-height:16px"></div>
+    <div style="border-top:.5px solid var(--border);margin-top:1rem;padding-top:1rem">
+      <div class="theme-label" style="margin-bottom:8px">❤️ お気に入りのバックアップ</div>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button class="btn" onclick="exportFavs()" style="flex:1;font-size:12px">エクスポート（コピー）</button>
+        <button class="btn" onclick="importFavs()" style="flex:1;font-size:12px">インポート（貼り付け）</button>
+      </div>
+      <textarea id="favBackup" rows="2" placeholder="エクスポートするとここにデータが表示されます。新しい端末ではこのデータを貼り付けてインポートしてください。"
+        style="width:100%;font-size:11px;padding:6px 8px;border-radius:var(--radius);border:.5px solid var(--border-strong);background:var(--bg);color:var(--text-primary);resize:vertical;font-family:monospace;box-sizing:border-box"></textarea>
+      <div id="favMsg" style="font-size:11px;margin-top:4px;min-height:16px;color:var(--success-text)"></div>
+    </div>
     <div class="modal-row">
       <button class="btn btn-danger" onclick="clearKey()">削除</button>
       <button class="btn" onclick="testApi()">接続テスト</button>
@@ -233,6 +243,91 @@ const SP_ICONS = {
   "股関節":`<svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="6" cy="5" r="3.2"/><circle cx="6" cy="5" r="1.3" fill="currentColor" stroke="none"/><path d="M8 8 Q10 10 11 13"/><path d="M4 8 Q2 10 1 13"/></svg>`,
   "膝":`<svg width="11" height="15" viewBox="0 0 11 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="5.5" y1="0" x2="5.5" y2="5"/><ellipse cx="5.5" cy="8" rx="4" ry="3"/><circle cx="5.5" cy="8" r="1.5" fill="currentColor" stroke="none"/><line x1="5.5" y1="11" x2="5.5" y2="15"/></svg>`,
   "外傷":`<svg width="13" height="13" viewBox="0 0 13 13" fill="currentColor"><rect x="5" y="1" width="3" height="11" rx="1.5"/><rect x="1" y="5" width="11" height="3" rx="1.5"/></svg>`
+};
+const TITLE_EN = {
+  "s1":"Decompression Alone vs Decompression with Fusion for Lumbar Spinal Stenosis SSSS Trial 5-Year",
+  "s2":"Vancomycin Powder in Spine Surgery SSI Prevention Meta-analysis RCT",
+  "s3":"Robot-Assisted vs CT Navigation Pedicle Screw Accuracy Class I Evidence",
+  "s4":"Pulmonary Complications After Vertebral Body Tethering Adolescent Idiopathic Scoliosis",
+  "s5":"Hounsfield Units Predict Vertebral Body Collapse After Thoracolumbar Burst Fracture",
+  "sh1":"FIMPACT Trial 10-Year Arthroscopic Subacromial Decompression Sham Surgery Exercise",
+  "sh2":"Rotator Cuff Repair vs Physical Therapy 15-Year RCT Moosmayer",
+  "sh3":"Bankart Remplissage vs Bankart Alone Recurrence Meta-analysis Hill-Sachs",
+  "sh4":"Total Shoulder Arthroplasty Long-term Survival International Registry Meta-analysis",
+  "sh5":"ESSKA ESA Consensus Traumatic Anterior Shoulder Instability Treatment Return to Sport",
+  "sh6":"Coracoid Resorption After Latarjet CRDL Classification Clinical Outcomes",
+  "sh7":"Superior Capsule Reconstruction vs Reverse Total Shoulder Arthroplasty Irreparable Rotator Cuff",
+  "sh8":"Re-revision After Reverse Shoulder Arthroplasty Revision NJR 685 Cases",
+  "el1":"SCIENCE Trial Surgery vs Cast Displaced Medial Epicondyle Fractures Children RCT Lancet",
+  "el2":"SOFIE RCT Surgery vs Conservative Olecranon Fracture Elderly DASH Score",
+  "el3":"Internal Brace Revision UCL Repair Failed Tommy John Surgery Pitchers",
+  "el4":"Conservative Treatment Partial Distal Biceps Tendon Tear Recovery",
+  "ha1":"Digital Replantation Survival Meta-analysis 7278 Digits Venous Anastomosis",
+  "ha2":"YOLOv8 Deep Learning Scaphoid Fracture Detection X-ray",
+  "ha3":"Active vs Passive Early Mobilization Zone 2 Flexor Tendon Repair RCT TAM",
+  "ha4":"Volar Locking Plate vs Cast Distal Radius Fracture High Anesthesia Risk Elderly",
+  "hi1":"DUALITY Trial Dual Mobility vs Standard Cup Total Hip Arthroplasty Femoral Neck Fracture RCT Lancet",
+  "hi2":"HIP ATTACK Trial Early Surgery Troponin Elevation Hip Fracture Mortality",
+  "hi3":"Periacetabular Osteotomy 10-Year Outcomes THA Conversion Multicenter",
+  "hi4":"Bisphosphonate Use Before Total Hip Arthroplasty Periprosthetic Fracture Risk",
+  "hi5":"Triple Tapered Collared Cementless Stem Periprosthetic Fracture Risk Reduction AJRR",
+  "kn1":"Unicompartmental Knee Arthroplasty vs High Tibial Osteotomy Meta-analysis 56000",
+  "kn2":"Cementless Total Knee Arthroplasty Under 50 30-Year Follow-up Survival",
+  "kn3":"Meniscectomy vs Conservative Degenerative Medial Meniscus Posterior Root Tear OA Progression",
+  "kn4":"ACL Reconstruction Lateral Meniscus Posterior Root Repair Outcomes MRI Healing",
+  "kn5":"Osteoarthritis GWAS 962 Genetic Loci 1.96 Million Individuals Nature",
+  "tr1":"ORIF Primary Subtalar Arthrodesis Displaced Intra-articular Calcaneal Fracture",
+  "tr2":"Gentamicin Coated Intramedullary Nail Open Tibial Fracture Fracture Related Infection",
+  "tr3":"Swedish Fracture Register Proximal Humerus Fracture Conservative Surgery Conversion Rate",
+  "tr4":"Reamed vs Unreamed Intramedullary Nail Femoral Shaft Fracture Meta-analysis RCT",
+  "tr5":"Suture Button vs Syndesmotic Screw MCID Functional Outcome Umbrella Review"
+};
+
+function pubmedUrl(paper){
+  const q = TITLE_EN[paper.id] || paper.title_en || paper.title;
+  return "https://scholar.google.com/scholar?q="+encodeURIComponent(q);
+}
+function pubmedDirectUrl(paper){
+  const q = TITLE_EN[paper.id] || paper.title_en || paper.title;
+  return "https://pubmed.ncbi.nlm.nih.gov/?term="+encodeURIComponent(q)+"[Title]";
+}
+const PAPER_AUTHORS = {
+  "s1":"Försth P, et al.",
+  "s2":"Livas C, et al.",
+  "s3":"Staartjes VE, et al.",
+  "s4":"Yucekul A, et al.",
+  "s5":"Iyer S, et al.",
+  "sh1":"Paavola M, et al.",
+  "sh2":"Moosmayer S, et al.",
+  "sh3":"Ahmed AF, et al.",
+  "sh4":"Shields E, et al.",
+  "sh5":"De Carli A, Longo UG, et al.",
+  "sh6":"Kawamura K, et al.",
+  "sh7":"Kim SH, et al.",
+  "sh8":"Evans JP, et al.",
+  "el1":"Platt S, et al.",
+  "el2":"Carofino BC, et al.",
+  "el3":"Lawson WJ, et al.",
+  "el4":"Shu B, et al.",
+  "ha1":"Sebastin SJ, et al.",
+  "ha2":"Alzahrani M, et al.",
+  "ha3":"Ahmad M, et al.",
+  "ha4":"Valdes K, et al.",
+  "hi1":"Griffiths EJ, et al.",
+  "hi2":"Bhandari M, et al.",
+  "hi3":"Ganz R, et al.",
+  "hi4":"Prieto HA, et al.",
+  "hi5":"Kheir MM, et al.",
+  "kn1":"Zheng Y, et al.",
+  "kn2":"Whiteside LA, et al.",
+  "kn3":"Lee YS, et al.",
+  "kn4":"Chahla J, et al.",
+  "kn5":"Boer CG, Boehringer S, et al.",
+  "tr1":"Zhu Z, et al.",
+  "tr2":"Metsemakers WJ, et al.",
+  "tr3":"Bergdahl C, et al.",
+  "tr4":"Fang Y, et al.",
+  "tr5":"Salmon LJ, et al."
 };
 const RATING_COLORS = [
   {text:"#94A3B8"},{text:"#A16207"},{text:"#92400E"},{text:"#991B1B"}
@@ -300,6 +395,7 @@ const detailShown = new Set();
 let favorites = new Set();
 let manualPapers = [];
 let localDetails = {};
+let readPapers = new Set();
 let currentThemeId = "blue";
 
 /* ──── 永続化 ──── */
@@ -308,6 +404,10 @@ function saveFavorites(){ localStorage.setItem("ortho_fav", JSON.stringify([...f
 function loadManualPapers(){ try{ manualPapers = JSON.parse(localStorage.getItem("ortho_manual")||"[]"); }catch(e){} }
 function loadLocalDetails(){ try{ localDetails = JSON.parse(localStorage.getItem("ortho_local_details")||"{}"); }catch(e){} }
 function saveLocalDetails(){ try{ localStorage.setItem("ortho_local_details", JSON.stringify(localDetails)); }catch(e){} }
+function saveLocalImplants(){ try{ if(implantData) localStorage.setItem("ortho_implants", JSON.stringify(implantData)); }catch(e){} }
+function loadLocalImplants(){ try{ const d=JSON.parse(localStorage.getItem("ortho_implants")||"null"); if(d) implantData=d; }catch(e){} }
+function loadReadPapers(){ try{ readPapers = new Set(JSON.parse(localStorage.getItem("ortho_read")||"[]")); }catch(e){} }
+function saveReadPapers(){ try{ localStorage.setItem("ortho_read", JSON.stringify([...readPapers].slice(-500))); }catch(e){} }
 function saveManualPapers(){ try{ localStorage.setItem("ortho_manual", JSON.stringify(manualPapers.slice(0,100))); }catch(e){} }
 
 /* ──── テーマ ──── */
@@ -336,6 +436,30 @@ function openTheme(){ renderSwatches(); document.getElementById("themeOverlay").
 function closeTheme(){ document.getElementById("themeOverlay").classList.remove("open"); }
 
 /* ──── 設定モーダル ──── */
+function exportFavs(){
+  if(favorites.size === 0){
+    document.getElementById("favMsg").textContent = "お気に入りが登録されていません";
+    return;
+  }
+  const data = JSON.stringify([...favorites]);
+  document.getElementById("favBackup").value = data;
+  navigator.clipboard?.writeText(data).catch(()=>{});
+  document.getElementById("favMsg").textContent = "✅ "+favorites.size+"件をエクスポートしました（クリップボードにもコピー済み）";
+}
+function importFavs(){
+  const raw = document.getElementById("favBackup").value.trim();
+  if(!raw){ document.getElementById("favMsg").textContent = "テキストエリアにデータを貼り付けてください"; return; }
+  try{
+    const ids = JSON.parse(raw);
+    if(!Array.isArray(ids)) throw new Error();
+    favorites = new Set(ids);
+    saveFavorites();
+    renderSubtabs();
+    document.getElementById("favMsg").textContent = "✅ "+ids.length+"件のお気に入りをインポートしました";
+  }catch(e){
+    document.getElementById("favMsg").textContent = "❌ データの形式が正しくありません";
+  }
+}
 function openSettings(){
   const key = localStorage.getItem("ortho_gemini_key")||"";
   document.getElementById("geminiKeyInput").value = key;
@@ -373,7 +497,14 @@ async function loadImplants(){
     const r = await fetch("implant_news.json?t="+Date.now());
     if(!r.ok){ console.warn("implant_news.json:",r.status); return; }
     const d = await r.json();
-    if(d && d.companies && d.companies.length){ implantData = d; implantsUpdated = d.updated||""; }
+    if(d && d.companies && d.companies.length){
+      // localStorageの方が新しければそちらを優先
+      const localDate = implantData?.updated_iso || "";
+      const serverDate = d.updated_iso || "";
+      if(!localDate || serverDate > localDate){
+        implantData = d; implantsUpdated = d.updated||"";
+      }
+    }
   }catch(e){ console.warn("implant fetch error:",e); }
 }
 async function loadDetails(){
@@ -415,7 +546,7 @@ async function fetchManual(){
   if(!key) return null;
 
   const today = new Date().toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric"});
-  const prompt = `整形外科の最新論文4件をJSON配列で返してください。各フィールド: specialty(脊椎/肩/股関節/膝/外傷/肘/手指のいずれか), title(日本語), journal(雑誌名と年月), overview(1〜2文), results(1〜2文), conclusion(1〜2文)。JSONのみ。前置き不要。`;
+  const prompt = `整形外科の最新論文4件をJSON配列で返してください。各フィールド: specialty(脊椎/肩/股関節/膝/外傷/肘/手指のいずれか), title(日本語タイトル), title_en(英語原題), authors(筆頭著者 et al.の形式), journal(雑誌名と年月), overview(1〜2文), results(1〜2文), conclusion(1〜2文)。JSONのみ。前置き不要。`;
 
   const body = JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}]});
 
@@ -542,7 +673,7 @@ async function callGemini(prompt){
 async function fetchManualImplants(){
   const today = new Date().toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric"});
   const COMPANIES = ["Stryker","Zimmer Biomet","DePuy Synthes（J&J）","Smith+Nephew","帝人ナカシマメディカル","メディカルネクスト","HOYAテクノサージカル","Globus Medical","京セラメディカル","日本MDM","Medtronic"];
-  const prompt = `日本の整形外科インプラント11社の今週(${today})の動向をJSON配列で返してください。対象: ${COMPANIES.join(", ")}。各企業: company(企業名), rating(0〜3), items(配列: category(新製品/薬事承認/臨床データ/提携・契約/人事/その他), title(20字以内), summary(2〜3文))。情報なければrating:0, items:[]。JSONのみ。`;
+  const prompt = `あなたは日本の整形外科インプラント業界の専門アナリストです。以下の11社について、日本国内の直近の動向（最新情報）をJSON配列で返してください。対象: ${COMPANIES.join(", ")}。PMDA承認、新製品発売、国内臨床データ発表、提携・契約、人事などを含めてください。何らかの動きがある企業はrating 1以上にしてください。各企業: company(企業名), rating(3=重要/新製品・承認, 2=注目, 1=軽微な動き, 0=情報なし), items(配列: category(新製品/薬事承認/臨床データ/提携・契約/人事/その他), title(20字以内), summary(2〜3文))。JSONのみ。前置き不要。`;
   const text = await callGemini(prompt);
   const m = text.match(/\[[\s\S]*\]/);
   if(!m) throw new Error("JSON解析失敗: "+text.slice(0,100));
@@ -655,10 +786,11 @@ function renderSubtabs(){
 function renderPapers(){
   const list = filteredPapers();
   const nc = list.filter(p=>p.isNew).length;
+  const unread = list.filter(p=>p.isNew && !readPapers.has(p.id)).length;
   document.getElementById("countLabel").textContent = list.length+"件";
   const sl = document.getElementById("subLabel");
-  sl.textContent = nc>0 ? "うち新着 "+nc+"件" : "";
-  sl.style.color = "#059669";
+  sl.textContent = unread > 0 ? "未読 "+unread+"件" : nc > 0 ? "新着 "+nc+"件（すべて既読）" : "";
+  sl.style.color = unread > 0 ? "#DC2626" : "#059669";
   if(!list.length){ document.getElementById("content").innerHTML='<div class="empty">この分野の論文はありません</div>'; return; }
   let html = '<div class="paper-list">';
   let shownNew=false, shownOld=false;
@@ -674,7 +806,7 @@ function renderPapers(){
         <div class="card-meta">
           <div class="badges">
             <span class="badge" style="background:${sp.bg};color:${sp.text}">${SP_ICONS[p.specialty]||""}${p.specialty}</span>
-            ${p.isNew?'<span class="badge" style="background:#ECFDF5;color:#065F46">新着</span>':""}
+            ${p.isNew && !readPapers.has(p.id) ? '<span class="badge" style="background:#ECFDF5;color:#065F46">新着</span><span class="badge" style="background:#FEF2F2;color:#991B1B">未読</span>' : ''}
           </div>
           <div style="display:flex;align-items:center;gap:8px">
             <button id="fav-h-${p.id}" onclick="toggleFav('${p.id}',event)"
@@ -688,6 +820,14 @@ function renderPapers(){
         <p class="card-journal">${p.journal}</p>
       </div>
       ${exp ? `<div class="card-body">
+        <div style="padding:8px 12px;background:var(--bg);border-radius:var(--radius);font-size:11px;color:var(--text-secondary);line-height:1.7">
+          <span style="font-weight:600;color:var(--text-muted);letter-spacing:.05em;text-transform:uppercase;font-size:10px">出典</span><br>
+          ${TITLE_EN[p.id]||p.title_en ? `<span style="color:var(--text-primary)">${TITLE_EN[p.id]||p.title_en}</span><br>` : ""}
+          ${(PAPER_AUTHORS[p.id]||p.authors) ? `<span style="color:var(--text-secondary)">${PAPER_AUTHORS[p.id]||p.authors}</span><br>` : ""}
+          <span>${p.journal}</span>
+          <a href="${pubmedUrl(p)}" target="_blank" rel="noopener" style="color:var(--accent);margin-left:8px">Google Scholar ↗</a>
+          <a href="${pubmedDirectUrl(p)}" target="_blank" rel="noopener" style="color:var(--text-muted);margin-left:8px;font-size:10px">PubMed ↗</a>
+        </div>
         <div><div class="section-label">概要</div><div class="section-text">${p.overview}</div></div>
         <div><div class="section-label">結果</div><div class="section-text">${p.results}</div></div>
         <div><div class="section-label">結論・考察</div><div class="section-text">${p.conclusion}</div></div>
@@ -782,7 +922,15 @@ async function setMode(mode){
   render();
 }
 function selectSp(sp){ currentSp=sp; expandedId=null; renderSubtabs(); renderPapers(); }
-function togglePaper(id){ expandedId = expandedId===id ? null : id; renderPapers(); }
+function togglePaper(id){
+  expandedId = expandedId===id ? null : id;
+  if(expandedId===id){
+    // 開いたら既読にする
+    readPapers.add(id);
+    saveReadPapers();
+  }
+  renderPapers();
+}
 
 /* ──── 通知 ──── */
 let noticeTimer = null;
@@ -843,12 +991,15 @@ async function reloadAll(){
       showNotice("loading","Gemini API でインプラントニュースを取得中...");
       try{
         const data = await fetchManualImplants();
-        if(data && data.companies){
-          implantData = data; implantsUpdated = data.updated;
-          render();
-          showNotice("success","インプラントニュースを更新しました（"+data.companies.length+"社）", 3000);
+        if(data && data.companies && data.companies.length > 0){
+          implantData = data;
+          implantsUpdated = data.updated;
+          saveLocalImplants();
+          const active = data.companies.filter(c=>c.rating>0).length;
+          renderImplants();
+          showNotice("success",`インプラントニュースを更新しました（${data.companies.length}社・うち${active}社に動きあり）`, 4000);
         } else {
-          showNotice("error","データの取得に失敗しました", 4000);
+          showNotice("error","データの取得に失敗しました（レスポンスが空）", 4000);
         }
       }catch(e){
         showNotice("error","取得に失敗しました："+e.message, 6000);
@@ -896,6 +1047,8 @@ async function reloadAll(){
   loadFavorites();
   loadManualPapers();
   loadLocalDetails();
+  loadLocalImplants();
+  loadReadPapers();
   applyTheme(localStorage.getItem("ortho_theme")||"blue");
   showNotice("loading","データを読み込み中...");
   await loadAll();
