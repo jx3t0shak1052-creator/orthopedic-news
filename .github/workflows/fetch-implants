@@ -1,0 +1,27 @@
+Run git config user.name "github-actions[bot]"
+[main 22de042] 📰 論文ニュース更新 2026-09-27
+ 2 files changed, 114 insertions(+), 28 deletions(-)
+To https://github.com/jx3t0shak1052-creator/orthopedic-news
+ ! [rejected]        main -> main (non-fast-forward)
+error: failed to push some refs to 'https://github.com/jx3t0shak1052-creator/orthopedic-news'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. If you want to integrate the remote changes,
+hint: use 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+Push失敗 (試行 1)。pull --rebase してリトライ...
+From https://github.com/jx3t0shak1052-creator/orthopedic-news
+ * branch            main       -> FETCH_HEAD
+   2a36e2d..6f98ed6  main       -> origin/main
+Auto-merging details.json
+CONFLICT (content): Merge conflict in details.json
+Auto-merging news.json
+CONFLICT (content): Merge conflict in news.json
+Rebasing (1/1)
+error: could not apply 22de042... 📰 論文ニュース更新 2026-09-27
+hint: Resolve all conflicts manually, mark them as resolved with
+hint: "git add/rm <conflicted_files>", then run "git rebase --continue".
+hint: You can instead skip this commit: run "git rebase --skip".
+hint: To abort and get back to the state before "git rebase", run "git rebase --abort".
+hint: Disable this message with "git config set advice.mergeConflict false"
+Could not apply 22de042... # 📰 論文ニュース更新 2026-09-27
+Error: Process completed with exit code 1.
