@@ -1,0 +1,57 @@
+name: 国内インプラントメーカーニュース取得（毎週月曜）
+
+on:
+  schedule:
+    - cron: '30 21 * * 0'   # 日 21:30 UTC = 月曜 6:30 JST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch-implants
+  cancel-in-progress: false
+
+jobs:
+  fetch-implants:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: リモート最新へ同期
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git reset --hard origin/main
+
+      - name: インプラントニュースを取得・生成
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        run: python fetch_implant_news.py
+
+      - name: コミットして push（競合時は自動リトライ）
+        run: |
+          git add implant_news.json
+          if git diff --staged --quiet; then
+            echo "変更なし。終了します。"
+            exit 0
+          fi
+          git commit -m "🏭 インプラントニュース更新 $(TZ=Asia/Tokyo date '+%Y-%m-%d')"
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then
+              echo "push 成功（試行 ${attempt} 回目）"
+              exit 0
+            fi
+            echo "push 失敗（試行 ${attempt} 回目）→ origin/main を取り込んでリトライ"
+            git fetch origin main
+            git merge -X ours origin/main --no-edit -m "chore: origin/main を取り込み"
+          done
+          echo "push に失敗しました"
+          exit 1
