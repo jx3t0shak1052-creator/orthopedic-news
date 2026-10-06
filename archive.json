@@ -118,8 +118,25 @@
       "source": "Europe PMC (PubMed)",
       "id": "auto_20261005_6",
       "isNew": true
+    },
+    {
+      "specialty": "外傷",
+      "title": "セメントレス人工股関節全置換術における術中内側距骨骨折：システマティックレビュー",
+      "title_en": "Intraoperative Calcar Fractures in Uncemented Total Hip Replacement: A Systematic Review.",
+      "journal": "JBJS Rev, 2026年9月",
+      "authors": "Ali AA, Tarar MY, Ali Z, Tan QZ, Arshad M.",
+      "overview": "セメントレス人工股関節全置換術（THA）に伴う術中内側距骨骨折（IOCF）の疫学、危険因子、管理戦略、および転帰に関する現在のエビデンスを統合することを目的としてシステマティックレビューを実施した。",
+      "results": "60件の研究（465,030例の一次セメントレスTHA）が選択され、全体でのIOCF発生率は0.74%（個々の研究では0%〜10%）であった。発生が最も多かった手術ステップはステムの打込み時（72%）であり、術中管理としてはセラージュ固定が最も多く用いられた（>95%）。",
+      "conclusion": "セメントレスTHA中のIOCFは稀ではあるが臨床的に重要な合併症であり、迅速な認識と適切な固定（主にセラージュワイヤー）により概ね良好な転帰が得られる。",
+      "pmid": "42777093",
+      "doi": "10.2106/jbjs.rvw.26.00135",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42777093/",
+      "published": "2026-09-23",
+      "source": "Europe PMC (PubMed)",
+      "id": "auto_20261006_3",
+      "isNew": true
     }
   ],
-  "last_updated": "2026-10-06T08:20:21.639412+09:00",
-  "total": 7
+  "last_updated": "2026-10-06T10:24:14.698298+09:00",
+  "total": 8
 }
