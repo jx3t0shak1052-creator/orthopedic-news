@@ -862,7 +862,7 @@ function renderPapers(){
     const on = favorites.has(p.id);
     const dShown = detailShown.has(p.id);
     if(p.isNew && !shownNew){ html+=`<div class="new-divider"><i class="ti ti-sparkles"></i>今週の新着</div>`; shownNew=true; }
-    if(!p.isNew && !shownOld && nc>0){ html+=`<div class="old-divider">アーカイブ</div>`; shownOld=true; }
+    if(!p.isNew && !shownOld && nc>0){ html+=`<div class="old-divider">アーカイブ${archiveCnt>0?` (累計 ${archiveCnt}件)`:""}
     html += `<article class="card">
       <div class="card-header" onclick="togglePaper('${p.id}')">
         <div class="card-meta">
