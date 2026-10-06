@@ -854,6 +854,7 @@ function renderPapers(){
   sl.textContent = unread > 0 ? "未読 "+unread+"件" : nc > 0 ? "新着 "+nc+"件（すべて既読）" : "";
   sl.style.color = unread > 0 ? "#DC2626" : "#059669";
   if(!list.length){ document.getElementById("content").innerHTML='<div class="empty">この分野の論文はありません</div>'; return; }
+  const archiveCnt = archivePapers.length;
   let html = '<div class="paper-list">';
   let shownNew=false, shownOld=false;
   list.forEach(p=>{
