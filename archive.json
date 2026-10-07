@@ -135,8 +135,59 @@
       "source": "Europe PMC (PubMed)",
       "id": "auto_20261006_3",
       "isNew": true
+    },
+    {
+      "specialty": "外傷",
+      "title": "青年および若年成人における非タバコ性ニコチン依存症は骨折リスクの上昇と関連している",
+      "title_en": "NonTobacco Nicotine Dependence Is Associated With Increased Fracture Risk in Adolescents and Young Adults.",
+      "journal": "J Orthop Trauma, 2026年10月",
+      "authors": "Zhang J, Zhang J, Meydan Y, Chen B, Barsi J.",
+      "overview": "本研究は、青年および若年成人における非タバコ性ニコチン依存症（NTND）が、中長期の追跡において新規骨折リスクの上昇と関連しているかを評価することを目的とした。",
+      "results": "傾向スコアマッチングされた各群10,576例（平均年齢19.4歳）において、5年時点の骨折発生率はNTND群が1.1%、対照群が0.5%であり（RR 2.1、95% CI 1.5-2.9）、延長追跡期間でもNTND群で有意な骨折リスクの上昇が認められた（RR 1.9、95% CI 1.5-2.4）。",
+      "conclusion": "青年および若年成人における非タバコ性ニコチン依存症は約2倍の骨折リスク上昇と関連しており、若年者におけるニコチン使用の長期的影響を評価する際には骨の健康への影響を考慮すべきであることが示唆される。",
+      "pmid": "42085352",
+      "doi": "10.1097/bot.0000000000003220",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42085352/",
+      "published": "2026-10-01",
+      "source": "Europe PMC (PubMed)",
+      "id": "auto_20261008_1",
+      "isNew": true
+    },
+    {
+      "specialty": "肘",
+      "title": "肘関節後外側回旋不安定症に対する動的安定化のための上腕三頭筋腱部分移行術：生体力学的研究",
+      "title_en": "Partial triceps tendon transfer for dynamic stabilization in posterolateral rotatory instability of the elbow: a biomechanical study.",
+      "journal": "Arch Orthop Trauma Surg, 2026年10月",
+      "authors": "Pucher CJ, Lanzerath F, Kahmann SL, Hackl M, Müller LP, Leschinger T.",
+      "overview": "肘関節後外側回旋不安定症（PLRI）に対する従来の靭帯再建術破綻時の救済術式が未確立であることを背景に、回外筋稜への上腕三頭筋腱部分移行術による動的安定化の効果をヒト屍体肘関節標本で生体力学的に評価した。",
+      "results": "上腕三頭筋腱部分移行術は不安定状態と比較して外旋を有意に減少させたが（平均差 -3.38°、p = 0.005）、外側側副靱帯複合体修復術のほうが移行術よりも外旋が有意に小さかった（平均差 -3.13°、p = 0.012）。また、外旋は上腕二頭筋0 kg/上腕三頭筋0 kg負荷時の13.37°から、上腕二頭筋0.5 kg/上腕三頭筋4.0 kg負荷時の2.42°へと減少した。",
+      "conclusion": "上腕三頭筋腱部分移行術は肘関節の動的安定性を改善しPLRIを有意に軽減したが、安定性を完全には回復しなかったため、初回術式というより補助的または救済的な選択肢となる可能性が示唆された。",
+      "pmid": "42829365",
+      "doi": "10.1007/s00402-026-06520-z",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42829365/",
+      "published": "2026-10-03",
+      "source": "Europe PMC (PubMed)",
+      "id": "auto_20261008_2",
+      "isNew": true
+    },
+    {
+      "specialty": "膝",
+      "title": "変形性膝関節症患者の慢性疼痛に対する鍼関連統合療法とセレコキシブ併用療法の有効性および安全性を評価するランダム化比較有効性試験：プロトコル",
+      "title_en": "Randomised comparative effectiveness trial evaluating the efficacy and safety of acupuncture-related integrative therapy combined with celecoxib for chronic pain in patients with knee osteoarthritis: protocol.",
+      "journal": "BMJ Open, 2026年9月",
+      "authors": "Xiao X, Liu S, Tian A, Guo C, Liu C, Gong Z, Zhong F, Zhang W, Liu W, She C, Liu H, Liu M.",
+      "overview": "変形性膝関節症に対するセレコキシブ単独、鍼関連統合療法単独、および両者の併用療法の有効性と安全性を比較検証することを目的とした、多施設共同3群並行群間ランダム化比較試験の実施計画である。",
+      "results": "プロトコル論文のため、試験結果は抄録に記載なし。",
+      "conclusion": "プロトコル論文のため、試験の結論は抄録に記載なし。",
+      "pmid": "42785936",
+      "doi": "10.1136/bmjopen-2026-124004",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42785936/",
+      "published": "2026-09-24",
+      "source": "Europe PMC (PubMed)",
+      "id": "auto_20261008_4",
+      "isNew": true
     }
   ],
-  "last_updated": "2026-10-07T07:35:18.147335+09:00",
-  "total": 8
+  "last_updated": "2026-10-08T07:59:57.978170+09:00",
+  "total": 11
 }
