@@ -186,8 +186,25 @@
       "source": "Europe PMC (PubMed)",
       "id": "auto_20261008_4",
       "isNew": true
+    },
+    {
+      "specialty": "膝",
+      "title": "変形性膝関節症の運動療法プログラムにおける高頻度TENS併用の効果：無作為化偽刺激対照試験",
+      "title_en": "Effects of Using High-Frequency TENS During an Exercise Therapy Program in Knee Osteoarthritis: A Randomized Sham-Controlled Trial.",
+      "journal": "Physiother Res Int, 2026年10月",
+      "authors": "Dos Santos PG, Liebano RE, Verengue BR, da Silva ACB, Miura BG, Girasol CE, Dibai-Filho AV, Fidelis-de-Paula-Gomes CA.",
+      "overview": "変形性膝関節症（KOA）の運動療法中に高頻度経皮的電気神経刺激（TENS）を併用することが、偽刺激と比較して追加のベネフィットをもたらすかを評価することを目的とした無作為化偽刺激対照優越性試験である。",
+      "results": "主要評価項目であるKOOS痛みサブスケールにおいて、介入後（調整平均差1.05ポイント、95% CI -5.19〜7.29）および1ヶ月後のフォローアップ（0.40ポイント、95% CI -5.91〜6.71）のいずれにおいても、活性TENS群は偽刺激群と比較して追加の有用性を示さず、二次評価項目でも群間有意差は認められなかった。",
+      "conclusion": "KOA患者に対する構造化された運動療法プログラムへの高頻度TENSの追加は、偽刺激と比較して追加のベネフィットをもたらさなかった。",
+      "pmid": "42775508",
+      "doi": "10.1002/pri.70351",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42775508/",
+      "published": "2026-10-01",
+      "source": "Europe PMC (PubMed)",
+      "id": "auto_20261009_4",
+      "isNew": true
     }
   ],
-  "last_updated": "2026-10-08T07:59:57.978170+09:00",
-  "total": 11
+  "last_updated": "2026-10-09T08:14:23.437927+09:00",
+  "total": 12
 }
