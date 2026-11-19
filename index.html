@@ -158,6 +158,46 @@
     .cal-dows div:first-child{color:#DC2626}
     .cal-dows div:last-child{color:#2563EB}
 
+    /* ステータス・リマインド */
+    .tab-badge{display:none;align-items:center;justify-content:center;min-width:15px;height:15px;padding:0 4px;margin-left:5px;border-radius:8px;background:#DC2626;color:#fff;font-size:9.5px;font-weight:700;line-height:1}
+    .rem{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:10px;overflow:hidden}
+    .rem-head{display:flex;align-items:center;gap:6px;padding:9px 13px;font-size:12px;font-weight:700;border-bottom:.5px solid var(--border);background:var(--accent-bg);color:var(--accent-text)}
+    .rem-head .n{margin-left:auto;font-size:10px;font-weight:500;opacity:.85}
+    .rem-item{display:flex;align-items:center;gap:9px;padding:8px 13px;border:0;border-bottom:.5px solid var(--border);width:100%;text-align:left;background:transparent;cursor:pointer;font-family:inherit;color:inherit}
+    .rem-item:last-of-type{border-bottom:0}
+    .rem-item:hover{background:var(--bg)}
+    .rem-date{font-size:11px;font-variant-numeric:tabular-nums;color:var(--text-secondary);width:46px;flex-shrink:0;line-height:1.3;font-weight:700}
+    .rem-date b{display:block;font-size:9px;color:var(--text-muted);font-weight:500}
+    .rem-body{min-width:0;flex:1}
+    .rem-name{font-size:11.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;line-height:1.5}
+    .rem-sub{font-size:9.5px;color:var(--text-muted);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .rem-kind{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:6px;margin-right:5px;vertical-align:1px}
+    .rem-kind.reg{background:#EFF6FF;color:#1E40AF}
+    .rem-kind.abs{background:#F5F3FF;color:#6D28D9}
+    .rem-kind.due{background:#FEF2F2;color:#991B1B}
+    .rem-left{font-size:11px;font-weight:700;color:var(--accent-text);flex-shrink:0;font-variant-numeric:tabular-nums}
+    .rem-left.warn{color:#DC2626}
+    .rem-none{padding:12px 13px;font-size:11px;color:var(--text-muted);line-height:1.7}
+    .rem-foot{display:flex;gap:6px;padding:8px 13px;border-top:.5px solid var(--border);background:var(--bg)}
+    .rem-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:7px;border:.5px solid var(--border-strong);border-radius:8px;background:var(--surface);color:var(--text-secondary);font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap}
+    .rem-btn:hover{border-color:var(--accent);color:var(--accent-text)}
+    .rem-btn.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+    .st-seg{display:inline-flex;border:.5px solid var(--border-strong);border-radius:8px;overflow:hidden;flex-shrink:0;background:var(--surface)}
+    .st-seg button{border:0;background:transparent;color:var(--text-muted);font-size:10px;padding:4px 7px;cursor:pointer;font-family:inherit;white-space:nowrap}
+    .st-seg button+button{border-left:.5px solid var(--border)}
+    .st-seg button.on.attend{background:#ECFDF5;color:#065F46;font-weight:700}
+    .st-seg button.on.undecided{background:#FFFBEB;color:#92400E;font-weight:700}
+    .st-seg button.on.absent{background:var(--bg);color:var(--text-secondary);font-weight:700}
+    .st-seg.big button{font-size:11.5px;padding:8px 0;flex:1}
+    .st-seg.big{display:flex;width:100%}
+    @media(prefers-color-scheme:dark){
+      .rem-kind.reg{background:#1E3A8A;color:#93C5FD}
+      .rem-kind.abs{background:#4C1D95;color:#DDD6FE}
+      .rem-kind.due{background:#7F1D1D;color:#FCA5A5}
+      .st-seg button.on.attend{background:#064E3B;color:#6EE7B7}
+      .st-seg button.on.undecided{background:#451A03;color:#FCD34D}
+    }
+    .cal-bar .br{flex-shrink:0;font-size:8px;font-weight:500;color:var(--text-secondary);opacity:.85;padding-left:2px}
     /* 週ブロック：日付行＋イベント帯のレーン */
     .cal-week{
       display:grid;grid-template-columns:repeat(7,minmax(0,1fr));
@@ -216,6 +256,8 @@
     }
     .cal-empty{text-align:center;padding:2.5rem 1rem;color:var(--text-muted);font-size:13px}
     .soc-card{background:var(--surface);border-radius:var(--radius-lg);border:.5px solid var(--border);margin-bottom:8px;overflow:hidden}
+    .soc-foot{display:flex;align-items:center;gap:8px;padding:7px 14px;border-top:.5px solid var(--border);background:var(--bg)}
+    .soc-foot-note{font-size:9.5px;color:var(--text-muted);margin-left:auto}
     .soc-head{padding:12px 14px;cursor:pointer;display:flex;flex-direction:column;gap:5px;text-align:left;width:100%;border:0;background:transparent;font-family:inherit;color:inherit}
     .soc-head:hover{background:rgba(0,0,0,.018)}
     @media(prefers-color-scheme:dark){.soc-head:hover{background:rgba(255,255,255,.03)}}
@@ -287,7 +329,7 @@
       </div>
       <div>
         <h1>整形外科 情報ダイジェスト</h1>
-        <p>論文エビデンス・国内インプラント動向・学会カレンダー <span style="opacity:.5">v4.3</span></p>
+        <p>論文エビデンス・国内インプラント動向・学会カレンダー <span style="opacity:.5">v4.4</span></p>
       </div>
     </div>
     <div class="header-right">
@@ -308,7 +350,7 @@
       <i class="ti ti-building-factory-2" aria-hidden="true"></i>インプラントニュース
     </button>
     <button class="mode-btn" id="btnCalendar" onclick="setMode('societies')">
-      <i class="ti ti-calendar-month" aria-hidden="true"></i>学会カレンダー
+      <i class="ti ti-calendar-month" aria-hidden="true"></i>学会カレンダー<span class="tab-badge" id="calBadge"></span>
     </button>
   </div>
 </div>
@@ -349,6 +391,52 @@
       <a href="https://aistudio.google.com" target="_blank" rel="noopener">aistudio.google.com</a>から無料で取得できます。
     </p>
     <div id="keyStatus" style="font-size:12px;color:var(--success-text);margin-top:.5rem;min-height:16px"></div>
+    <div style="border-top:.5px solid var(--border);margin-top:1rem;padding-top:1rem">
+      <div class="theme-label" style="margin-bottom:8px">📱 端末の引っ越し（トークン不要）</div>
+      <p class="modal-note" style="margin-bottom:.5rem">
+        学会の参加／不参加／未定・メモ・お気に入りを<b>1つのコード</b>にまとめます。新しい端末で貼り付けるだけで復元できます。サーバーもトークンも不要です。
+      </p>
+      <div style="display:flex;gap:6px">
+        <button class="btn" onclick="codeMake()" style="flex:1;font-size:11.5px">コードを発行</button>
+        <button class="btn" onclick="codeApplyFromBox()" style="flex:1;font-size:11.5px">コードを適用</button>
+      </div>
+      <textarea id="syncCodeBox" rows="3" placeholder="「コードを発行」でここに表示されます。新しい端末ではこのコードを貼り付けて「コードを適用」を押してください。"
+        style="width:100%;font-size:10.5px;padding:6px 8px;margin-top:6px;border-radius:var(--radius);border:.5px solid var(--border-strong);background:var(--bg);color:var(--text-primary);resize:vertical;font-family:monospace;box-sizing:border-box;word-break:break-all"></textarea>
+      <div id="codeStatus" style="font-size:11px;margin-top:4px;min-height:16px;color:var(--text-muted)"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px">
+        <button class="btn" onclick="codeCopyUrl()" style="font-size:11px;padding:8px 4px">URLをコピー</button>
+        <button class="btn" onclick="codeShowQr()" style="font-size:11px;padding:8px 4px">QRを表示</button>
+        <button class="btn" onclick="codeDownload()" style="font-size:11px;padding:8px 4px">ファイル保存</button>
+        <button class="btn" onclick="document.getElementById('codeFile').click()" style="font-size:11px;padding:8px 4px">ファイル読込</button>
+      </div>
+      <input type="file" id="codeFile" accept=".json,.txt,application/json" style="display:none" onchange="codeLoadFile(this)">
+      <div id="qrBox" style="display:none;text-align:center;margin-top:10px;padding:10px;background:#fff;border-radius:8px"></div>
+      <p class="modal-note" style="margin-top:.5rem">
+        URLとQRには学会ステータス・メモ・お気に入りだけを載せています（手動論文はサイズが大きいため「ファイル保存」に含まれます）。
+      </p>
+    </div>
+    <details style="border-top:.5px solid var(--border);margin-top:1rem;padding-top:.8rem">
+      <summary style="font-size:11.5px;font-weight:700;color:var(--text-secondary);cursor:pointer">上級者向け：GitHubに自動保存（トークン使用）</summary>
+      <div style="padding-top:.7rem">
+        <input type="password" id="ghTokenInput" placeholder="github_pat_... （未設定）" autocomplete="off">
+        <p class="modal-note">
+          手動で追加した論文も含めて、変更のたびにGitHubへ自動保存します。トークンはこの端末のブラウザ内にのみ保存され、リポジトリには書き込まれません。
+        </p>
+        <div id="ghStatus" style="font-size:11px;margin-top:.4rem;min-height:16px;color:var(--text-muted)"></div>
+        <div style="display:flex;gap:6px;margin-top:.4rem">
+          <button class="btn" onclick="ghSaveToken()" style="flex:1;font-size:11.5px">トークンを保存</button>
+          <button class="btn" onclick="ghTest()" style="flex:1;font-size:11.5px">接続テスト</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button class="btn" onclick="ghMigrate()" style="flex:1;font-size:11.5px">端末データを送信</button>
+          <button class="btn" onclick="ghPullNow()" style="flex:1;font-size:11.5px">最新を取得</button>
+        </div>
+        <p class="modal-note" style="margin-top:.5rem">
+          トークン作成：GitHub → Settings → Developer settings → Personal access tokens → <b>Fine-grained tokens</b> →
+          リポジトリ <code>orthopedic-news</code> のみ → 権限 <b>Contents: Read and write</b>。
+        </p>
+      </div>
+    </details>
     <div style="border-top:.5px solid var(--border);margin-top:1rem;padding-top:1rem">
       <div class="theme-label" style="margin-bottom:8px">❤️ お気に入りのバックアップ</div>
       <div style="display:flex;gap:6px;margin-bottom:8px">
@@ -637,6 +725,10 @@ function openSettings(){
   const key = localStorage.getItem("ortho_gemini_key")||"";
   document.getElementById("geminiKeyInput").value = key;
   document.getElementById("keyStatus").textContent = key ? "✅ APIキーが保存されています" : "";
+  const gh = ghToken();
+  const ghEl = document.getElementById("ghTokenInput");
+  if(ghEl){ ghEl.placeholder = gh ? "設定済み（変更する場合のみ入力）" : "github_pat_... （未設定）"; }
+  syncStatus(gh ? "同期設定済み" : "未設定：この端末にのみ保存されます", gh ? true : null);
   document.getElementById("settingsOverlay").classList.add("open");
 }
 function closeSettings(){ document.getElementById("settingsOverlay").classList.remove("open"); }
@@ -1249,6 +1341,8 @@ async function reloadAll(){
         if(papers && papers.length){
           manualPapers = [...papers, ...manualPapers];
           saveManualPapers();
+          lastMan = ""; lastPushed = "";
+          syncPushSoon();
           // 手動取得に成功したらヘッダーの更新日を今日にする（以前は更新されず古い日付のままだった）
           papersUpdated = todayLabel();
           savePapersUpdated();
@@ -1278,60 +1372,63 @@ async function reloadAll(){
 /* ──── 学会カレンダー ──── */
 const SOC_CATS = {"総会":"#1D4ED8","基礎・研究":"#047857","関節":"#B45309","脊椎・外傷":"#0E7490","領域":"#7C3AED"};
 const SOCIETIES = [
-  {id:"jks4",cat:"関節",ed:"第4回",name:"日本膝関節学会学術集会",short:"膝関節学会",start:"2026-12-04",end:"2026-12-05",
-   venue:"TAKANAWA GATEWAY Convention Center",city:"東京都港区",president:"石島 旨章（順天堂大学）",theme:"",reg:null,abs:null,
-   url:"https://site2.convention.co.jp/jks2026/",note:""},
-  {id:"jsra57",cat:"関節",ed:"第57回",name:"日本人工関節学会",short:"人工関節学会",start:"2027-02-18",end:"2027-02-19",
+  {id:"jks4",cat:"関節",ed:"第4回",name:"日本膝関節学会学術集会",short:"膝関節学会",region:"東京都",start:"2026-12-04",end:"2026-12-05",
+   venue:"TAKANAWA GATEWAY Convention Center",city:"東京都港区",president:"石島 旨章（順天堂大学）",theme:"",reg:{start:"2026-11-04",end:"2026-12-05"},
+   abs:{start:"2026-04-21",end:"2026-06-02",label:"演題 4/21–6/2"},
+   url:"https://site2.convention.co.jp/jks2026/",note:"参加登録は2026年11月4日12:00〜12月5日16:30（オンライン・カード決済のみ）。"},
+  {id:"jsra57",cat:"関節",ed:"第57回",name:"日本人工関節学会",short:"人工関節学会",region:"福岡県",start:"2027-02-18",end:"2027-02-19",
    venue:"福岡国際会議場・福岡サンパレス・福岡国際センター",city:"福岡県福岡市博多区",president:"中島 康晴（九州大学）",theme:"Joint Effort —共創する人工関節の未来—",
-   reg:null,abs:{start:"2026-09-01",end:"2026-10-12",label:"演題 9/1–10/12（延長）"},
-   url:"https://site2.convention.co.jp/jsra2027/",note:"第56回は2026年1月14日にオンライン参加登録を開始。今回は12月〜1月頃の受付開始が見込まれます。"},
-  {id:"chubu148",cat:"脊椎・外傷",ed:"第148回",name:"中部日本整形外科災害外科学会・学術集会",short:"中部日本災害外科学会",start:"2027-04-09",end:"2027-04-10",
+   reg:null,abs:{start:"2026-09-01",end:"2026-10-12",label:"演題 9/1–10/12"},
+   url:"https://site2.convention.co.jp/jsra2027/",note:"参加登録ページは未公開。第56回は2026年1月14日に受付を開始しており、12月〜1月頃の公開が見込まれます。"},
+  {id:"chubu148",cat:"脊椎・外傷",ed:"第148回",name:"中部日本整形外科災害外科学会・学術集会",short:"中部日本災害外科学会",region:"岡山県",start:"2027-04-09",end:"2027-04-10",
    venue:"倉敷市芸文館・倉敷アイビースクエア",city:"岡山県倉敷市",president:"三谷 茂（川崎医科大学）",theme:"",reg:null,abs:null,
    url:"https://www.kwcs.jp/148chubu/index.html",note:""},
-  {id:"jssr56",cat:"脊椎・外傷",ed:"第56回",name:"日本脊椎脊髄病学会学術集会",short:"脊椎脊髄病学会",start:"2027-04-15",end:"2027-04-17",
+  {id:"jssr56",cat:"脊椎・外傷",ed:"第56回",name:"日本脊椎脊髄病学会学術集会",short:"脊椎脊髄病学会",region:"京都府",start:"2027-04-15",end:"2027-04-17",
    venue:"国立京都国際会館",city:"京都府京都市左京区",president:"川口 善治（富山大学）／長谷川 和宏",theme:"",reg:null,abs:null,
-   url:"https://jssr2027.org/",note:"一般演題の登録受付中（締切は公式サイト参照）。"},
-  {id:"jssh70",cat:"領域",ed:"第70回",name:"日本手外科学会学術集会",short:"手外科学会",start:"2027-04-22",end:"2027-04-23",
-   venue:"コングレコンベンションセンター・ナレッジキャピタル",city:"大阪府大阪市北区",president:"村瀬 剛（ベルランド総合病院）",theme:"",reg:null,abs:null,
-   url:"https://site.convention.co.jp/70jssh/",note:""},
-  {id:"jcr71",cat:"領域",ed:"第71回",name:"日本リウマチ学会総会・学術集会",short:"リウマチ学会",start:"2027-04-26",end:"2027-04-28",
+   url:"https://jssr2027.org/",note:"参加登録ページは「準備中」。一般演題の登録状況は公式サイト参照。"},
+  {id:"jssh70",cat:"領域",ed:"第70回",name:"日本手外科学会学術集会",short:"手外科学会",region:"大阪府",start:"2027-04-22",end:"2027-04-23",
+   venue:"コングレコンベンションセンター・ナレッジキャピタル",city:"大阪府大阪市北区",president:"村瀬 剛（ベルランド総合病院）",theme:"",reg:null,
+   abs:{start:"2026-09-16",end:"2026-10-29",label:"演題 9/16–10/29（延長11/12）"},
+   url:"https://site.convention.co.jp/70jssh/",note:"参加登録ページは公開準備中。旧回は1月下旬〜2月に受付開始。"},
+  {id:"jcr71",cat:"領域",ed:"第71回",name:"日本リウマチ学会総会・学術集会",short:"リウマチ学会",region:"神奈川県",start:"2027-04-26",end:"2027-04-28",
    venue:"パシフィコ横浜 会議センター・展示ホール",city:"神奈川県横浜市西区",president:"高柳 広（東京大学）",theme:"Beyond Treatment —基礎と臨床の融合—",
    reg:null,abs:{start:null,end:"2026-10-30",label:"演題 〜10/30 正午"},
    url:"https://www.jcr2027.com/",note:""},
-  {id:"joa100",cat:"総会",ed:"第100回",name:"日本整形外科学会学術総会",short:"日整会学術総会",start:"2027-05-13",end:"2027-05-16",
+  {id:"joa100",cat:"総会",ed:"第100回",name:"日本整形外科学会学術総会",short:"日整会学術総会",region:"神奈川県",start:"2027-05-13",end:"2027-05-16",
    venue:"パシフィコ横浜（会議センター・展示ホール・アネックス）",city:"神奈川県横浜市西区",president:"松田 秀一（京都大学）",theme:"The Best is yet to come. — 未来へ挑む —",
    reg:null,abs:{start:"2026-07-10",end:"2026-09-10",label:"演題 7/10–9/10"},
    url:"https://www.congre.co.jp/joa2027/",note:"5月12日（水）午後に創立100年記念式典を開催（日整会会員限定・事前申込制）。"},
-  {id:"jsoa27",cat:"領域",ed:"2027",name:"日本スポーツ整形外科学会（JSOA2027）",short:"スポーツ整形外科学会",start:"2027-06-17",end:"2027-06-18",
-   venue:"札幌コンベンションセンター",city:"北海道札幌市白石区",president:"佐藤 和毅（慶應義塾大学）",theme:"",reg:null,abs:null,
-   url:"https://www.congre.co.jp/jsoa2027/",note:""},
-  {id:"jsjd55",cat:"関節",ed:"第55回",name:"日本関節病学会",short:"関節病学会",start:"2027-07-02",end:"2027-07-03",
+  {id:"jsoa27",cat:"領域",ed:"2027",name:"日本スポーツ整形外科学会（JSOA2027）",short:"スポーツ整形外科学会",region:"北海道",start:"2027-06-17",end:"2027-06-18",
+   venue:"札幌コンベンションセンター",city:"北海道札幌市白石区",president:"佐藤 和毅（慶應義塾大学）",theme:"",reg:null,
+   abs:{start:"2026-11-11",end:null,label:"演題 11/11 募集開始"},
+   url:"https://www.congre.co.jp/jsoa2027/",note:"一般演題募集を2026年11月11日に開始。"},
+  {id:"jsjd55",cat:"関節",ed:"第55回",name:"日本関節病学会",short:"関節病学会",region:"岡山県",start:"2027-07-02",end:"2027-07-03",
    venue:"倉敷市芸文館",city:"岡山県倉敷市",president:"",theme:"",reg:null,abs:null,
    url:"https://jsjd.info/",note:""},
-  {id:"tumor60",cat:"基礎・研究",ed:"第60回",name:"日本整形外科学会 骨・軟部腫瘍学術集会",short:"骨・軟部腫瘍学術集会",start:"2027-07-15",end:"2027-07-16",
+  {id:"tumor60",cat:"基礎・研究",ed:"第60回",name:"日本整形外科学会 骨・軟部腫瘍学術集会",short:"骨・軟部腫瘍学術集会",region:"北海道",start:"2027-07-15",end:"2027-07-16",
    venue:"札幌コンベンションセンター",city:"北海道札幌市白石区",president:"平賀 博明（北海道がんセンター）",theme:"",reg:null,
-   abs:{start:"2026-10-01",end:null,label:"演題 2026年10月開始"},
+   abs:{start:"2026-10-01",end:null,label:"演題 10月開始"},
    url:"https://www.joa.or.jp/",note:""},
-  {id:"jota53",cat:"脊椎・外傷",ed:"第53回",name:"日本整形外傷学会学術集会",short:"整形外傷学会",start:"2027-08-27",end:"2027-08-28",
+  {id:"jota53",cat:"脊椎・外傷",ed:"第53回",name:"日本整形外傷学会学術集会",short:"整形外傷学会",region:"福岡県",start:"2027-08-27",end:"2027-08-28",
    venue:"福岡国際会議場・マリンメッセ福岡",city:"福岡県福岡市博多区",president:"",theme:"",reg:null,abs:null,
    url:"https://www.jota2027.jp/",note:"旧称：日本骨折治療学会。"},
-  {id:"jos29",cat:"領域",ed:"第29回",name:"日本骨粗鬆症学会",short:"骨粗鬆症学会",start:"2027-09-17",end:"2027-09-19",
+  {id:"jos29",cat:"領域",ed:"第29回",name:"日本骨粗鬆症学会",short:"骨粗鬆症学会",region:"福岡県",start:"2027-09-17",end:"2027-09-19",
    venue:"福岡市（会場調整中）",city:"福岡県福岡市",president:"",theme:"",reg:null,abs:null,
    url:"https://www.josteo.com/",note:"会場は発表され次第更新されます。"},
-  {id:"hip54",cat:"関節",ed:"第54回",name:"日本股関節学会学術集会",short:"股関節学会",start:"2027-10-15",end:"2027-10-16",
+  {id:"hip54",cat:"関節",ed:"第54回",name:"日本股関節学会学術集会",short:"股関節学会",region:"福岡県",start:"2027-10-15",end:"2027-10-16",
    venue:"ヒルトン福岡シーホーク",city:"福岡県福岡市中央区",president:"山本 卓明（福岡大学）",theme:"継承と発展",reg:null,abs:null,
    url:"https://www.congre.co.jp/hip54/",note:""},
-  {id:"kiso42",cat:"基礎・研究",ed:"第42回",name:"日本整形外科学会 基礎学術集会",short:"基礎学術集会",start:"2027-10-21",end:"2027-10-22",
+  {id:"kiso42",cat:"基礎・研究",ed:"第42回",name:"日本整形外科学会 基礎学術集会",short:"基礎学術集会",region:"京都府",start:"2027-10-21",end:"2027-10-22",
    venue:"国立京都国際会館",city:"京都府京都市左京区",president:"今井 晋二（滋賀医科大学）",theme:"",reg:null,
-   abs:{start:"2026-12-01",end:null,label:"演題 2026年12月開始"},
+   abs:{start:"2026-12-01",end:null,label:"演題 12月開始"},
    url:"https://www.joa.or.jp/",note:""},
-  {id:"jss54",cat:"関節",ed:"第54回",name:"日本肩関節学会学術集会",short:"肩関節学会",start:"2027-10-29",end:"2027-10-30",
+  {id:"jss54",cat:"関節",ed:"第54回",name:"日本肩関節学会学術集会",short:"肩関節学会",region:"広島県",start:"2027-10-29",end:"2027-10-30",
    venue:"広島国際会議場",city:"広島県広島市中区",president:"菊川 和彦（マツダ病院）",theme:"",reg:null,abs:null,
    url:"https://www.j-shoulder-s.jp/meeting/",note:"第24回 日本肩の運動機能研究会を併催。"},
-  {id:"jssf52",cat:"領域",ed:"第52回",name:"日本足の外科学会学術集会",short:"足の外科学会",start:"2027-10-29",end:"2027-10-30",
+  {id:"jssf52",cat:"領域",ed:"第52回",name:"日本足の外科学会学術集会",short:"足の外科学会",region:"奈良県",start:"2027-10-29",end:"2027-10-30",
    venue:"なら100年会館・ホテル日航奈良",city:"奈良県奈良市",president:"佐本 憲宏（国保中央病院）",theme:"",reg:null,abs:null,
    url:"https://www.jssf.jp/medical/academic.html",note:""},
-  {id:"jks5",cat:"関節",ed:"第5回",name:"日本膝関節学会学術集会",short:"膝関節学会",start:"2027-12-03",end:"2027-12-04",
+  {id:"jks5",cat:"関節",ed:"第5回",name:"日本膝関節学会学術集会",short:"膝関節学会",region:"神奈川県",start:"2027-12-03",end:"2027-12-04",
    venue:"パシフィコ横浜ノース",city:"神奈川県横浜市西区",president:"斎藤 充（東京慈恵会医科大学）",theme:"",reg:null,abs:null,
    url:"https://www.knees.or.jp/academic/",note:""}
 ];
@@ -1340,7 +1437,7 @@ const SOC_AB = {jks4:"膝関節",jsra57:"人工関節",chubu148:"中部",jssr56:
   joa100:"日整会",jsoa27:"スポーツ",jsjd55:"関節病",tumor60:"腫瘍",jota53:"外傷",jos29:"骨粗鬆症",hip54:"股関節",
   kiso42:"基礎",jss54:"肩関節",jssf52:"足の外科",jks5:"膝関節"};
 const SOC_WD = ["日","月","火","水","木","金","土"];
-let socView = "month", socFilter = new Set(), socAttend = new Set(), socMemos = {}, socExpanded = null;
+let socView = "month", socFilter = new Set(), socSFilter = "all", socStatus = {}, socMemos = {}, socExpanded = null;
 const socToday = (()=>{ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); })();
 let socCursor = (()=>{
   const n = SOCIETIES.filter(e=>e.end>=socToday).sort((a,b)=>a.start<b.start?-1:1)[0];
@@ -1348,11 +1445,24 @@ let socCursor = (()=>{
   return n ? {y:+n.start.slice(0,4), m:+n.start.slice(5,7)-1} : {y:d.getFullYear(), m:d.getMonth()};
 })();
 
+const SOC_ST = {attend:{t:"参加",c:"attend"},undecided:{t:"未定",c:"undecided"},absent:{t:"不参加",c:"absent"}};
 function socLoad(){
-  try{ socAttend = new Set(JSON.parse(localStorage.getItem("ortho_soc_attend")||"[]")); }catch(e){ socAttend = new Set(); }
+  try{ socStatus = JSON.parse(localStorage.getItem("ortho_soc_status")||"{}") || {}; }catch(e){ socStatus = {}; }
   try{ socMemos = JSON.parse(localStorage.getItem("ortho_soc_memo")||"{}") || {}; }catch(e){ socMemos = {}; }
+  // 旧「★参加予定」データを引き継ぐ
+  try{
+    const old = JSON.parse(localStorage.getItem("ortho_soc_attend")||"[]");
+    old.forEach(id=>{ if(!socStatus[id]) socStatus[id] = "attend"; });
+  }catch(e){}
 }
-function socSaveAttend(){ try{ localStorage.setItem("ortho_soc_attend", JSON.stringify([...socAttend])); }catch(e){} }
+function socSaveStatus(){ try{ localStorage.setItem("ortho_soc_status", JSON.stringify(socStatus)); }catch(e){} }
+function socStat(id){ return socStatus[id] || "undecided"; }
+function socSetStatus(id, st){
+  socStatus[id] = st; socSaveStatus();
+  socDirty.add(id); syncPushSoon();
+  renderSocieties();
+  if(document.getElementById("socSheet").classList.contains("open")) openSociety(id);
+}
 function socSaveMemos(){ try{ localStorage.setItem("ortho_soc_memo", JSON.stringify(socMemos)); }catch(e){} }
 
 function socDT(iso){ const a=iso.split("-").map(Number); return Date.UTC(a[0],a[1]-1,a[2]); }
@@ -1376,16 +1486,20 @@ function socRange(r){
 }
 function socVisible(e){
   if(socFilter.size && !socFilter.has(e.cat)) return false;
+  if(socSFilter !== "all" && socStat(e.id) !== socSFilter) return false;
   return true;
 }
 function socSorted(a,b){ return a.start===b.start ? (a.name<b.name?-1:1) : (a.start<b.start?-1:1); }
 function socById(id){ return SOCIETIES.find(x=>x.id===id); }
+function $(q){ return document.querySelector(q); }
 
 function renderSocieties(){
   const up = SOCIETIES.filter(e=>e.end>=socToday).sort(socSorted);
+  const cnt = {attend:0, undecided:0, absent:0};
+  SOCIETIES.forEach(e=>{ cnt[socStat(e.id)]++; });
   document.getElementById("countLabel").textContent = SOCIETIES.length+"学会を収録";
   const sl = document.getElementById("subLabel");
-  sl.textContent = "今後の開催 "+up.length+"件";
+  sl.textContent = "参加 "+cnt.attend+" ／ 未定 "+cnt.undecided+" ／ 不参加 "+cnt.absent;
   sl.style.color = "var(--text-muted)";
 
   const evs = SOCIETIES.filter(socVisible);
@@ -1395,10 +1509,12 @@ function renderSocieties(){
     const n = up[0], l = socLeft(n.start);
     html += `<button class="cal-banner" onclick="openSociety('${n.id}')">
       <span class="cd">${l>0?l:"—"}<small>${l>0?"DAYS":"開催中"}</small></span>
-      <span class="bn"><b>${n.ed} ${n.name}</b><span>${socMD(n.start)} – ${socMD(n.end)} ／ ${n.venue}</span></span>
+      <span class="bn"><b>${n.ed} ${n.name}</b><span>${socMD(n.start)} – ${socMD(n.end)} ／ ${n.region}・${n.venue}</span></span>
       <i class="ti ti-chevron-right arw"></i>
     </button>`;
   }
+
+  html += socRenderReminders();
 
   html += `<div class="cal-toolbar">
     <div class="cal-month"><b>${String(socCursor.m+1).padStart(2,"0")}</b><span>${socCursor.y}年</span></div>
@@ -1416,19 +1532,28 @@ function renderSocieties(){
   </div>`;
 
   html += `<div class="cal-chips">
-    <button class="cal-chip ${socFilter.size?"":"on"}" onclick="socFilterClear()">すべて</button>
+    <button class="cal-chip ${(!socFilter.size&&socSFilter==="all")?"on":""}" onclick="socFilterClear()">すべて</button>
     ${Object.keys(SOC_CATS).map(c=>`<button class="cal-chip ${socFilter.has(c)?"on":""}" onclick="socToggleCat('${c}')">
       <span class="dt" style="background:${SOC_CATS[c]}"></span>${c}</button>`).join("")}
+  </div>
+  <div class="cal-chips" style="margin-top:-2px">
+    <button class="cal-chip ${socSFilter==="all"?"on":""}" onclick="socSetSFilter('all')">全ステータス</button>
+    <button class="cal-chip ${socSFilter==="attend"?"on":""}" onclick="socSetSFilter('attend')">参加 ${cnt.attend}</button>
+    <button class="cal-chip ${socSFilter==="undecided"?"on":""}" onclick="socSetSFilter('undecided')">未定 ${cnt.undecided}</button>
+    <button class="cal-chip ${socSFilter==="absent"?"on":""}" onclick="socSetSFilter('absent')">不参加 ${cnt.absent}</button>
   </div>`;
 
   html += socView==="month" ? socMonthHTML(evs) : socListHTML(evs);
   html += `<div style="display:flex;gap:7px;margin-top:.9rem">
       <button class="soc-btn" style="flex:1" onclick="socExportAll()"><i class="ti ti-calendar-down"></i>全学会を.icsで保存</button>
     </div>
-    <p class="soc-note">情報基準日 2026年11月19日。会期・会場は各学会公式サイトの公表情報にもとづきます。2027年度分の参加登録期間は未発表の学会が多く、判明しているもののみ表示しています。申込前に公式サイトでご確認ください。</p>`;
+    <p class="soc-note">情報基準日 2026年11月19日。会期・会場・申込期間は各学会公式サイトの公表情報にもとづきます。参加登録期間が未発表の学会は「未発表」と表示し、リマインドの対象外です。申込前に公式サイトでご確認ください。</p>`;
 
   document.getElementById("content").innerHTML = html;
+  socNotifyMarkup();
 }
+
+function socSetSFilter(v){ socSFilter = v; renderSocieties(); }
 
 function socMonthHTML(evs){
   const {y,m} = socCursor;
@@ -1504,7 +1629,7 @@ function socMonthHTML(evs){
       bars += `<button class="${classes}" style="--ec:${SOC_CATS[e.cat]};--c1:${p.c1+1};--c2:${p.c2+2};--r:${p.lane+2}"
         onclick="openSociety('${e.id}')"
         title="${e.ed} ${e.name}／${socFull(e.start)}〜${socFull(e.end)}">
-        <span class="bt">${label}</span>${showDate?`<span class="bd">${socMD(e.start)}–${socMD(e.end)}</span>`:""}
+        <span class="bt">${label}</span>${span>=2?`<span class="br">${e.region||""}</span>`:""}${showDate?`<span class="bd">${socMD(e.start)}–${socMD(e.end)}</span>`:""}
       </button>`;
     });
     if(hidden.length){
@@ -1540,27 +1665,29 @@ function socListHTML(evs){
     html += `<div class="cal-month" style="margin:1rem 0 .5rem"><b>${mm}</b><span>${yy}年 ／ ${groups[k].length}件</span></div>`;
     groups[k].forEach(e=>{
       const st = socRegState(e);
-      const on = socAttend.has(e.id);
+      const cur = socStat(e.id);
       html += `<article class="soc-card">
         <div class="soc-head" onclick="openSociety('${e.id}')">
           <div class="soc-row">
             <div class="badges">
               <span class="badge" style="background:color-mix(in srgb,${SOC_CATS[e.cat]} 14%,transparent);color:${SOC_CATS[e.cat]}">${e.cat}</span>
               <span class="badge" style="background:var(--bg);color:var(--text-muted)">${e.ed}</span>
+              <span class="badge" style="background:var(--bg);color:var(--text-muted)">${e.region}</span>
             </div>
             <span class="soc-date">${socMD(e.start)} – ${socMD(e.end)}<span class="soc-days"> ・${socDays(e)}日間</span></span>
           </div>
-          <div class="soc-row">
-            <div style="min-width:0">
-              <div class="soc-title">${e.name}</div>
-              <div class="soc-venue"><i class="ti ti-map-pin"></i>${e.venue}</div>
-            </div>
-            <button class="soc-star ${on?"on":""}" onclick="socToggleAttend('${e.id}',event)" aria-label="参加予定">${on?"★":"☆"}</button>
-          </div>
-          <div style="display:flex;gap:5px;flex-wrap:wrap">
+          <div class="soc-title">${e.name}</div>
+          <div class="soc-venue"><i class="ti ti-map-pin"></i>${e.venue}</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:1px">
             <span class="soc-state ${st.k}"><i class="ti ti-ticket"></i>${st.t}</span>
             ${e.abs?`<span class="soc-state">${e.abs.label||"演題 "+socRange(e.abs)}</span>`:""}
           </div>
+        </div>
+        <div class="soc-foot">
+          <div class="st-seg" role="group" aria-label="参加予定">
+            ${["attend","undecided","absent"].map(k=>`<button class="${cur===k?"on "+k:""}" onclick="event.stopPropagation();socSetStatus('${e.id}','${k}')">${SOC_ST[k].t}</button>`).join("")}
+          </div>
+          <span class="soc-foot-note">${cur==="attend"?"リマインド対象":cur==="undecided"?"リマインド対象（未定）":"通知しません"}</span>
         </div>
       </article>`;
     });
@@ -1582,19 +1709,65 @@ function socToggleCat(c){
   renderSocieties();
 }
 function socFilterClear(){ socFilter.clear(); renderSocieties(); }
-function socToggleAttend(id, ev){
-  if(ev){ ev.stopPropagation(); }
-  if(socAttend.has(id)) socAttend.delete(id); else socAttend.add(id);
-  socSaveAttend();
-  renderSocieties();
-  if(document.getElementById("socSheet").classList.contains("open")) openSociety(id);
+/* 期限の抽出とリマインド */
+function socDeadlines(){
+  const out = [];
+  SOCIETIES.forEach(e=>{
+    if(socStat(e.id) === "absent") return;
+    const add = (kind, date, label, cls)=>{
+      if(!date) return;
+      out.push({key:e.id+"|"+kind, soc:e, kind, label, cls, date, left:socLeft(date), st:socStat(e.id)});
+    };
+    if(e.abs){
+      add("abs-start", e.abs.start, "演題登録 開始", "abs");
+      add("abs-end", e.abs.end, "演題登録 締切", "abs due");
+    }
+    if(e.reg){
+      add("reg-start", e.reg.start, "参加登録 開始", "reg");
+      add("reg-end", e.reg.end, "参加登録 締切", "reg due");
+    }
+  });
+  return out.filter(d=>d.left >= 0).sort((a,b)=>a.date<b.date?-1:1);
+}
+function socRenderReminders(){
+  const all = socDeadlines();
+  const near = all.filter(d=>d.left <= 30);
+  $('#calBadge') && ($('#calBadge').textContent = near.length ? String(near.length) : "");
+  if($('#calBadge')) $('#calBadge').style.display = near.length ? "inline-flex" : "none";
+
+  if(!all.length){
+    return `<div class="rem"><div class="rem-head"><i class="ti ti-bell"></i>リマインド<span class="n">参加・未定の学会</span></div>
+      <div class="rem-none">申込期間が公表されている学会がまだありません。参加登録の受付が始まると、ここに締切が並びます。</div></div>`;
+  }
+  const top = all.slice(0,5);
+  let rows = "";
+  top.forEach(d=>{
+    const cls = d.left<=7 ? "rem-left warn" : "rem-left";
+    rows += `<button class="rem-item" onclick="openSociety('${d.soc.id}')">
+      <span class="rem-date">${socMD(d.date)}<b>${SOC_WD[socD(d.date).w]}曜</b></span>
+      <span class="rem-body">
+        <span class="rem-name"><span class="rem-kind ${d.cls}">${d.label}</span>${d.soc.short}</span>
+        <span class="rem-sub">${d.soc.region} ／ ${d.st==="undecided"?"未定":"参加"}${d.soc.reg?"":""}</span>
+      </span>
+      <span class="${cls}">${d.left===0?"本日":d.left+"日"}</span>
+    </button>`;
+  });
+  return `<div class="rem">
+    <div class="rem-head"><i class="ti ti-bell"></i>リマインド
+      <span class="n">参加・未定 ${all.length}件の期日</span></div>
+    ${rows}
+    <div class="rem-foot">
+      <button class="rem-btn" onclick="socExportReminders()"><i class="ti ti-calendar-down"></i>締切を.icsで保存</button>
+      <button class="rem-btn" id="notifyBtn" onclick="socNotifyToggle()"><i class="ti ti-bell-ringing"></i>通知を有効に</button>
+    </div>
+  </div>`;
 }
 
 /* ──── 学会詳細シート ──── */
 function openSociety(id){
   const e = socById(id); if(!e) return;
   const st = socRegState(e);
-  const on = socAttend.has(id);
+  const cur = socStat(e.id);
   const same = SOCIETIES.filter(o=>o.id!==id && !(o.end<e.start || o.start>e.end));
   const sheet = document.getElementById("socSheet");
   sheet.innerHTML = `
@@ -1602,6 +1775,7 @@ function openSociety(id){
     <div class="sheet-head">
       <span class="badge" style="background:color-mix(in srgb,${SOC_CATS[e.cat]} 14%,transparent);color:${SOC_CATS[e.cat]}">${e.cat}</span>
       <span class="badge" style="background:var(--bg);color:var(--text-muted)">${e.ed}</span>
+      <span class="badge" style="background:var(--bg);color:var(--text-muted)">${e.region}</span>
       <button class="close" onclick="closeSociety()" aria-label="閉じる">✕</button>
     </div>
     <div class="sheet-body">
@@ -1619,6 +1793,13 @@ function openSociety(id){
       ${e.theme?`<div class="sheet-field"><div class="sheet-k">テーマ</div><div class="sheet-v">${e.theme}</div></div>`:""}
       ${e.president?`<div class="sheet-field"><div class="sheet-k">会 長</div><div class="sheet-v">${e.president}</div></div>`:""}
       <div class="sheet-field"><div class="sheet-k">公式サイト</div><div class="sheet-v"><a href="${e.url}" target="_blank" rel="noopener">${e.url.replace(/^https?:\/\//,"")}</a></div></div>
+      <div class="sheet-field" style="grid-template-columns:1fr;gap:5px">
+        <div class="sheet-k">参加ステータス</div>
+        <div class="st-seg big" role="group" aria-label="参加ステータス">
+          ${["attend","undecided","absent"].map(k=>`<button class="${cur===k?"on "+k:""}" onclick="socSetStatus('${e.id}','${k}')">${SOC_ST[k].t}</button>`).join("")}
+        </div>
+        <small style="font-size:10px;color:var(--text-muted);line-height:1.6">「参加」「未定」の学会は、演題登録・参加登録の期日をリマインドします。</small>
+      </div>
       <div class="sheet-field" style="grid-template-columns:1fr;gap:2px">
         <div class="sheet-k">メ モ</div>
         <textarea class="sheet-memo" id="socMemo" placeholder="参加登録の期限、宿泊、演題の有無など">${(socMemos[e.id]||"").replace(/</g,"&lt;")}</textarea>
@@ -1626,9 +1807,6 @@ function openSociety(id){
       ${same.length?`<div class="soc-warn"><i class="ti ti-alert-triangle"></i> 日程が重なります：${same.map(o=>o.short).join("、")}</div>`:""}
       ${e.note?`<p class="soc-note" style="margin-top:8px">${e.note}</p>`:""}
       <div class="sheet-actions">
-        <button class="soc-btn ${on?"on":""}" onclick="socToggleAttend('${e.id}')">
-          <span style="font-size:14px;line-height:1">${on?"★":"☆"}</span>${on?"参加予定に登録済み":"参加予定に追加"}
-        </button>
         <div class="row2">
           <button class="soc-btn" onclick="socExportOne('${e.id}')"><i class="ti ti-download"></i>.ics を保存</button>
           <a class="soc-btn" href="${socGcal(e)}" target="_blank" rel="noopener"><i class="ti ti-calendar-plus"></i>Googleカレンダー</a>
@@ -1641,7 +1819,7 @@ function openSociety(id){
   sheet.classList.add("open");
   document.body.style.overflow = "hidden";
   const memo = document.getElementById("socMemo");
-  if(memo) memo.addEventListener("input", ()=>{ socMemos[e.id] = memo.value; socSaveMemos(); });
+  if(memo) memo.addEventListener("input", ()=>{ socMemos[e.id] = memo.value; socSaveMemos(); socDirty.add(e.id); syncPushSoon(); });
 }
 function closeSociety(){
   document.getElementById("socMask").classList.remove("open");
@@ -1700,9 +1878,507 @@ function socGcal(e){
   const det = encodeURIComponent(e.city+"\n参加登録："+(e.reg?socRange(e.reg):"未発表")+"\n"+e.url);
   return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+text+"&dates="+d1+"/"+d2+"&location="+loc+"&details="+det;
 }
+/* ──── 締切リマインド：通知・書き出し ──── */
+function socExportReminders(){
+  const ds = socDeadlines();
+  if(!ds.length){ alert("リマインドできる期日がまだありません。"); return; }
+  const L = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Ortho Digest Reminders//JA","CALSCALE:GREGORIAN","METHOD:PUBLISH"];
+  ds.forEach(d=>{
+    const desc = [
+      d.soc.ed+" "+d.soc.name,
+      "期日："+socFull(d.date)+"（"+d.label+"）",
+      "会場："+d.soc.venue+"（"+d.soc.region+"）",
+      "学会："+socFull(d.soc.start)+"〜"+socFull(d.soc.end),
+      d.soc.reg?"参加登録："+socRange(d.soc.reg):"参加登録：未発表",
+      d.soc.abs?"演題登録："+socRange(d.soc.abs):"",
+      d.soc.url
+    ].filter(Boolean).join("\n");
+    const stamp = d.date.replace(/-/g,"");
+    L.push("BEGIN:VEVENT",
+      "UID:"+d.key+"@ortho-digest-reminder",
+      "DTSTAMP:"+new Date().toISOString().replace(/[-:]/g,"").split(".")[0]+"Z",
+      "DTSTART;VALUE=DATE:"+stamp,
+      "DTEND;VALUE=DATE:"+socNextDay(d.date).replace(/-/g,""),
+      "SUMMARY:"+socEsc("[締切] "+d.soc.short+" "+d.label),
+      "DESCRIPTION:"+socEsc(desc),
+      "URL:"+d.soc.url);
+    [7,1].forEach(days=>{
+      L.push("BEGIN:VALARM","ACTION:DISPLAY",
+        "DESCRIPTION:"+socEsc(d.soc.short+" "+d.label+" まで"+days+"日"),
+        "TRIGGER:-P"+days+"D","END:VALARM");
+    });
+    L.push("END:VEVENT");
+  });
+  L.push("END:VCALENDAR");
+  socDownload(L.join("\r\n"), "ortho-deadline-reminders.ics");
+}
+function socNotifySupported(){ return typeof Notification !== "undefined"; }
+function socNotifyMarkup(){
+  const btn = document.getElementById("notifyBtn");
+  if(!btn) return;
+  if(!socNotifySupported()){
+    btn.style.display = "none";
+    return;
+  }
+  const on = localStorage.getItem("ortho_soc_notify") === "1" && Notification.permission === "granted";
+  btn.classList.toggle("on", on);
+  btn.innerHTML = on ? '<i class="ti ti-bell-check"></i>通知オン' : '<i class="ti ti-bell-ringing"></i>通知を有効に';
+}
+function socNotifyToggle(){
+  if(!socNotifySupported()){ alert("このブラウザは通知に対応していません。"); return; }
+  if(localStorage.getItem("ortho_soc_notify") === "1"){
+    localStorage.setItem("ortho_soc_notify","0");
+    socNotifyMarkup();
+    return;
+  }
+  Notification.requestPermission().then(p=>{
+    localStorage.setItem("ortho_soc_notify", p==="granted" ? "1" : "0");
+    socNotifyMarkup();
+    if(p === "granted"){
+      socCheckDeadlines(true);
+    } else {
+      alert("ブラウザの設定で通知がブロックされています。サイトの通知を許可すると、締切7日前・前日に通知します。");
+    }
+  });
+}
+function socCheckDeadlines(force){
+  if(!socNotifySupported() || Notification.permission !== "granted") return;
+  if(localStorage.getItem("ortho_soc_notify") !== "1") return;
+  let shown = {};
+  try{ shown = JSON.parse(localStorage.getItem("ortho_soc_notified")||"{}"); }catch(e){}
+  const today = socToday;
+  socDeadlines().filter(d=>d.left <= 7).forEach(d=>{
+    const k = d.key+"|"+d.left+"|"+today;
+    if(shown[k] && !force) return;
+    const body = d.left === 0 ? "本日が締切です。" : "あと"+d.left+"日（"+socMD(d.date)+"）";
+    try{
+      new Notification("[締切] "+d.soc.short+" "+d.label, {
+        body: body+(d.st==="undecided"?"（ステータス：未定）":""),
+        tag: d.key
+      });
+      shown[k] = 1;
+    }catch(e){}
+  });
+  try{ localStorage.setItem("ortho_soc_notified", JSON.stringify(shown)); }catch(e){}
+}
+
 document.addEventListener("keydown", e=>{
   if(e.key==="Escape") closeSociety();
 });
+
+
+
+/* ──── トークン不要の端末移行（同期コード） ──── */
+const SYNC_PREFIX = "OSC1";
+const SYNC_PREFIX_RAW = "OSC1r";
+
+function b64uFromBytes(bytes){
+  let bin = "";
+  for(let i=0;i<bytes.length;i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+function bytesFromB64u(str){
+  const b = atob(str.replace(/-/g,"+").replace(/_/g,"/"));
+  const out = new Uint8Array(b.length);
+  for(let i=0;i<b.length;i++) out[i] = b.charCodeAt(i);
+  return out;
+}
+async function deflateBytes(bytes){
+  if(typeof CompressionStream === "undefined") return null;
+  try{
+    const cs = new CompressionStream("deflate-raw");
+    const stream = new Blob([bytes]).stream().pipeThrough(cs);
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  }catch(e){ return null; }
+}
+async function inflateBytes(bytes){
+  if(typeof DecompressionStream === "undefined") return null;
+  try{
+    const ds = new DecompressionStream("deflate-raw");
+    const stream = new Blob([bytes]).stream().pipeThrough(ds);
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  }catch(e){ return null; }
+}
+
+function syncStatePayload(includePapers){
+  const p = {
+    v: 1,
+    at: new Date().toISOString(),
+    status: socStatus,
+    memos: socMemos,
+    fav: [...favorites],
+    read: [...readPapers].slice(-500)
+  };
+  if(includePapers) p.papers = manualPapers;
+  return p;
+}
+async function packPayload(obj){
+  const bytes = new TextEncoder().encode(JSON.stringify(obj));
+  const comp = await deflateBytes(bytes);
+  if(comp && comp.length < bytes.length){
+    return SYNC_PREFIX + "." + b64uFromBytes(comp);
+  }
+  return SYNC_PREFIX_RAW + "." + b64uFromBytes(bytes);
+}
+async function unpackPayload(code){
+  const clean = String(code||"").trim().replace(/\s+/g,"");
+  let body = null, isRaw = false;
+  if(clean.startsWith(SYNC_PREFIX_RAW + ".")){ body = clean.slice(SYNC_PREFIX_RAW.length+1); isRaw = true; }
+  else if(clean.startsWith(SYNC_PREFIX + ".")){ body = clean.slice(SYNC_PREFIX.length+1); }
+  else { throw new Error("コードの形式が違います（OSC1... で始まる必要があります）"); }
+  const bytes = bytesFromB64u(body);
+  let raw = bytes;
+  if(!isRaw){
+    const inf = await inflateBytes(bytes);
+    if(!inf) throw new Error("この端末のブラウザが展開に対応していません");
+    raw = inf;
+  }
+  const obj = JSON.parse(new TextDecoder().decode(raw));
+  if(!obj || obj.v !== 1) throw new Error("コードのバージョンが対応していません");
+  return obj;
+}
+
+function applyPayload(obj){
+  let n = 0;
+  if(obj.status && typeof obj.status === "object"){
+    Object.keys(obj.status).forEach(k=>{ socStatus[k] = obj.status[k]; n++; });
+    socSaveStatus();
+  }
+  if(obj.memos && typeof obj.memos === "object"){
+    Object.assign(socMemos, obj.memos);
+    socSaveMemos();
+  }
+  if(Array.isArray(obj.fav)){
+    obj.fav.forEach(x=>{ if(!favorites.has(x)){ favorites.add(x); n++; } });
+    saveFavorites();
+  }
+  if(Array.isArray(obj.read)){
+    obj.read.forEach(x=>readPapers.add(x));
+    saveReadPapers();
+  }
+  if(Array.isArray(obj.papers) && obj.papers.length){
+    const ids = new Set(manualPapers.map(p=>p.id));
+    const add = obj.papers.filter(p=>p && p.id && !ids.has(p.id));
+    if(add.length){ manualPapers = [...add, ...manualPapers]; saveManualPapers(); }
+    n += add.length;
+  }
+  socDirty.clear();
+  lastPushed = ""; lastSoc = ""; lastMan = "";
+  return n;
+}
+
+function codeStatusMsg(msg, ok){
+  const el = document.getElementById("codeStatus");
+  if(!el) return;
+  el.textContent = msg;
+  el.style.color = ok === false ? "var(--danger-text)" : (ok ? "var(--success-text)" : "var(--text-muted)");
+}
+
+async function codeMake(){
+  try{
+    codeStatusMsg("生成中...");
+    const code = await packPayload(syncStatePayload(false));
+    document.getElementById("syncCodeBox").value = code;
+    codeStatusMsg("発行しました（" + code.length.toLocaleString() + "文字）。新しい端末に貼り付けてください。", true);
+  }catch(e){ codeStatusMsg("生成できませんでした: " + e.message, false); }
+}
+async function codeApplyFromBox(){
+  const v = document.getElementById("syncCodeBox").value;
+  if(!v.trim()){ codeStatusMsg("コードを貼り付けてください。", false); return; }
+  await codeApply(v);
+}
+async function codeApply(code){
+  try{
+    codeStatusMsg("適用中...");
+    const obj = await unpackPayload(code);
+    const n = applyPayload(obj);
+    render();
+    const when = obj.at ? obj.at.slice(0,16).replace("T"," ") : "—";
+    codeStatusMsg("適用しました（" + when + " 時点のデータ）", true);
+    return true;
+  }catch(e){
+    codeStatusMsg("適用できませんでした: " + e.message, false);
+    return false;
+  }
+}
+async function codeUrl(){
+  const code = document.getElementById("syncCodeBox").value.trim();
+  if(!code) return null;
+  return location.origin + location.pathname + "#sync=" + code;
+}
+async function codeCopyUrl(){
+  let code = document.getElementById("syncCodeBox").value.trim();
+  if(!code){ await codeMake(); code = document.getElementById("syncCodeBox").value.trim(); }
+  const url = location.origin + location.pathname + "#sync=" + code;
+  if(url.length > 16000){ codeStatusMsg("コードが長すぎてURLにできません。「ファイル保存」を使うか、コードを直接コピーしてください。", false); return; }
+  try{
+    await navigator.clipboard.writeText(url);
+    codeStatusMsg("URLをコピーしました（メールやLINEで自分に送ってください）", true);
+  }catch(e){
+    document.getElementById("syncCodeBox").value = url;
+    codeStatusMsg("URLをテキスト欄に表示しました。手動でコピーしてください。", false);
+  }
+}
+async function codeShowQr(){
+  let code = document.getElementById("syncCodeBox").value.trim();
+  if(!code){ await codeMake(); code = document.getElementById("syncCodeBox").value.trim(); }
+  const url = location.origin + location.pathname + "#sync=" + code;
+  const box = document.getElementById("qrBox");
+  if(url.length > 2900){
+    codeStatusMsg("データが大きすぎてQRに収まりません（「URLをコピー」か「ファイル保存」をお使いください）", false);
+    return;
+  }
+  box.style.display = "block";
+  box.innerHTML = '<div style="font-size:11px;color:#666">QRを生成中...</div>';
+  const show = ()=>{
+    try{
+      const qr = qrcode(0, "L");
+      qr.addData(url, "Byte");
+      qr.make();
+      box.innerHTML = qr.createImgTag(5, 8);
+      codeStatusMsg("このQRを新しい端末のカメラで読み取ってください", true);
+    }catch(e){
+      box.style.display = "none";
+      codeStatusMsg("QRを生成できませんでした。「URLをコピー」をお使いください。", false);
+    }
+  };
+  if(typeof qrcode === "function"){ show(); return; }
+  const sc = document.createElement("script");
+  sc.src = "https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js";
+  sc.onload = show;
+  sc.onerror = ()=>{ box.style.display="none"; codeStatusMsg("QRライブラリを読み込めませんでした（オフライン？）。「URLをコピー」をお使いください。", false); };
+  document.head.appendChild(sc);
+}
+async function codeDownload(){
+  try{
+    const obj = syncStatePayload(true);
+    const blob = new Blob([JSON.stringify(obj, null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    const d = new Date();
+    a.download = "ortho-backup-" + d.getFullYear() + String(d.getMonth()+1).padStart(2,"0") + String(d.getDate()).padStart(2,"0") + ".json";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 3000);
+    codeStatusMsg("ファイルを保存しました（手動論文も含みます）", true);
+  }catch(e){ codeStatusMsg("保存できませんでした: " + e.message, false); }
+}
+function codeLoadFile(input){
+  const f = input.files && input.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = async ()=>{
+    const txt = String(r.result||"");
+    try{
+      if(txt.trim().startsWith("{")){
+        const obj = JSON.parse(txt);
+        if(!obj || obj.v !== 1) throw new Error("ファイルの形式が違います");
+        const n = applyPayload(obj);
+        render();
+        codeStatusMsg("ファイルから復元しました（" + n + " 件を反映）", true);
+      } else {
+        await codeApply(txt);
+      }
+    }catch(e){ codeStatusMsg("読み込めませんでした: " + e.message, false); }
+    input.value = "";
+  };
+  r.readAsText(f);
+}
+/* URLの #sync=... を自動適用 */
+async function codeApplyFromHash(){
+  const h = location.hash || "";
+  const m = h.match(/[#&]sync=([^&]+)/);
+  if(!m) return;
+  const ok = await codeApply(decodeURIComponent(m[1]));
+  history.replaceState(null, "", location.pathname + location.search);
+  if(ok) setTimeout(()=>{ try{ openSettings(); }catch(e){} }, 200);
+}
+
+/* ──── GitHub 同期（読み取りは公開URL / 書き込みのみトークン） ──── */
+const SYNC = {
+  owner: "jx3t0shak1052-creator",
+  repo: "orthopedic-news",
+  branch: localStorage.getItem("ortho_sync_branch") || "sync-data",
+  fallback: "main",
+  socPath: "data/society-state.json",
+  manPath: "data/manual-papers.json"
+};
+let syncTimer = null, syncBusy = false, lastPushed = "", lastSoc = "", lastMan = "";
+const socDirty = new Set();
+
+function ghToken(){ return localStorage.getItem("ortho_gh_token") || ""; }
+function ghHeaders(token){
+  return {
+    "Authorization": "Bearer " + token,
+    "Accept": "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+    "Content-Type": "application/json"
+  };
+}
+function b64enc(str){
+  const bytes = new TextEncoder().encode(str);
+  let bin = "";
+  for(let i=0;i<bytes.length;i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+function syncStatus(msg, ok){
+  const el = document.getElementById("ghStatus");
+  if(el){ el.textContent = msg; el.style.color = ok === false ? "var(--danger-text)" : (ok ? "var(--success-text)" : "var(--text-muted)"); }
+}
+
+/* 公開URLから読む（トークン不要・CORS可） */
+async function ghReadRaw(path){
+  for(const br of [SYNC.branch, SYNC.fallback]){
+    try{
+      const u = `https://raw.githubusercontent.com/${SYNC.owner}/${SYNC.repo}/${br}/${path}?t=${Date.now()}`;
+      const r = await fetch(u, {cache:"no-store"});
+      if(r.ok) return await r.json();
+    }catch(e){}
+  }
+  return null;
+}
+
+/* ブランチが無ければ default の HEAD から作る */
+async function ghEnsureBranch(token){
+  const repo = await fetch(`https://api.github.com/repos/${SYNC.owner}/${SYNC.repo}`, {headers:ghHeaders(token)});
+  if(!repo.ok) throw new Error("リポジトリ情報を取得できません（トークンの権限を確認）");
+  const def = (await repo.json()).default_branch || "main";
+  const ref = await fetch(`https://api.github.com/repos/${SYNC.owner}/${SYNC.repo}/git/ref/heads/${def}`, {headers:ghHeaders(token)});
+  if(!ref.ok) throw new Error("既定ブランチの参照を取得できません");
+  const sha = (await ref.json()).object.sha;
+  const mk = await fetch(`https://api.github.com/repos/${SYNC.owner}/${SYNC.repo}/git/refs`, {
+    method:"POST", headers:ghHeaders(token),
+    body: JSON.stringify({ref:"refs/heads/"+SYNC.branch, sha})
+  });
+  if(!mk.ok && mk.status !== 422) throw new Error("同期用ブランチを作成できません");
+}
+
+/* 書き込み */
+async function ghPut(path, obj, msg){
+  const token = ghToken();
+  if(!token) throw new Error("no-token");
+  const api = `https://api.github.com/repos/${SYNC.owner}/${SYNC.repo}/contents/${path}`;
+  const content = b64enc(JSON.stringify(obj, null, 2));
+  for(let attempt=0; attempt<3; attempt++){
+    let sha = null;
+    const g = await fetch(api + "?ref=" + encodeURIComponent(SYNC.branch), {headers:ghHeaders(token), cache:"no-store"});
+    if(g.ok){ sha = (await g.json()).sha; }
+    else if(g.status === 404){
+      if(attempt === 0){ try{ await ghEnsureBranch(token); }catch(e){} }
+    } else if(g.status === 401){ throw new Error("トークンが無効です"); }
+    else if(g.status === 403){ throw new Error("権限不足です（Contents: Read and write が必要）"); }
+
+    const payload = {message: msg, content: content, branch: SYNC.branch};
+    if(sha) payload.sha = sha;
+    const r = await fetch(api, {method:"PUT", headers:ghHeaders(token), body: JSON.stringify(payload)});
+    if(r.ok) return true;
+    if(r.status === 409 || r.status === 422){ await new Promise(x=>setTimeout(x, 700)); continue; }
+    const t = await r.text();
+    throw new Error("HTTP " + r.status + " " + t.slice(0, 120));
+  }
+  throw new Error("競合が解消できませんでした");
+}
+
+/* 起動時：リモートの内容を取り込む */
+async function syncPull(){
+  const st = await ghReadRaw(SYNC.socPath);
+  if(st && st.status){
+    Object.keys(st.status).forEach(k=>{ if(!socDirty.has(k)) socStatus[k] = st.status[k]; });
+    if(st.memos) Object.assign(socMemos, st.memos);
+    localStorage.setItem("ortho_soc_status", JSON.stringify(socStatus));
+    localStorage.setItem("ortho_soc_memo", JSON.stringify(socMemos));
+    if(st.updated) localStorage.setItem("ortho_sync_at", st.updated);
+  }
+  const man = await ghReadRaw(SYNC.manPath);
+  if(man && Array.isArray(man.papers)){
+    const ids = new Set(manualPapers.map(p=>p.id));
+    const added = man.papers.filter(p=>p && p.id && !ids.has(p.id));
+    if(added.length){
+      manualPapers = [...added, ...manualPapers];
+      saveManualPapers();
+    }
+    if(man.updated) localStorage.setItem("ortho_sync_at", man.updated);
+  }
+  lastSoc = JSON.stringify({status: socStatus, memos: socMemos});
+  lastMan = JSON.stringify(manualPapers);
+  lastPushed = lastSoc + "|" + lastMan;
+  const at = localStorage.getItem("ortho_sync_at");
+  if(at) syncStatus("最終同期: " + at, true);
+}
+
+/* 変更をまとめて送る（3秒デバウンス） */
+function syncPushSoon(){
+  if(!ghToken()){
+    syncStatus("端末にのみ保存しています（同期するにはトークンを設定）");
+    return;
+  }
+  if(syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(()=>{ syncFlush(); }, 3000);
+}
+async function syncFlush(){
+  if(syncBusy || !ghToken()) return;
+  syncBusy = true;
+  try{
+    const sigSoc = JSON.stringify({status: socStatus, memos: socMemos});
+    const sigMan = JSON.stringify(manualPapers);
+    const sig = sigSoc + "|" + sigMan;
+    if(sig === lastPushed){
+      syncStatus("変更はありません（最終同期: " + (localStorage.getItem("ortho_sync_at")||"—") + "）", true);
+      return;
+    }
+    const now = new Date().toISOString();
+    const stamp = now.slice(0,16).replace("T"," ");
+    if(sigSoc !== lastSoc){
+      await ghPut(SYNC.socPath, {updated: now, status: socStatus, memos: socMemos}, "学会ステータス更新 " + stamp);
+      lastSoc = sigSoc;
+    }
+    if(sigMan !== lastMan){
+      await ghPut(SYNC.manPath, {updated: now, papers: manualPapers.slice(0, 500)}, "手動論文を更新 " + stamp);
+      lastMan = sigMan;
+    }
+    lastPushed = sig;
+    localStorage.setItem("ortho_sync_at", stamp);
+    syncStatus("同期しました " + stamp, true);
+  }catch(e){
+    syncStatus("同期できませんでした: " + e.message, false);
+  }finally{
+    syncBusy = false;
+  }
+}
+
+/* 設定モーダル操作 */
+function ghSaveToken(){
+  const v = (document.getElementById("ghTokenInput").value || "").trim();
+  if(!v){ localStorage.removeItem("ortho_gh_token"); syncStatus("トークンを削除しました。端末のみの保存になります。"); return; }
+  localStorage.setItem("ortho_gh_token", v);
+  document.getElementById("ghTokenInput").value = "";
+  syncStatus("トークンを保存しました。接続テストを実行してください。");
+}
+async function ghTest(){
+  const token = ghToken();
+  if(!token){ syncStatus("先にトークンを保存してください。", false); return; }
+  syncStatus("接続を確認中...");
+  try{
+    const r = await fetch(`https://api.github.com/repos/${SYNC.owner}/${SYNC.repo}`, {headers:ghHeaders(token)});
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    const j = await r.json();
+    syncStatus("接続OK（" + j.full_name + " / 権限: " + (j.permissions && j.permissions.push ? "書き込み可" : "読み取りのみ") + "）", true);
+  }catch(e){ syncStatus("接続できません: " + e.message, false); }
+}
+async function ghMigrate(){
+  if(!ghToken()){ syncStatus("先にトークンを保存してください。", false); return; }
+  syncStatus("端末のデータを送信中...");
+  lastPushed = "";
+  await syncFlush();
+}
+async function ghPullNow(){
+  syncStatus("最新を取得中...");
+  try{
+    socDirty.clear();
+    await syncPull();
+    render();
+    syncStatus("最新を取得しました", true);
+  }catch(e){ syncStatus("取得できません: " + e.message, false); }
+}
 
 /* ──── 初期化 ──── */
 (async ()=>{
@@ -1712,11 +2388,14 @@ document.addEventListener("keydown", e=>{
   loadLocalImplants();
   loadReadPapers();
   socLoad();
+  try{ await syncPull(); }catch(e){}
   applyTheme(localStorage.getItem("ortho_theme")||"blue");
   showNotice("loading","データを読み込み中...");
   await loadAll();
   document.getElementById("noticeBar").style.display="none";
   render();
+  try{ await codeApplyFromHash(); }catch(e){}
+  setTimeout(()=>{ socCheckDeadlines(false); socNotifyMarkup(); }, 1200);
 })();
 </script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
