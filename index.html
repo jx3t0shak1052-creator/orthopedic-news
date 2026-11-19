@@ -153,25 +153,66 @@
     .cal-banner .bn span{display:block;font-size:10.5px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
     .cal-banner .arw{margin-left:auto;color:var(--text-muted);font-size:15px;flex-shrink:0}
     .cal-grid{border:.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--surface)}
-    .cal-dows,.cal-cells{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
-    .cal-dows{background:var(--bg);border-bottom:.5px solid var(--border)}
+    .cal-dows{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));background:var(--bg);border-bottom:.5px solid var(--border)}
     .cal-dows div{text-align:center;font-size:10px;color:var(--text-muted);padding:6px 0;font-weight:500}
     .cal-dows div:first-child{color:#DC2626}
     .cal-dows div:last-child{color:#2563EB}
-    .cal-cell{min-height:64px;border-right:.5px solid var(--border);border-bottom:.5px solid var(--border);padding:3px 3px 4px;display:flex;flex-direction:column;gap:2.5px;overflow:hidden;min-width:0}
-    .cal-cell:nth-child(7n){border-right:0}
-    .cal-cell.dim{background:var(--bg);opacity:.5}
-    .cal-cell.today{box-shadow:inset 0 0 0 1.5px var(--accent)}
-    .cal-date{font-size:10.5px;color:var(--text-secondary);font-variant-numeric:tabular-nums;line-height:1.3}
-    .cal-cell.today .cal-date{color:var(--accent-text);font-weight:700}
-    .cal-ev{display:block;width:100%;text-align:left;border:0;border-left:2.5px solid var(--ec);background:var(--surface);color:var(--text-primary);font-size:8.5px;line-height:1.35;padding:1.5px 3px;border-radius:2px;cursor:pointer;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:color-mix(in srgb,var(--ec) 13%,var(--surface))}
-    .cal-ev:hover{background:color-mix(in srgb,var(--ec) 24%,var(--surface))}
-    .cal-cont{height:4px;border-radius:2px;background:var(--ec);opacity:.28;margin:0 4px 0 1px}
-    .cal-more{border:0;background:none;color:var(--text-muted);font-size:8.5px;text-align:left;cursor:pointer;padding:0 3px;font-family:inherit}
+
+    /* 週ブロック：日付行＋イベント帯のレーン */
+    .cal-week{
+      display:grid;grid-template-columns:repeat(7,minmax(0,1fr));
+      grid-auto-rows:auto;position:relative;
+      border-bottom:.5px solid var(--border);
+      padding-bottom:3px;min-height:46px;--rowh:17px;
+    }
+    .cal-week:last-child{border-bottom:0}
+    .wk-bg{grid-row:1 / span 99;border-right:.5px solid var(--border);pointer-events:none}
+    .wk-bg:nth-child(7){border-right:0}
+    .wk-bg.dim{background:var(--bg)}
+    .wk-bg.we{background:color-mix(in srgb,var(--bg) 55%,var(--surface))}
+    .wk-bg.today{box-shadow:inset 0 0 0 1.5px var(--accent);border-radius:2px}
+    .wk-date{
+      grid-row:1;padding:3px 4px 2px;font-size:10.5px;line-height:1.2;
+      color:var(--text-secondary);font-variant-numeric:tabular-nums;
+      display:flex;align-items:center;gap:3px;pointer-events:none;z-index:1;
+    }
+    .wk-date.dim{color:var(--text-muted);opacity:.55}
+    .wk-date.today{color:var(--accent-text);font-weight:700}
+    .wk-date.today b{
+      background:var(--accent);color:#fff;border-radius:50%;
+      width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;
+      font-size:9.5px;font-weight:700
+    }
+    .cal-bar{
+      grid-column:var(--c1) / var(--c2);grid-row:var(--r);
+      margin:1px 2px 0;height:16px;min-width:0;
+      display:flex;align-items:center;gap:3px;
+      padding:0 5px;border:0;border-radius:3px;
+      border-left:3px solid var(--ec);
+      background:color-mix(in srgb,var(--ec) 21%,var(--surface));
+      box-shadow:inset 0 0 0 .5px color-mix(in srgb,var(--ec) 26%,transparent);
+      color:var(--text-primary);font-family:inherit;font-size:9.5px;font-weight:700;
+      line-height:1;text-align:left;white-space:nowrap;overflow:hidden;
+      cursor:pointer;z-index:2;
+    }
+    .cal-bar:hover{background:color-mix(in srgb,var(--ec) 34%,var(--surface))}
+    .cal-bar .bt{overflow:hidden;text-overflow:ellipsis}
+    .cal-bar .bd{flex-shrink:0;font-size:8px;color:var(--text-secondary);opacity:.75;font-variant-numeric:tabular-nums}
+    .cal-bar.cont-before{border-left:3px dashed color-mix(in srgb,var(--ec) 55%,var(--surface));border-top-left-radius:0;border-bottom-left-radius:0}
+    .cal-bar.cont-after{border-top-right-radius:0;border-bottom-right-radius:0}
+    .cal-more{
+      grid-column:var(--c1) / var(--c2);grid-row:var(--r);
+      margin:1px 2px 0;height:14px;border:0;background:none;
+      color:var(--text-muted);font-size:8.5px;text-align:left;padding:0 5px;
+      cursor:pointer;font-family:inherit;z-index:2;overflow:hidden;white-space:nowrap;
+    }
+    .cal-more:hover{color:var(--accent-text)}
     @media(min-width:600px){
-      .cal-cell{min-height:82px;padding:4px 4px 5px}
-      .cal-ev{font-size:9.5px;padding:2.5px 5px}
-      .cal-date{font-size:11px}
+      .cal-week{min-height:58px;--rowh:19px}
+      .wk-date{font-size:11.5px;padding:4px 5px 3px}
+      .cal-bar{height:18px;font-size:11px;margin:1.5px 3px 0;padding:0 7px}
+      .cal-bar .bd{font-size:8.5px}
+      .cal-more{font-size:9.5px;height:15px}
     }
     .cal-empty{text-align:center;padding:2.5rem 1rem;color:var(--text-muted);font-size:13px}
     .soc-card{background:var(--surface);border-radius:var(--radius-lg);border:.5px solid var(--border);margin-bottom:8px;overflow:hidden}
@@ -1295,9 +1336,9 @@ const SOCIETIES = [
    url:"https://www.knees.or.jp/academic/",note:""}
 ];
 
-const SOC_AB = {jks4:"膝",jsra57:"人工",chubu148:"中部",jssr56:"脊椎",jssh70:"手",jcr71:"リウマ",
-  joa100:"日整会",jsoa27:"スポ",jsjd55:"関節病",tumor60:"腫瘍",jota53:"外傷",jos29:"骨粗",hip54:"股",
-  kiso42:"基礎",jss54:"肩",jssf52:"足",jks5:"膝"};
+const SOC_AB = {jks4:"膝関節",jsra57:"人工関節",chubu148:"中部",jssr56:"脊椎",jssh70:"手外科",jcr71:"リウマチ",
+  joa100:"日整会",jsoa27:"スポーツ",jsjd55:"関節病",tumor60:"腫瘍",jota53:"外傷",jos29:"骨粗鬆症",hip54:"股関節",
+  kiso42:"基礎",jss54:"肩関節",jssf52:"足の外科",jks5:"膝関節"};
 const SOC_WD = ["日","月","火","水","木","金","土"];
 let socView = "month", socFilter = new Set(), socAttend = new Set(), socMemos = {}, socExpanded = null;
 const socToday = (()=>{ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); })();
@@ -1394,37 +1435,99 @@ function socMonthHTML(evs){
   const key = y+"-"+String(m+1).padStart(2,"0");
   const dim = new Date(Date.UTC(y,m+1,0)).getUTCDate();
   const startDow = new Date(Date.UTC(y,m,1)).getUTCDay();
-  const total = Math.ceil((startDow+dim)/7)*7;
-  let cells = "";
-  for(let i=0;i<total;i++){
-    const dayNum = i-startDow+1;
-    let cy=y, cm=m, cd=dayNum, dim_=false;
-    if(dayNum<1){ dim_=true; cm=m-1; cd=new Date(Date.UTC(y,m,0)).getUTCDate()+dayNum; if(cm<0){cm=11;cy--;} }
-    else if(dayNum>dim){ dim_=true; cm=m+1; cd=dayNum-dim; if(cm>11){cm=0;cy++;} }
-    const iso = cy+"-"+String(cm+1).padStart(2,"0")+"-"+String(cd).padStart(2,"0");
-    const list = evs.filter(e=>e.start<=iso && e.end>=iso).sort(socSorted);
-    const starts = list.filter(e=>e.start===iso);
-    const conts = list.filter(e=>e.start<iso);
-    let inner = "";
-    starts.forEach(e=>{
-      inner += `<button class="cal-ev" style="--ec:${SOC_CATS[e.cat]}" onclick="openSociety('${e.id}')" title="${e.ed} ${e.name}">${SOC_AB[e.id]||e.short}</button>`;
+  const D = ms => new Date(ms).toISOString().slice(0,10);
+  const base = Date.UTC(y,m,1);
+  const monthStart = Date.UTC(y,m,1), monthEnd = Date.UTC(y,m,dim);
+
+  let weeks = "";
+  let ws = base - startDow*86400000;
+
+  while(ws <= monthEnd){
+    const days = [];
+    for(let i=0;i<7;i++){
+      const ms = ws + i*86400000;
+      days.push({iso:D(ms), d:new Date(ms).getUTCDate(), month:new Date(ms).getUTCMonth(), inMonth:ms>=monthStart && ms<=monthEnd});
+    }
+    const wStart = days[0].iso, wEnd = days[6].iso;
+    const list = evs.filter(e=> e.start<=wEnd && e.end>=wStart).sort((a,b)=>{
+      if(a.start!==b.start) return a.start<b.start?-1:1;
+      return a.end>b.end?-1:1;
     });
-    conts.forEach(e=>{ inner += `<span class="cal-cont" style="--ec:${SOC_CATS[e.cat]}"></span>`; });
-    const extra = starts.length - 2;
-    if(extra > 0) inner += `<button class="cal-more" onclick="socSetView('list')">+${extra}</button>`;
-    cells += `<div class="cal-cell${dim_?" dim":""}${iso===socToday?" today":""}">
-      <span class="cal-date">${cd}</span>${inner}</div>`;
+
+    // レーン割り当て（重なり回避）
+    const lanes = [];
+    const placed = list.map(e=>{
+      let c1 = 0, c2 = 6;
+      const si = days.findIndex(x=>x.iso===e.start);
+      const ei = days.findIndex(x=>x.iso===e.end);
+      c1 = si>=0 ? si : (e.start < wStart ? 0 : 0);
+      c2 = ei>=0 ? ei : (e.end > wEnd ? 6 : 6);
+      if(c2 < c1) c2 = c1;
+      let lane = 0;
+      while(true){
+        const row = lanes[lane] || (lanes[lane] = new Array(7).fill(false));
+        let free = true;
+        for(let c=c1;c<=c2;c++){ if(row[c]){ free=false; break; } }
+        if(free){ for(let c=c1;c<=c2;c++) row[c]=true; break; }
+        lane++;
+      }
+      return {e, c1, c2, lane, contBefore: e.start < wStart, contAfter: e.end > wEnd};
+    });
+
+    // 表示レーン上限（モバイル2 / 広い画面3）
+    const wide = window.innerWidth >= 600;
+    const maxLane = wide ? 3 : 2;
+    const shown = placed.filter(p=>p.lane < maxLane);
+    const hidden = placed.filter(p=>p.lane >= maxLane);
+    const laneCount = Math.max(1, Math.min(maxLane, lanes.length));
+    const rows = laneCount + (hidden.length ? 1 : 0);
+
+    let bg = "";
+    days.forEach((d,i)=>{
+      const cls = `wk-bg${d.inMonth?"":" dim"}${(i===0||i===6)?" we":""}${d.iso===socToday?" today":""}`;
+      bg += `<div class="${cls}" style="grid-column:${i+1}"></div>`;
+    });
+
+    let dates = "";
+    days.forEach((d,i)=>{
+      const cls = `wk-date${d.inMonth?"":" dim"}${d.iso===socToday?" today":""}`;
+      dates += `<div class="${cls}" style="grid-column:${i+1}">${d.iso===socToday?`<b>${d.d}</b>`:d.d}</div>`;
+    });
+
+    let bars = "";
+    shown.forEach(p=>{
+      const e = p.e;
+      const span = p.c2-p.c1+1;
+      const label = (SOC_AB[e.id]||e.short);
+      const showDate = span >= 3 || (p.contAfter || p.contBefore);
+      const classes = `cal-bar${p.contBefore?" cont-before":""}${p.contAfter?" cont-after":""}`;
+      bars += `<button class="${classes}" style="--ec:${SOC_CATS[e.cat]};--c1:${p.c1+1};--c2:${p.c2+2};--r:${p.lane+2}"
+        onclick="openSociety('${e.id}')"
+        title="${e.ed} ${e.name}／${socFull(e.start)}〜${socFull(e.end)}">
+        <span class="bt">${label}</span>${showDate?`<span class="bd">${socMD(e.start)}–${socMD(e.end)}</span>`:""}
+      </button>`;
+    });
+    if(hidden.length){
+      const first = Math.min(...hidden.map(p=>p.c1));
+      const last = Math.max(...hidden.map(p=>p.c2));
+      bars += `<button class="cal-more" style="--c1:${first+1};--c2:${last+2};--r:${laneCount+1}"
+        onclick="socSetView('list')">＋${hidden.length}件（リストで表示）</button>`;
+    }
+
+    weeks += `<div class="cal-week" style="grid-template-rows:auto repeat(${rows},var(--rowh))">${bg}${dates}${bars}</div>`;
+    ws += 7*86400000;
   }
+
   const dows = SOC_WD.map(w=>`<div>${w}</div>`).join("");
   const monthCount = evs.filter(e=>{
-    const s=e.start.slice(0,7), en=e.end.slice(0,7);
-    return s<=key && en>=key;
+    const s0=e.start.slice(0,7), en=e.end.slice(0,7);
+    return s0<=key && en>=key;
   }).length;
   return `<div class="cal-grid">
     <div class="cal-dows">${dows}</div>
-    <div class="cal-cells">${cells}</div>
+    ${weeks}
   </div>
-  <p class="soc-note" style="margin-top:6px">${y}年${m+1}月の開催：${monthCount}件</p>`;
+  <p class="soc-note" style="margin-top:6px">${y}年${m+1}月の開催：${monthCount}件 ／ 帯の色＝領域、破線の左端＝前の週からの継続</p>`;
 }
 
 function socListHTML(evs){
