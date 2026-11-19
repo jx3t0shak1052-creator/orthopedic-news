@@ -302,16 +302,60 @@ def normalize_epmc(r):
     }
 
 
+def _ym(year, month):
+    """'2026' / '11' / 'Nov' → (2026, 11)。月不明は 1 とする。"""
+    try:
+        y = int(str(year)[:4])
+    except (TypeError, ValueError):
+        return None
+    ms = str(month or "").strip()
+    if ms.isdigit():
+        mo = int(ms)
+    else:
+        mo = MONTH_MAP.get(ms[:3].lower(), 1)
+    return (y, mo if 1 <= mo <= 12 else 1)
+
+
+def journal_label(rec):
+    """表示用の雑誌表記を作る。
+
+    号の年月（例: 2027年1月号）が今日より先になる場合は「未来の号」とみなし、
+    実際の公開日を主表示にして号を括弧に残す。
+      J Hand Surg Glob Online, 2026年10月公開（2027年1月号）
+    """
+    jt = rec.get("journal_title") or "Journal"
+    ym = _ym(rec.get("journal_year"), rec.get("journal_month"))
+    if not ym:
+        return jt
+    jy, jm = ym
+    has_month = bool(str(rec.get("journal_month") or "").strip())
+    if has_month:
+        base = f"{jt}, {jy}年{jm}月"
+    else:
+        base = f"{jt}, {jy}年"
+
+    now = datetime.now(JST)
+    today = (now.year, now.month)
+    future = (jy, jm) > today if has_month else jy > today[0]
+
+    m = re.match(r"(\d{4})-(\d{2})-(\d{2})", (rec.get("published") or "").strip())
+    if m:
+        pub = (int(m.group(1)), int(m.group(2)))
+        if pub > today:          # 公開日そのものが未来（先行公開）
+            future = True
+        if future:
+            tail = f"{jy}年{jm}月号" if has_month else f"{jy}年"
+            return f"{jt}, {pub[0]}年{pub[1]}月公開（{tail}）"
+    if future:                   # 公開日が不明な未来号
+        return f"{jt}, {jy}年{jm}月号" if has_month else f"{jt}, {jy}年"
+    return base
+
+
 def finalize(rec):
     """共通形式のレコードに表示用フィールドを付与"""
     pmid = rec.get("pmid", "")
     rec["url"] = f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/" if pmid else ""
-    y, m = rec.get("journal_year", ""), rec.get("journal_month", "")
-    mm = ""
-    if m:
-        mm = f"{int(m)}月" if str(m).isdigit() else f"{MONTH_MAP.get(str(m)[:3].lower(), '')}月"
-    jt = rec.get("journal_title") or "Journal"
-    rec["journal_display"] = f"{jt}, {y}年{mm}" if y else jt
+    rec["journal_display"] = journal_label(rec)
     return rec
 
 
