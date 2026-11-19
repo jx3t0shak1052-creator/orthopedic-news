@@ -1,0 +1,562 @@
+diff --git a/index.html b/index.html
+index 365d3ee..c79f276 100644
+--- a/index.html
++++ b/index.html
+@@ -120,6 +120,116 @@
+     .swatch-name{font-size:10px;color:var(--text-muted);text-align:center;margin-top:2px}
+     @keyframes spin{to{transform:rotate(360deg)}}
+     .spin{display:inline-block;animation:spin .8s linear infinite}
++
++    /* ──── 学会カレンダー ──── */
++    .mode-inner{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
++    .mode-inner::-webkit-scrollbar{display:none}
++    .mode-btn{flex-shrink:0;white-space:nowrap}
++    @media(max-width:420px){.mode-btn{padding:7px 11px;font-size:12px;gap:4px}}
++    .cal-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:.9rem 0 .7rem}
++    .cal-month{display:flex;align-items:baseline;gap:7px}
++    .cal-month b{font-size:23px;font-weight:700;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
++    .cal-month span{font-size:11.5px;color:var(--text-muted)}
++    .cal-tools{display:flex;align-items:center;gap:6px}
++    .cal-nav{display:flex;border:.5px solid var(--border-strong);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
++    .cal-nav button{border:0;background:transparent;color:var(--text-secondary);padding:7px 11px;font-size:13px;line-height:1;cursor:pointer;font-family:inherit}
++    .cal-nav button+button{border-left:.5px solid var(--border)}
++    .cal-nav button:hover{background:var(--accent-bg);color:var(--accent-text)}
++    .cal-seg{display:flex;border:.5px solid var(--border-strong);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
++    .cal-seg button{border:0;background:transparent;color:var(--text-secondary);padding:7px 11px;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap}
++    .cal-seg button+button{border-left:.5px solid var(--border)}
++    .cal-seg button.on{background:var(--accent-bg);color:var(--accent-text);font-weight:700}
++    .cal-chips{display:flex;gap:5px;overflow-x:auto;padding-bottom:3px;margin-bottom:.65rem;-webkit-overflow-scrolling:touch}
++    .cal-chips::-webkit-scrollbar{display:none}
++    .cal-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:14px;font-size:11.5px;font-weight:500;border:.5px solid var(--border);background:var(--surface);color:var(--text-secondary);cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit}
++    .cal-chip .dt{width:7px;height:7px;border-radius:50%;flex-shrink:0}
++    .cal-chip.on{background:var(--accent-bg);border-color:var(--accent);color:var(--accent-text);font-weight:700}
++    .cal-banner{display:flex;align-items:center;gap:13px;background:var(--surface);border:.5px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius-lg);padding:11px 14px;margin-bottom:.8rem;cursor:pointer;text-align:left;width:100%;font-family:inherit;color:inherit}
++    .cal-banner:hover{background:var(--accent-bg)}
++    .cal-banner .cd{font-size:27px;font-weight:700;line-height:1;color:var(--accent-text);font-variant-numeric:tabular-nums;flex-shrink:0}
++    .cal-banner .cd small{display:block;font-size:9px;font-weight:500;color:var(--text-muted);margin-top:2px;letter-spacing:.06em}
++    .cal-banner .bn{min-width:0}
++    .cal-banner .bn b{display:block;font-size:12.5px;font-weight:700;line-height:1.45;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
++    .cal-banner .bn span{display:block;font-size:10.5px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
++    .cal-banner .arw{margin-left:auto;color:var(--text-muted);font-size:15px;flex-shrink:0}
++    .cal-grid{border:.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--surface)}
++    .cal-dows,.cal-cells{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
++    .cal-dows{background:var(--bg);border-bottom:.5px solid var(--border)}
++    .cal-dows div{text-align:center;font-size:10px;color:var(--text-muted);padding:6px 0;font-weight:500}
++    .cal-dows div:first-child{color:#DC2626}
++    .cal-dows div:last-child{color:#2563EB}
++    .cal-cell{min-height:64px;border-right:.5px solid var(--border);border-bottom:.5px solid var(--border);padding:3px 3px 4px;display:flex;flex-direction:column;gap:2.5px;overflow:hidden;min-width:0}
++    .cal-cell:nth-child(7n){border-right:0}
++    .cal-cell.dim{background:var(--bg);opacity:.5}
++    .cal-cell.today{box-shadow:inset 0 0 0 1.5px var(--accent)}
++    .cal-date{font-size:10.5px;color:var(--text-secondary);font-variant-numeric:tabular-nums;line-height:1.3}
++    .cal-cell.today .cal-date{color:var(--accent-text);font-weight:700}
++    .cal-ev{display:block;width:100%;text-align:left;border:0;border-left:2.5px solid var(--ec);background:var(--surface);color:var(--text-primary);font-size:8.5px;line-height:1.35;padding:1.5px 3px;border-radius:2px;cursor:pointer;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:color-mix(in srgb,var(--ec) 13%,var(--surface))}
++    .cal-ev:hover{background:color-mix(in srgb,var(--ec) 24%,var(--surface))}
++    .cal-cont{height:4px;border-radius:2px;background:var(--ec);opacity:.28;margin:0 4px 0 1px}
++    .cal-more{border:0;background:none;color:var(--text-muted);font-size:8.5px;text-align:left;cursor:pointer;padding:0 3px;font-family:inherit}
++    @media(min-width:600px){
++      .cal-cell{min-height:82px;padding:4px 4px 5px}
++      .cal-ev{font-size:9.5px;padding:2.5px 5px}
++      .cal-date{font-size:11px}
++    }
++    .cal-empty{text-align:center;padding:2.5rem 1rem;color:var(--text-muted);font-size:13px}
++    .soc-card{background:var(--surface);border-radius:var(--radius-lg);border:.5px solid var(--border);margin-bottom:8px;overflow:hidden}
++    .soc-head{padding:12px 14px;cursor:pointer;display:flex;flex-direction:column;gap:5px;text-align:left;width:100%;border:0;background:transparent;font-family:inherit;color:inherit}
++    .soc-head:hover{background:rgba(0,0,0,.018)}
++    @media(prefers-color-scheme:dark){.soc-head:hover{background:rgba(255,255,255,.03)}}
++    .soc-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
++    .soc-title{font-size:13px;font-weight:700;line-height:1.45}
++    .soc-venue{font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
++    .soc-date{font-size:11px;color:var(--text-secondary);font-variant-numeric:tabular-nums;flex-shrink:0}
++    .soc-days{font-size:9.5px;color:var(--text-muted);font-weight:500;letter-spacing:.04em}
++    .soc-star{background:none;border:none;cursor:pointer;padding:0 2px 0 6px;font-size:18px;line-height:1.2;color:var(--text-muted);flex-shrink:0}
++    .soc-star.on{color:#e11d48}
++    .soc-state{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:2px 8px;border-radius:10px;border:.5px solid var(--border);color:var(--text-muted)}
++    .soc-state.open{border-color:#BBF7D0;background:#F0FDF4;color:#166534}
++    .soc-state.closed{border-color:var(--border);background:var(--bg);color:var(--text-muted)}
++    .soc-state.tba{border-style:dashed}
++    .soc-state.soon{border-color:#FDE68A;background:#FFFBEB;color:#92400E}
++    @media(prefers-color-scheme:dark){
++      .soc-state.open{border-color:#065F46;background:#064E3B;color:#6EE7B7}
++      .soc-state.soon{border-color:#78350F;background:#451A03;color:#FCD34D}
++    }
++    .sheet-mask{display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:210}
++    .sheet-mask.open{display:block}
++    .sheet{position:fixed;left:0;right:0;bottom:0;z-index:220;background:var(--surface);border-radius:16px 16px 0 0;max-height:88vh;overflow-y:auto;transform:translateY(101%);transition:transform .26s cubic-bezier(.32,.72,.24,1);box-shadow:0 -10px 40px rgba(0,0,0,.22)}
++    .sheet.open{transform:translateY(0)}
++    @media(min-width:760px){
++      .sheet{left:50%;right:auto;width:470px;transform:translate(-50%,101%)}
++      .sheet.open{transform:translate(-50%,0)}
++    }
++    .sheet-grab{width:36px;height:4px;border-radius:2px;background:var(--border-strong);margin:8px auto 0}
++    .sheet-head{display:flex;align-items:flex-start;gap:9px;padding:12px 16px 10px;position:sticky;top:0;background:var(--surface);z-index:2}
++    .sheet-head .close{margin-left:auto;border:.5px solid var(--border);background:transparent;border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary);font-size:14px;flex-shrink:0}
++    .sheet-body{padding:0 16px 20px}
++    .sheet-body h3{font-size:16px;font-weight:700;line-height:1.45;margin-bottom:3px}
++    .sheet-ed{font-size:10.5px;color:var(--text-muted);letter-spacing:.03em;margin-bottom:10px}
++    .sheet-dates{display:flex;align-items:flex-end;gap:10px;padding:9px 0 10px;border-top:.5px solid var(--border);border-bottom:.5px solid var(--border);margin-bottom:4px}
++    .sheet-dates b{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
++    .sheet-dates span{font-size:10.5px;color:var(--text-muted);line-height:1.6;margin-left:auto;text-align:right}
++    .sheet-field{display:grid;grid-template-columns:74px 1fr;gap:10px;padding:10px 0;border-bottom:.5px dotted var(--border);align-items:start}
++    .sheet-field:last-of-type{border-bottom:0}
++    .sheet-k{font-size:10.5px;color:var(--text-muted);padding-top:2px}
++    .sheet-v{font-size:12.5px;line-height:1.65;min-width:0}
++    .sheet-v small{display:block;font-size:10.5px;color:var(--text-muted);margin-top:2px}
++    .sheet-v a{color:var(--accent);text-decoration:none;word-break:break-all;font-size:11.5px}
++    .sheet-v a:hover{text-decoration:underline}
++    .sheet-memo{width:100%;min-height:64px;margin-top:4px;border:.5px solid var(--border-strong);border-radius:var(--radius);background:var(--bg);color:var(--text-primary);padding:8px 10px;font-family:inherit;font-size:12.5px;line-height:1.6;resize:vertical}
++    .sheet-memo:focus{outline:none;border-color:var(--accent)}
++    .sheet-actions{display:flex;flex-direction:column;gap:7px;margin-top:12px}
++    .sheet-actions .row2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
++    .soc-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:var(--radius);border:.5px solid var(--border-strong);background:var(--surface);color:var(--text-secondary);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;text-decoration:none}
++    .soc-btn:hover{background:var(--accent-bg);color:var(--accent-text);border-color:var(--accent)}
++    .soc-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
++    .soc-btn.primary:hover{filter:brightness(.94);color:#fff}
++    .soc-btn.on{background:#FFF1F2;border-color:#FECDD3;color:#BE123C}
++    .soc-warn{margin-top:10px;padding:8px 10px;border-radius:8px;border:.5px solid #FCA5A5;background:#FEF2F2;color:#991B1B;font-size:11px;line-height:1.6}
++    @media(prefers-color-scheme:dark){.soc-warn{border-color:#7F1D1D;background:#450A0A;color:#FCA5A5}}
++    .soc-note{font-size:10.5px;color:var(--text-muted);line-height:1.7;margin-top:12px}
+   </style>
+ </head>
+ <body>
+@@ -136,7 +246,7 @@
+       </div>
+       <div>
+         <h1>整形外科 情報ダイジェスト</h1>
+-        <p>論文エビデンス ＆ 国内インプラント動向 <span style="opacity:.5">v4.2</span></p>
++        <p>論文エビデンス・国内インプラント動向・学会カレンダー <span style="opacity:.5">v4.3</span></p>
+       </div>
+     </div>
+     <div class="header-right">
+@@ -156,6 +266,9 @@
+     <button class="mode-btn" id="btnImplants" onclick="setMode('implants')">
+       <i class="ti ti-building-factory-2" aria-hidden="true"></i>インプラントニュース
+     </button>
++    <button class="mode-btn" id="btnCalendar" onclick="setMode('societies')">
++      <i class="ti ti-calendar-month" aria-hidden="true"></i>学会カレンダー
++    </button>
+   </div>
+ </div>
+ 
+@@ -226,6 +339,10 @@
+   </div>
+ </div>
+ 
++<!-- 学会詳細シート -->
++<div class="sheet-mask" id="socMask" onclick="closeSociety()"></div>
++<div class="sheet" id="socSheet" role="dialog" aria-modal="true" aria-label="学会の詳細"></div>
++
+ <script>
+ /* ──── 定数 ──── */
+ const SPECIALTIES = ["すべて","お気に入り","脊椎","肩","肘","手指","股関節","膝","外傷"];
+@@ -965,18 +1082,26 @@ async function retryImplants(){
+ }
+ function render(){
+   updateBadge();
++  const fab = document.querySelector(".fab-wrap");
+   if(currentMode==="papers"){
+     document.getElementById("subtabsWrap").style.display="";
++    if(fab) fab.style.display="";
+     renderSubtabs(); renderPapers();
+-  } else {
++  } else if(currentMode==="implants"){
+     document.getElementById("subtabsWrap").style.display="none";
++    if(fab) fab.style.display="";
+     renderImplants();
++  } else {
++    document.getElementById("subtabsWrap").style.display="none";
++    if(fab) fab.style.display="none";
++    renderSocieties();
+   }
+ }
+ async function setMode(mode){
+   currentMode = mode; expandedId = null;
+   document.getElementById("btnPapers").classList.toggle("active", mode==="papers");
+   document.getElementById("btnImplants").classList.toggle("active", mode==="implants");
++  document.getElementById("btnCalendar").classList.toggle("active", mode==="societies");
+   if(mode==="implants" && !implantData){
+     showNotice("loading","インプラントニュースを読み込み中...");
+     await loadImplants();
+@@ -1108,6 +1233,374 @@ async function reloadAll(){
+   btn.innerHTML='<i class="ti ti-refresh"></i>最新情報を読込';
+ }
+ 
++
++/* ──── 学会カレンダー ──── */
++const SOC_CATS = {"総会":"#1D4ED8","基礎・研究":"#047857","関節":"#B45309","脊椎・外傷":"#0E7490","領域":"#7C3AED"};
++const SOCIETIES = [
++  {id:"jks4",cat:"関節",ed:"第4回",name:"日本膝関節学会学術集会",short:"膝関節学会",start:"2026-12-04",end:"2026-12-05",
++   venue:"TAKANAWA GATEWAY Convention Center",city:"東京都港区",president:"石島 旨章（順天堂大学）",theme:"",reg:null,abs:null,
++   url:"https://site2.convention.co.jp/jks2026/",note:""},
++  {id:"jsra57",cat:"関節",ed:"第57回",name:"日本人工関節学会",short:"人工関節学会",start:"2027-02-18",end:"2027-02-19",
++   venue:"福岡国際会議場・福岡サンパレス・福岡国際センター",city:"福岡県福岡市博多区",president:"中島 康晴（九州大学）",theme:"Joint Effort —共創する人工関節の未来—",
++   reg:null,abs:{start:"2026-09-01",end:"2026-10-12",label:"演題 9/1–10/12（延長）"},
++   url:"https://site2.convention.co.jp/jsra2027/",note:"第56回は2026年1月14日にオンライン参加登録を開始。今回は12月〜1月頃の受付開始が見込まれます。"},
++  {id:"chubu148",cat:"脊椎・外傷",ed:"第148回",name:"中部日本整形外科災害外科学会・学術集会",short:"中部日本災害外科学会",start:"2027-04-09",end:"2027-04-10",
++   venue:"倉敷市芸文館・倉敷アイビースクエア",city:"岡山県倉敷市",president:"三谷 茂（川崎医科大学）",theme:"",reg:null,abs:null,
++   url:"https://www.kwcs.jp/148chubu/index.html",note:""},
++  {id:"jssr56",cat:"脊椎・外傷",ed:"第56回",name:"日本脊椎脊髄病学会学術集会",short:"脊椎脊髄病学会",start:"2027-04-15",end:"2027-04-17",
++   venue:"国立京都国際会館",city:"京都府京都市左京区",president:"川口 善治（富山大学）／長谷川 和宏",theme:"",reg:null,abs:null,
++   url:"https://jssr2027.org/",note:"一般演題の登録受付中（締切は公式サイト参照）。"},
++  {id:"jssh70",cat:"領域",ed:"第70回",name:"日本手外科学会学術集会",short:"手外科学会",start:"2027-04-22",end:"2027-04-23",
++   venue:"コングレコンベンションセンター・ナレッジキャピタル",city:"大阪府大阪市北区",president:"村瀬 剛（ベルランド総合病院）",theme:"",reg:null,abs:null,
++   url:"https://site.convention.co.jp/70jssh/",note:""},
++  {id:"jcr71",cat:"領域",ed:"第71回",name:"日本リウマチ学会総会・学術集会",short:"リウマチ学会",start:"2027-04-26",end:"2027-04-28",
++   venue:"パシフィコ横浜 会議センター・展示ホール",city:"神奈川県横浜市西区",president:"高柳 広（東京大学）",theme:"Beyond Treatment —基礎と臨床の融合—",
++   reg:null,abs:{start:null,end:"2026-10-30",label:"演題 〜10/30 正午"},
++   url:"https://www.jcr2027.com/",note:""},
++  {id:"joa100",cat:"総会",ed:"第100回",name:"日本整形外科学会学術総会",short:"日整会学術総会",start:"2027-05-13",end:"2027-05-16",
++   venue:"パシフィコ横浜（会議センター・展示ホール・アネックス）",city:"神奈川県横浜市西区",president:"松田 秀一（京都大学）",theme:"The Best is yet to come. — 未来へ挑む —",
++   reg:null,abs:{start:"2026-07-10",end:"2026-09-10",label:"演題 7/10–9/10"},
++   url:"https://www.congre.co.jp/joa2027/",note:"5月12日（水）午後に創立100年記念式典を開催（日整会会員限定・事前申込制）。"},
++  {id:"jsoa27",cat:"領域",ed:"2027",name:"日本スポーツ整形外科学会（JSOA2027）",short:"スポーツ整形外科学会",start:"2027-06-17",end:"2027-06-18",
++   venue:"札幌コンベンションセンター",city:"北海道札幌市白石区",president:"佐藤 和毅（慶應義塾大学）",theme:"",reg:null,abs:null,
++   url:"https://www.congre.co.jp/jsoa2027/",note:""},
++  {id:"jsjd55",cat:"関節",ed:"第55回",name:"日本関節病学会",short:"関節病学会",start:"2027-07-02",end:"2027-07-03",
++   venue:"倉敷市芸文館",city:"岡山県倉敷市",president:"",theme:"",reg:null,abs:null,
++   url:"https://jsjd.info/",note:""},
++  {id:"tumor60",cat:"基礎・研究",ed:"第60回",name:"日本整形外科学会 骨・軟部腫瘍学術集会",short:"骨・軟部腫瘍学術集会",start:"2027-07-15",end:"2027-07-16",
++   venue:"札幌コンベンションセンター",city:"北海道札幌市白石区",president:"平賀 博明（北海道がんセンター）",theme:"",reg:null,
++   abs:{start:"2026-10-01",end:null,label:"演題 2026年10月開始"},
++   url:"https://www.joa.or.jp/",note:""},
++  {id:"jota53",cat:"脊椎・外傷",ed:"第53回",name:"日本整形外傷学会学術集会",short:"整形外傷学会",start:"2027-08-27",end:"2027-08-28",
++   venue:"福岡国際会議場・マリンメッセ福岡",city:"福岡県福岡市博多区",president:"",theme:"",reg:null,abs:null,
++   url:"https://www.jota2027.jp/",note:"旧称：日本骨折治療学会。"},
++  {id:"jos29",cat:"領域",ed:"第29回",name:"日本骨粗鬆症学会",short:"骨粗鬆症学会",start:"2027-09-17",end:"2027-09-19",
++   venue:"福岡市（会場調整中）",city:"福岡県福岡市",president:"",theme:"",reg:null,abs:null,
++   url:"https://www.josteo.com/",note:"会場は発表され次第更新されます。"},
++  {id:"hip54",cat:"関節",ed:"第54回",name:"日本股関節学会学術集会",short:"股関節学会",start:"2027-10-15",end:"2027-10-16",
++   venue:"ヒルトン福岡シーホーク",city:"福岡県福岡市中央区",president:"山本 卓明（福岡大学）",theme:"継承と発展",reg:null,abs:null,
++   url:"https://www.congre.co.jp/hip54/",note:""},
++  {id:"kiso42",cat:"基礎・研究",ed:"第42回",name:"日本整形外科学会 基礎学術集会",short:"基礎学術集会",start:"2027-10-21",end:"2027-10-22",
++   venue:"国立京都国際会館",city:"京都府京都市左京区",president:"今井 晋二（滋賀医科大学）",theme:"",reg:null,
++   abs:{start:"2026-12-01",end:null,label:"演題 2026年12月開始"},
++   url:"https://www.joa.or.jp/",note:""},
++  {id:"jss54",cat:"関節",ed:"第54回",name:"日本肩関節学会学術集会",short:"肩関節学会",start:"2027-10-29",end:"2027-10-30",
++   venue:"広島国際会議場",city:"広島県広島市中区",president:"菊川 和彦（マツダ病院）",theme:"",reg:null,abs:null,
++   url:"https://www.j-shoulder-s.jp/meeting/",note:"第24回 日本肩の運動機能研究会を併催。"},
++  {id:"jssf52",cat:"領域",ed:"第52回",name:"日本足の外科学会学術集会",short:"足の外科学会",start:"2027-10-29",end:"2027-10-30",
++   venue:"なら100年会館・ホテル日航奈良",city:"奈良県奈良市",president:"佐本 憲宏（国保中央病院）",theme:"",reg:null,abs:null,
++   url:"https://www.jssf.jp/medical/academic.html",note:""},
++  {id:"jks5",cat:"関節",ed:"第5回",name:"日本膝関節学会学術集会",short:"膝関節学会",start:"2027-12-03",end:"2027-12-04",
++   venue:"パシフィコ横浜ノース",city:"神奈川県横浜市西区",president:"斎藤 充（東京慈恵会医科大学）",theme:"",reg:null,abs:null,
++   url:"https://www.knees.or.jp/academic/",note:""}
++];
++
++const SOC_AB = {jks4:"膝",jsra57:"人工",chubu148:"中部",jssr56:"脊椎",jssh70:"手",jcr71:"リウマ",
++  joa100:"日整会",jsoa27:"スポ",jsjd55:"関節病",tumor60:"腫瘍",jota53:"外傷",jos29:"骨粗",hip54:"股",
++  kiso42:"基礎",jss54:"肩",jssf52:"足",jks5:"膝"};
++const SOC_WD = ["日","月","火","水","木","金","土"];
++let socView = "month", socFilter = new Set(), socAttend = new Set(), socMemos = {}, socExpanded = null;
++const socToday = (()=>{ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); })();
++let socCursor = (()=>{
++  const n = SOCIETIES.filter(e=>e.end>=socToday).sort((a,b)=>a.start<b.start?-1:1)[0];
++  const d = new Date();
++  return n ? {y:+n.start.slice(0,4), m:+n.start.slice(5,7)-1} : {y:d.getFullYear(), m:d.getMonth()};
++})();
++
++function socLoad(){
++  try{ socAttend = new Set(JSON.parse(localStorage.getItem("ortho_soc_attend")||"[]")); }catch(e){ socAttend = new Set(); }
++  try{ socMemos = JSON.parse(localStorage.getItem("ortho_soc_memo")||"{}") || {}; }catch(e){ socMemos = {}; }
++}
++function socSaveAttend(){ try{ localStorage.setItem("ortho_soc_attend", JSON.stringify([...socAttend])); }catch(e){} }
++function socSaveMemos(){ try{ localStorage.setItem("ortho_soc_memo", JSON.stringify(socMemos)); }catch(e){} }
++
++function socDT(iso){ const a=iso.split("-").map(Number); return Date.UTC(a[0],a[1]-1,a[2]); }
++function socD(iso){ const a=iso.split("-").map(Number); return {y:a[0],m:a[1],d:a[2],w:new Date(Date.UTC(a[0],a[1]-1,a[2])).getUTCDay()}; }
++function socMD(iso){ const p=socD(iso); return p.m+"/"+p.d; }
++function socFull(iso){ const p=socD(iso); return p.y+"年"+p.m+"月"+p.d+"日（"+SOC_WD[p.w]+"）"; }
++function socDays(e){ return Math.round((socDT(e.end)-socDT(e.start))/86400000)+1; }
++function socLeft(iso){ return Math.round((socDT(iso)-socDT(socToday))/86400000); }
++function socRegState(e){
++  if(!e.reg) return {k:"tba", t:"参加登録 未発表"};
++  if(e.reg.start && socToday < e.reg.start) return {k:"soon", t:"受付開始前"};
++  if(e.reg.end && socToday > e.reg.end) return {k:"closed", t:"受付終了"};
++  return {k:"open", t:"受付中"};
++}
++function socRange(r){
++  if(!r) return "未発表";
++  if(r.start && r.end) return socMD(r.start)+" – "+socMD(r.end);
++  if(r.end) return "〜 "+socMD(r.end);
++  if(r.start) return socMD(r.start)+" 〜";
++  return "未発表";
++}
++function socVisible(e){
++  if(socFilter.size && !socFilter.has(e.cat)) return false;
++  return true;
++}
++function socSorted(a,b){ return a.start===b.start ? (a.name<b.name?-1:1) : (a.start<b.start?-1:1); }
++function socById(id){ return SOCIETIES.find(x=>x.id===id); }
++
++function renderSocieties(){
++  const up = SOCIETIES.filter(e=>e.end>=socToday).sort(socSorted);
++  document.getElementById("countLabel").textContent = SOCIETIES.length+"学会を収録";
++  const sl = document.getElementById("subLabel");
++  sl.textContent = "今後の開催 "+up.length+"件";
++  sl.style.color = "var(--text-muted)";
++
++  const evs = SOCIETIES.filter(socVisible);
++  let html = "";
++
++  if(up.length){
++    const n = up[0], l = socLeft(n.start);
++    html += `<button class="cal-banner" onclick="openSociety('${n.id}')">
++      <span class="cd">${l>0?l:"—"}<small>${l>0?"DAYS":"開催中"}</small></span>
++      <span class="bn"><b>${n.ed} ${n.name}</b><span>${socMD(n.start)} – ${socMD(n.end)} ／ ${n.venue}</span></span>
++      <i class="ti ti-chevron-right arw"></i>
++    </button>`;
++  }
++
++  html += `<div class="cal-toolbar">
++    <div class="cal-month"><b>${String(socCursor.m+1).padStart(2,"0")}</b><span>${socCursor.y}年</span></div>
++    <div class="cal-tools">
++      <div class="cal-nav">
++        <button onclick="socMove(-1)" aria-label="前の月"><i class="ti ti-chevron-left"></i></button>
++        <button onclick="socTodayJump()" style="font-size:11.5px">今日</button>
++        <button onclick="socMove(1)" aria-label="次の月"><i class="ti ti-chevron-right"></i></button>
++      </div>
++      <div class="cal-seg">
++        <button class="${socView==="month"?"on":""}" onclick="socSetView('month')">月</button>
++        <button class="${socView==="list"?"on":""}" onclick="socSetView('list')">リスト</button>
++      </div>
++    </div>
++  </div>`;
++
++  html += `<div class="cal-chips">
++    <button class="cal-chip ${socFilter.size?"":"on"}" onclick="socFilterClear()">すべて</button>
++    ${Object.keys(SOC_CATS).map(c=>`<button class="cal-chip ${socFilter.has(c)?"on":""}" onclick="socToggleCat('${c}')">
++      <span class="dt" style="background:${SOC_CATS[c]}"></span>${c}</button>`).join("")}
++  </div>`;
++
++  html += socView==="month" ? socMonthHTML(evs) : socListHTML(evs);
++  html += `<div style="display:flex;gap:7px;margin-top:.9rem">
++      <button class="soc-btn" style="flex:1" onclick="socExportAll()"><i class="ti ti-calendar-down"></i>全学会を.icsで保存</button>
++    </div>
++    <p class="soc-note">情報基準日 2026年11月19日。会期・会場は各学会公式サイトの公表情報にもとづきます。2027年度分の参加登録期間は未発表の学会が多く、判明しているもののみ表示しています。申込前に公式サイトでご確認ください。</p>`;
++
++  document.getElementById("content").innerHTML = html;
++}
++
++function socMonthHTML(evs){
++  const {y,m} = socCursor;
++  const key = y+"-"+String(m+1).padStart(2,"0");
++  const dim = new Date(Date.UTC(y,m+1,0)).getUTCDate();
++  const startDow = new Date(Date.UTC(y,m,1)).getUTCDay();
++  const total = Math.ceil((startDow+dim)/7)*7;
++  let cells = "";
++  for(let i=0;i<total;i++){
++    const dayNum = i-startDow+1;
++    let cy=y, cm=m, cd=dayNum, dim_=false;
++    if(dayNum<1){ dim_=true; cm=m-1; cd=new Date(Date.UTC(y,m,0)).getUTCDate()+dayNum; if(cm<0){cm=11;cy--;} }
++    else if(dayNum>dim){ dim_=true; cm=m+1; cd=dayNum-dim; if(cm>11){cm=0;cy++;} }
++    const iso = cy+"-"+String(cm+1).padStart(2,"0")+"-"+String(cd).padStart(2,"0");
++    const list = evs.filter(e=>e.start<=iso && e.end>=iso).sort(socSorted);
++    const starts = list.filter(e=>e.start===iso);
++    const conts = list.filter(e=>e.start<iso);
++    let inner = "";
++    starts.forEach(e=>{
++      inner += `<button class="cal-ev" style="--ec:${SOC_CATS[e.cat]}" onclick="openSociety('${e.id}')" title="${e.ed} ${e.name}">${SOC_AB[e.id]||e.short}</button>`;
++    });
++    conts.forEach(e=>{ inner += `<span class="cal-cont" style="--ec:${SOC_CATS[e.cat]}"></span>`; });
++    const extra = starts.length - 2;
++    if(extra > 0) inner += `<button class="cal-more" onclick="socSetView('list')">+${extra}</button>`;
++    cells += `<div class="cal-cell${dim_?" dim":""}${iso===socToday?" today":""}">
++      <span class="cal-date">${cd}</span>${inner}</div>`;
++  }
++  const dows = SOC_WD.map(w=>`<div>${w}</div>`).join("");
++  const monthCount = evs.filter(e=>{
++    const s=e.start.slice(0,7), en=e.end.slice(0,7);
++    return s<=key && en>=key;
++  }).length;
++  return `<div class="cal-grid">
++    <div class="cal-dows">${dows}</div>
++    <div class="cal-cells">${cells}</div>
++  </div>
++  <p class="soc-note" style="margin-top:6px">${y}年${m+1}月の開催：${monthCount}件</p>`;
++}
++
++function socListHTML(evs){
++  if(!evs.length) return `<div class="cal-empty">該当する学会がありません</div>`;
++  const groups = {};
++  evs.slice().sort(socSorted).forEach(e=>{ const k=e.start.slice(0,7); (groups[k]=groups[k]||[]).push(e); });
++  let html = "";
++  Object.keys(groups).sort().forEach(k=>{
++    const [yy,mm] = k.split("-");
++    html += `<div class="cal-month" style="margin:1rem 0 .5rem"><b>${mm}</b><span>${yy}年 ／ ${groups[k].length}件</span></div>`;
++    groups[k].forEach(e=>{
++      const st = socRegState(e);
++      const on = socAttend.has(e.id);
++      html += `<article class="soc-card">
++        <div class="soc-head" onclick="openSociety('${e.id}')">
++          <div class="soc-row">
++            <div class="badges">
++              <span class="badge" style="background:color-mix(in srgb,${SOC_CATS[e.cat]} 14%,transparent);color:${SOC_CATS[e.cat]}">${e.cat}</span>
++              <span class="badge" style="background:var(--bg);color:var(--text-muted)">${e.ed}</span>
++            </div>
++            <span class="soc-date">${socMD(e.start)} – ${socMD(e.end)}<span class="soc-days"> ・${socDays(e)}日間</span></span>
++          </div>
++          <div class="soc-row">
++            <div style="min-width:0">
++              <div class="soc-title">${e.name}</div>
++              <div class="soc-venue"><i class="ti ti-map-pin"></i>${e.venue}</div>
++            </div>
++            <button class="soc-star ${on?"on":""}" onclick="socToggleAttend('${e.id}',event)" aria-label="参加予定">${on?"★":"☆"}</button>
++          </div>
++          <div style="display:flex;gap:5px;flex-wrap:wrap">
++            <span class="soc-state ${st.k}"><i class="ti ti-ticket"></i>${st.t}</span>
++            ${e.abs?`<span class="soc-state">${e.abs.label||"演題 "+socRange(e.abs)}</span>`:""}
++          </div>
++        </div>
++      </article>`;
++    });
++  });
++  return html;
++}
++
++function socMove(d){
++  let m = socCursor.m + d, y = socCursor.y;
++  if(m<0){ m=11; y--; } if(m>11){ m=0; y++; }
++  socCursor = {y,m}; renderSocieties();
++}
++function socTodayJump(){
++  const d = new Date(); socCursor = {y:d.getFullYear(), m:d.getMonth()}; renderSocieties();
++}
++function socSetView(v){ socView = v; renderSocieties(); }
++function socToggleCat(c){
++  if(socFilter.has(c)) socFilter.delete(c); else socFilter.add(c);
++  renderSocieties();
++}
++function socFilterClear(){ socFilter.clear(); renderSocieties(); }
++function socToggleAttend(id, ev){
++  if(ev){ ev.stopPropagation(); }
++  if(socAttend.has(id)) socAttend.delete(id); else socAttend.add(id);
++  socSaveAttend();
++  renderSocieties();
++  if(document.getElementById("socSheet").classList.contains("open")) openSociety(id);
++}
++
++/* ──── 学会詳細シート ──── */
++function openSociety(id){
++  const e = socById(id); if(!e) return;
++  const st = socRegState(e);
++  const on = socAttend.has(id);
++  const same = SOCIETIES.filter(o=>o.id!==id && !(o.end<e.start || o.start>e.end));
++  const sheet = document.getElementById("socSheet");
++  sheet.innerHTML = `
++    <div class="sheet-grab"></div>
++    <div class="sheet-head">
++      <span class="badge" style="background:color-mix(in srgb,${SOC_CATS[e.cat]} 14%,transparent);color:${SOC_CATS[e.cat]}">${e.cat}</span>
++      <span class="badge" style="background:var(--bg);color:var(--text-muted)">${e.ed}</span>
++      <button class="close" onclick="closeSociety()" aria-label="閉じる">✕</button>
++    </div>
++    <div class="sheet-body">
++      <h3>${e.name}</h3>
++      <div class="sheet-ed">${e.id.toUpperCase()}</div>
++      <div class="sheet-dates">
++        <b>${String(socD(e.start).m).padStart(2,"0")}.${String(socD(e.start).d).padStart(2,"0")} – ${String(socD(e.end).m).padStart(2,"0")}.${String(socD(e.end).d).padStart(2,"0")}</b>
++        <span>${socFull(e.start)}<br>${e.start===e.end?"":socFull(e.end)}<br>${socDays(e)} DAYS</span>
++      </div>
++      <div class="sheet-field"><div class="sheet-k">会 場</div><div class="sheet-v">${e.venue}<small>${e.city}</small></div></div>
++      <div class="sheet-field"><div class="sheet-k">参加登録</div><div class="sheet-v">
++        <span class="soc-state ${st.k}">${st.t}</span><small>${e.reg?socRange(e.reg):"受付期間は公式サイトで未発表"}</small></div></div>
++      <div class="sheet-field"><div class="sheet-k">演題登録</div><div class="sheet-v">
++        ${e.abs?`<span class="soc-state">${socRange(e.abs)}</span>`:'<span class="soc-state tba">未発表</span>'}</div></div>
++      ${e.theme?`<div class="sheet-field"><div class="sheet-k">テーマ</div><div class="sheet-v">${e.theme}</div></div>`:""}
++      ${e.president?`<div class="sheet-field"><div class="sheet-k">会 長</div><div class="sheet-v">${e.president}</div></div>`:""}
++      <div class="sheet-field"><div class="sheet-k">公式サイト</div><div class="sheet-v"><a href="${e.url}" target="_blank" rel="noopener">${e.url.replace(/^https?:\/\//,"")}</a></div></div>
++      <div class="sheet-field" style="grid-template-columns:1fr;gap:2px">
++        <div class="sheet-k">メ モ</div>
++        <textarea class="sheet-memo" id="socMemo" placeholder="参加登録の期限、宿泊、演題の有無など">${(socMemos[e.id]||"").replace(/</g,"&lt;")}</textarea>
++      </div>
++      ${same.length?`<div class="soc-warn"><i class="ti ti-alert-triangle"></i> 日程が重なります：${same.map(o=>o.short).join("、")}</div>`:""}
++      ${e.note?`<p class="soc-note" style="margin-top:8px">${e.note}</p>`:""}
++      <div class="sheet-actions">
++        <button class="soc-btn ${on?"on":""}" onclick="socToggleAttend('${e.id}')">
++          <span style="font-size:14px;line-height:1">${on?"★":"☆"}</span>${on?"参加予定に登録済み":"参加予定に追加"}
++        </button>
++        <div class="row2">
++          <button class="soc-btn" onclick="socExportOne('${e.id}')"><i class="ti ti-download"></i>.ics を保存</button>
++          <a class="soc-btn" href="${socGcal(e)}" target="_blank" rel="noopener"><i class="ti ti-calendar-plus"></i>Googleカレンダー</a>
++        </div>
++        <a class="soc-btn primary" href="${e.url}" target="_blank" rel="noopener">公式サイトを開く <i class="ti ti-external-link"></i></a>
++      </div>
++      <p class="soc-note">掲載内容は2026年11月19日時点の公表情報です。</p>
++    </div>`;
++  document.getElementById("socMask").classList.add("open");
++  sheet.classList.add("open");
++  document.body.style.overflow = "hidden";
++  const memo = document.getElementById("socMemo");
++  if(memo) memo.addEventListener("input", ()=>{ socMemos[e.id] = memo.value; socSaveMemos(); });
++}
++function closeSociety(){
++  document.getElementById("socMask").classList.remove("open");
++  document.getElementById("socSheet").classList.remove("open");
++  document.body.style.overflow = "";
++}
++
++/* ──── .ics / Googleカレンダー ──── */
++function socNextDay(iso){
++  const a = iso.split("-").map(Number);
++  const d = new Date(Date.UTC(a[0],a[1]-1,a[2]+1));
++  return d.toISOString().slice(0,10);
++}
++function socEsc(t){ return String(t||"").replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\n/g,"\\n"); }
++function socIcs(evs){
++  const L = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Ortho Digest//JA","CALSCALE:GREGORIAN","METHOD:PUBLISH"];
++  evs.forEach(e=>{
++    const desc = [
++      "会場："+e.venue+"（"+e.city+"）",
++      "参加登録："+(e.reg?socRange(e.reg):"未発表"),
++      e.abs?"演題登録："+socRange(e.abs):"",
++      e.president?"会長："+e.president:"",
++      e.theme?"テーマ："+e.theme:"",
++      e.url
++    ].filter(Boolean).join("\n");
++    L.push("BEGIN:VEVENT",
++      "UID:"+e.id+"@ortho-digest",
++      "DTSTAMP:"+new Date().toISOString().replace(/[-:]/g,"").split(".")[0]+"Z",
++      "DTSTART;VALUE=DATE:"+e.start.replace(/-/g,""),
++      "DTEND;VALUE=DATE:"+socNextDay(e.end).replace(/-/g,""),
++      "SUMMARY:"+socEsc(e.ed+" "+e.name),
++      "LOCATION:"+socEsc(e.venue),
++      "DESCRIPTION:"+socEsc(desc),
++      "URL:"+e.url,
++      "END:VEVENT");
++  });
++  L.push("END:VCALENDAR");
++  return L.join("\r\n");
++}
++function socDownload(text, filename){
++  const blob = new Blob([text], {type:"text/calendar;charset=utf-8"});
++  const a = document.createElement("a");
++  a.href = URL.createObjectURL(blob); a.download = filename;
++  document.body.appendChild(a); a.click(); a.remove();
++  setTimeout(()=>URL.revokeObjectURL(a.href), 3000);
++}
++function socExportAll(){ socDownload(socIcs(SOCIETIES), "ortho-societies-2026-2027.ics"); }
++function socExportOne(id){
++  const e = socById(id); if(!e) return;
++  socDownload(socIcs([e]), e.id+".ics");
++}
++function socGcal(e){
++  const d1 = e.start.replace(/-/g,""), d2 = socNextDay(e.end).replace(/-/g,"");
++  const text = encodeURIComponent(e.ed+" "+e.name);
++  const loc = encodeURIComponent(e.venue);
++  const det = encodeURIComponent(e.city+"\n参加登録："+(e.reg?socRange(e.reg):"未発表")+"\n"+e.url);
++  return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+text+"&dates="+d1+"/"+d2+"&location="+loc+"&details="+det;
++}
++document.addEventListener("keydown", e=>{
++  if(e.key==="Escape") closeSociety();
++});
++
+ /* ──── 初期化 ──── */
+ (async ()=>{
+   loadFavorites();
+@@ -1115,6 +1608,7 @@ async function reloadAll(){
+   loadLocalDetails();
+   loadLocalImplants();
+   loadReadPapers();
++  socLoad();
+   applyTheme(localStorage.getItem("ortho_theme")||"blue");
+   showNotice("loading","データを読み込み中...");
+   await loadAll();
