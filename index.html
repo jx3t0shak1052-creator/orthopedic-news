@@ -348,6 +348,18 @@
     .rehab-card h2{font-size:17px;margin-bottom:.4rem}.rehab-card p{margin:.5rem 0;color:var(--text-secondary)}
     .rehab-card .btn{display:inline-block;background:var(--accent);color:#fff;padding:10px 18px;border-radius:var(--radius);text-decoration:none;font-weight:700}
     .rehab-note{font-size:12px;color:var(--text-muted)!important}
+    .tool-bar{display:flex;align-items:center;gap:6px;margin:.5rem 0 .5rem;flex-wrap:wrap}
+    .tool-bar .tt{flex:1;font-weight:700;font-size:14px;min-width:8em}
+    .tb-btn{display:inline-flex;align-items:center;gap:4px;border:.5px solid var(--border-strong);background:var(--surface);color:var(--text-primary);border-radius:var(--radius);padding:0 12px;min-height:38px;font:500 13px inherit;font-family:inherit;cursor:pointer}
+    .tb-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .tool-frame.fs,#kjPanel.fs{position:fixed;inset:0;z-index:150;background:var(--bg);padding:max(6px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(6px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
+    .tool-frame.fs{display:flex;flex-direction:column}
+    .tool-frame.fs .tool-bar{margin:0 0 6px}
+    .tool-frame.fs iframe{flex:1;height:auto;min-height:0;border-radius:var(--radius)}
+    .tool-frame.fs .tool-open{display:none}
+    #kjPanel.fs{overflow:auto;max-width:none}
+    #kjPanel.fs>*{max-width:900px;margin-left:auto;margin-right:auto}
+    body.tool-fs{overflow:hidden}
   </style>
 </head>
 <body>
@@ -722,6 +734,7 @@ function applyTheme(id){
   r.style.setProperty("--text-secondary",t.textSecondary); r.style.setProperty("--border",t.border);
   localStorage.setItem("ortho_theme", id);
   renderSwatches();
+  if(typeof syncFrameTheme==="function") syncFrameTheme();
 }
 function renderSwatches(){
   document.getElementById("swatches").innerHTML = THEMES.map(t=>`
@@ -1305,6 +1318,7 @@ function render(){
   }
 }
 async function setMode(mode){
+  exitToolFs();
   currentMode = mode; expandedId = null;
   try{ window.scrollTo(0,0); }catch(e){}
   document.getElementById("btnPapers").classList.toggle("active", mode==="papers");
@@ -1323,6 +1337,37 @@ async function setMode(mode){
 }
 function selectSp(sp){ currentSp=sp; expandedId=null; try{ window.scrollTo(0,0); }catch(e){} renderSubtabs(); renderPapers(); }
 
+/* ──── ツール共通：ツールバー・全画面・テーマ連動 ──── */
+function toolBar(title){return `<div class="tool-bar"><span class="tt">${title}</span><button type="button" class="tb-btn" onclick="openTheme()" aria-label="テーマ色を変更"><i class="ti ti-palette" aria-hidden="true"></i>テーマ</button><button type="button" class="tb-btn" data-fs onclick="toggleToolFs(this)" aria-pressed="false"><i class="ti ti-arrows-maximize" aria-hidden="true"></i><span>全画面</span></button></div>`;}
+function setToolFs(box,on){
+  if(!box) return;
+  box.classList.toggle("fs",on);document.body.classList.toggle("tool-fs",on);
+  const b=box.querySelector("[data-fs]");
+  if(b){b.setAttribute("aria-pressed",String(on));b.querySelector("i").className="ti "+(on?"ti-arrows-minimize":"ti-arrows-maximize");b.querySelector("span").textContent=on?"元に戻す":"全画面";}
+  try{
+    if(on&&document.documentElement.requestFullscreen&&!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+    if(!on&&document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  }catch(e){}
+}
+function toggleToolFs(btn){const box=btn.closest(".tool-frame,#kjPanel");setToolFs(box,!box.classList.contains("fs"));}
+function exitToolFs(){const box=document.querySelector(".tool-frame.fs,#kjPanel.fs");if(box) setToolFs(box,false);else document.body.classList.remove("tool-fs");}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!document.getElementById("themeOverlay").classList.contains("open")) exitToolFs();});
+document.addEventListener("fullscreenchange",()=>{if(!document.fullscreenElement){const box=document.querySelector(".tool-frame.fs,#kjPanel.fs");if(box) setToolFs(box,false);}});
+function syncFrameTheme(){
+  const f=document.querySelector("#content .tool-frame iframe");if(!f) return;
+  let d;try{d=f.contentDocument;}catch(e){return;}
+  if(!d||!d.documentElement) return;
+  const t=THEMES.find(x=>x.id===currentThemeId)||THEMES[0];const dark=t.id==="dark";
+  let st=d.getElementById("app-theme");
+  if(!st){st=d.createElement("style");st.id="app-theme";(d.head||d.documentElement).appendChild(st);}
+  if(/anesthesia/.test(f.getAttribute("src"))){
+    d.documentElement.setAttribute("data-theme",dark?"dark":"light");
+    st.textContent=dark?"":`:root{--steel:${t.accent};--steel-2:${t.accent};--fill:${t.accent};--steel-soft:${t.accentBg};--canvas:${t.bg};--paper:${t.surface};--line-2:${t.border}}`;
+  }else{
+    st.textContent=`:root{color-scheme:${dark?"dark":"light"}!important;--bg:${t.bg};--surface:${t.surface};--border:${t.border};--ink:${t.textPrimary};--mute:${t.textSecondary};--accent:${t.accent};--accent-bg:${t.accentBg};--sunk:${dark?"#162036":t.bg}}`;
+  }
+}
+
 /* ──── 組み込みツール（算定計算・臨床ツール・全身麻酔） ──── */
 const FRAME_TOOLS={santei:{src:"santei.html",title:"手術料 算定計算"},tools:{src:"clinical.html",title:"整形外科 臨床ツール"},anes:{src:"anesthesia.html",title:"全身麻酔 投与量・管理ツール"},rehab:{src:"rehab.html",title:"術後リハ プロトコル帳"}};
 const REHAB_URL="https://claude.ai/artifact/Q6bYCZGMBCntJAyKDEW9MR";
@@ -1331,7 +1376,7 @@ function renderFrameTool(mode){
   const t=FRAME_TOOLS[mode];const content=document.getElementById("content");
   if(content.dataset.frame===mode) return;
   content.dataset.frame=mode;
-  content.innerHTML=`<section class="tool-frame"><iframe src="${t.src}" title="${t.title}" loading="lazy"></iframe><p class="tool-open"><a href="${t.src}" target="_blank" rel="noopener">新しいタブで開く</a></p></section>`;
+  content.innerHTML=`<section class="tool-frame">${toolBar(t.title)}<iframe src="${t.src}" title="${t.title}" onload="syncFrameTheme()"></iframe><p class="tool-open"><a href="${t.src}" target="_blank" rel="noopener">新しいタブで開く</a></p></section>`;
 }
 function renderRehab(){
   document.getElementById("countLabel").textContent="";document.getElementById("subLabel").textContent="";
@@ -1418,7 +1463,7 @@ function renderKj(){
   document.getElementById("subLabel").textContent="";
   const content=document.getElementById("content");
   if(document.getElementById("kjPanel")) return;
-  content.innerHTML=`<section id="kjPanel" aria-labelledby="kjTitle"><div class="kj-head"><h2 id="kjTitle">整形外科 手術・処置コード早見表</h2><p>添付版の点数・注記と、更新される公式マスターを分けて表示します。</p><p id="kjVersion" role="status"></p><p id="kjWarning" role="status"></p><p><a id="kjNoticeLink" href="${kjNoticePage}" target="_blank" rel="noopener">厚労省の告示・通知</a> ／ <a href="${kjMasterPage}" target="_blank" rel="noopener">公式マスター</a></p></div><div class="kj-search"><input id="kjQuery" type="search" aria-label="手術・処置コードの検索" placeholder="例：K046、腱板、腕神経叢" autocomplete="off"><button type="button" class="btn" id="kjClear">消去</button><button type="button" class="btn" id="kjRefresh">再読込</button></div><div id="kjFilters" class="kj-filters" role="group" aria-label="分類"></div><p id="kjCount" role="status"></p><div id="kjResults"></div><p class="kj-footer">一覧の点数は添付版（未収録のコードは公式マスター）です。改定後は添付版と公式値が異なる場合があります。通則・加算の適用、施設基準、請求の可否は厚労省の原典をご確認ください。</p></section>`;
+  content.innerHTML=`<section id="kjPanel" aria-labelledby="kjTitle">${toolBar("手術・処置コード")}<div class="kj-head"><h2 id="kjTitle">整形外科 手術・処置コード早見表</h2><p>添付版の点数・注記と、更新される公式マスターを分けて表示します。</p><p id="kjVersion" role="status"></p><p id="kjWarning" role="status"></p><p><a id="kjNoticeLink" href="${kjNoticePage}" target="_blank" rel="noopener">厚労省の告示・通知</a> ／ <a href="${kjMasterPage}" target="_blank" rel="noopener">公式マスター</a></p></div><div class="kj-search"><input id="kjQuery" type="search" aria-label="手術・処置コードの検索" placeholder="例：K046、腱板、腕神経叢" autocomplete="off"><button type="button" class="btn" id="kjClear">消去</button><button type="button" class="btn" id="kjRefresh">再読込</button></div><div id="kjFilters" class="kj-filters" role="group" aria-label="分類"></div><p id="kjCount" role="status"></p><div id="kjResults"></div><p class="kj-footer">一覧の点数は添付版（未収録のコードは公式マスター）です。改定後は添付版と公式値が異なる場合があります。通則・加算の適用、施設基準、請求の可否は厚労省の原典をご確認ください。</p></section>`;
   const query=document.getElementById("kjQuery");query.value=kjState.query;
   query.oninput=()=>{kjState.query=query.value;kjResults();};
   document.getElementById("kjClear").onclick=()=>{query.value="";query.oninput();query.focus();};
