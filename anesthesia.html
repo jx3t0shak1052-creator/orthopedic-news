@@ -1,0 +1,1705 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="description" content="全身麻酔の薬剤投与量を体重基準別に即時換算。γ計算、筋弛緩拮抗、循環作動薬、作用時間トラッカーをまとめた臨床補助ツール。"><meta name="theme-color" content="#12293d"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><title>全身麻酔 投与量・管理ツール</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet"><link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2312293d'/><text y='72' x='50' font-size='62' font-family='sans-serif' font-weight='bold' fill='white' text-anchor='middle'>麻</text></svg>"><style>
+/* ==========================================================================
+   麻酔 投与量・管理ツール  —  stylesheet
+   ========================================================================== */
+
+/* ---------- tokens ---------- */
+:root{
+  --navy:#0d2338;
+  --navy-2:#14334f;
+  --steel:#225f80;
+  --steel-2:#377a9e;
+  --steel-soft:#d8e8f2;
+  /* --fill: 白文字を載せる「塗り」専用。--steel はダーク時に明るくなるため、
+     塗りに転用すると白文字が読めなくなる（実測 2.37:1）。白文字は必ず --fill を使う。 */
+  --fill:#225f80;
+  --paper:#ffffff;
+  --canvas:#e9eef3;
+  --canvas-2:#dae4ec;
+  --ink:#0d161d;
+  --ink-2:#36474f;
+  --ink-3:#4f5f67;
+  --line:#b6c7d3;
+  --line-2:#d6e0e8;
+  --accent:#9e2a1d;
+  --accent-soft:#fbdfda;
+  --warn:#6f4c00;
+  --warn-soft:#fbeac2;
+  --good:#0f5c46;
+  --good-soft:#cfeadf;
+  --shadow:0 1px 2px rgba(16,38,54,.06), 0 6px 18px rgba(16,38,54,.07);
+  --shadow-sm:0 1px 2px rgba(16,38,54,.07);
+  --r:14px;
+  --r-sm:9px;
+  --hdr-h:auto;
+  --mono:"Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --navy:#061524; --navy-2:#0d273c;
+    --steel:#74b0d0; --steel-2:#8fc4dd; --steel-soft:#172d3f; --fill:#1f6186;
+    --paper:#0c1822; --canvas:#07111a; --canvas-2:#13212d;
+    --ink:#f0f6fa; --ink-2:#bccbd6; --ink-3:#93a5b1;
+    --line:#2f4759; --line-2:#1f303e;
+    --accent:#f59c93; --accent-soft:#361d1a;
+    --warn:#f5cc74; --warn-soft:#322a14;
+    --good:#78dcb4; --good-soft:#0d2b21;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 22px rgba(0,0,0,.35);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --navy:#061524; --navy-2:#0d273c;
+  --steel:#74b0d0; --steel-2:#8fc4dd; --steel-soft:#172d3f; --fill:#1f6186;
+  --paper:#0c1822; --canvas:#07111a; --canvas-2:#13212d;
+  --ink:#f0f6fa; --ink-2:#bccbd6; --ink-3:#93a5b1;
+  --line:#2f4759; --line-2:#1f303e;
+  --accent:#f59c93; --accent-soft:#361d1a;
+  --warn:#f5cc74; --warn-soft:#322a14;
+  --good:#78dcb4; --good-soft:#0d2b21;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 22px rgba(0,0,0,.35);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+}
+
+/* ---------- base ---------- */
+*,*::before,*::after{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  background:var(--canvas);
+  color:var(--ink);
+  font-family:"Noto Sans JP",system-ui,-apple-system,"Hiragino Sans",sans-serif;
+  font-size:15px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:calc(28px + env(safe-area-inset-bottom,0px));
+}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums;}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer;}
+input,select{font-family:inherit;font-size:inherit;color:inherit;}
+h1,h2,h3,h4,p,ul,ol{margin:0;}
+ul,ol{padding:0;list-style:none;}
+:focus-visible{outline:2.5px solid var(--steel);outline-offset:2px;border-radius:6px;}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+
+/* ---------- header ---------- */
+.app-header{
+  position:sticky;top:0;z-index:40;
+  background:linear-gradient(150deg,var(--navy) 0%,var(--navy-2) 100%);
+  color:#fff;
+  padding:calc(11px + env(safe-area-inset-top,0px)) 14px 12px;
+  box-shadow:0 3px 16px rgba(6,20,32,.28);
+}
+.hdr-row{display:flex;align-items:center;gap:11px;}
+.brand-mark{
+  flex:0 0 auto;width:38px;height:38px;border-radius:11px;
+  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);
+  display:grid;place-items:center;font-weight:900;font-size:1.05rem;letter-spacing:.04em;
+}
+.brand-txt{min-width:0;flex:1 1 auto;}
+.brand-txt h1{font-size:1.02rem;font-weight:900;letter-spacing:.02em;line-height:1.25;}
+.brand-txt p{font-size:.68rem;color:#a9c1d4;letter-spacing:.02em;line-height:1.35;margin-top:1px;}
+.hdr-tools{display:flex;gap:7px;flex:0 0 auto;}
+.icon-btn{
+  width:36px;height:36px;border-radius:10px;border:1px solid rgba(255,255,255,.22);
+  background:rgba(255,255,255,.1);color:#e6f0f7;
+  display:grid;place-items:center;font-size:.72rem;font-weight:700;
+  transition:background .15s;
+}
+.icon-btn:hover{background:rgba(255,255,255,.2);}
+.icon-btn:active{transform:scale(.96);}
+
+/* ---------- patient strip ---------- */
+.patient-strip{
+  margin-top:11px;display:flex;gap:9px;flex-wrap:wrap;align-items:flex-end;
+}
+.pfield{display:flex;flex-direction:column;gap:3px;}
+.pfield>label{font-size:.63rem;color:#a9c1d4;letter-spacing:.03em;}
+.pfield input,.pfield select{
+  width:74px;padding:7px 8px;border-radius:9px;
+  border:1px solid rgba(255,255,255,.24);
+  background:rgba(255,255,255,.12);color:#fff;
+  font-family:var(--mono);font-size:.95rem;font-weight:700;
+  appearance:none;-webkit-appearance:none;
+}
+.pfield select{
+  width:74px;font-family:inherit;font-weight:500;font-size:.85rem;
+  background-image:none;text-align:center;
+}
+.pfield select option{background:var(--navy);color:#fff;}
+.pfield input::placeholder{color:#7e97ac;}
+.pfield input:focus,.pfield select:focus{
+  outline:2px solid #fff;outline-offset:1px;background:rgba(255,255,255,.2);
+}
+.pfield input::-webkit-outer-spin-button,
+.pfield input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.pfield input[type=number]{-moz-appearance:textfield;}
+
+.derived-row{
+  margin-left:auto;display:flex;gap:7px;flex-wrap:wrap;align-items:center;
+}
+.chip{
+  display:flex;align-items:baseline;gap:5px;
+  background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;padding:5px 11px;font-size:.66rem;color:#c3d6e4;white-space:nowrap;
+}
+.chip b{font-family:var(--mono);font-size:.85rem;color:#fff;font-weight:700;}
+.chip.is-on{border-color:#fff;background:rgba(255,255,255,.22);}
+.chip button{background:none;border:0;padding:0;color:inherit;}
+
+/* ---------- tabs ---------- */
+.tabbar{
+  position:sticky;top:var(--hdr-h,0px);z-index:35;
+  display:flex;gap:6px;overflow-x:auto;padding:9px 12px;
+  background:var(--paper);border-bottom:1px solid var(--line);
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  box-shadow:var(--shadow-sm);
+}
+.tabbar::-webkit-scrollbar{display:none;}
+.tabbar button{
+  flex:0 0 auto;border:1px solid var(--line);background:var(--canvas);
+  color:var(--ink-2);padding:7px 14px;border-radius:999px;
+  font-size:.78rem;font-weight:600;white-space:nowrap;
+  transition:background .15s,color .15s,border-color .15s;
+}
+.tabbar button.active{background:var(--fill);color:#fff;border-color:var(--fill);}
+
+/* ---------- layout ---------- */
+main{max-width:960px;margin:0 auto;padding:14px 12px 30px;}
+.panel{display:none;}
+.panel.active{display:block;animation:fade .22s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:none;}}
+
+.sec-title{
+  display:flex;align-items:center;gap:9px;
+  background:var(--navy-2);color:#fff;
+  padding:9px 14px;border-radius:11px;
+  font-size:.95rem;font-weight:800;margin:0 0 12px;
+}
+.sec-title .n{
+  flex:0 0 auto;width:22px;height:22px;border-radius:6px;
+  background:rgba(255,255,255,.16);display:grid;place-items:center;
+  font-size:.72rem;font-family:var(--mono);
+}
+h3.sub{
+  font-size:.9rem;font-weight:800;color:var(--navy-2);margin:20px 0 8px;
+  padding-left:9px;border-left:4px solid var(--steel);line-height:1.4;
+}
+:root[data-theme="dark"] h3.sub,
+:root:not([data-theme="light"]) h3.sub{color:var(--steel-2);}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) h3.sub{color:var(--navy-2);}}
+p.lead{font-size:.84rem;color:var(--ink-2);line-height:1.75;margin:0 0 10px;}
+
+/* ---------- toolbar ---------- */
+.toolbar{margin-bottom:11px;}
+.search-wrap{position:relative;margin-bottom:9px;}
+.search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.45;}
+.search-input{
+  width:100%;padding:11px 12px 11px 38px;border-radius:11px;
+  border:1px solid var(--line);background:var(--paper);
+  font-size:.92rem;box-shadow:var(--shadow-sm);
+}
+.search-input::placeholder{color:var(--ink-3);}
+.search-input:focus{outline:none;border-color:var(--steel);box-shadow:0 0 0 3px var(--steel-soft);}
+.cat-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:3px;scrollbar-width:none;}
+.cat-row::-webkit-scrollbar{display:none;}
+.cat-chip{
+  flex:0 0 auto;border:1px solid var(--line);background:var(--paper);
+  color:var(--ink-2);padding:6px 12px;border-radius:999px;
+  font-size:.75rem;font-weight:600;white-space:nowrap;
+}
+.cat-chip.active{background:var(--steel-soft);border-color:var(--steel);color:var(--steel);}
+:root[data-theme="dark"] .cat-chip.active{color:var(--steel-2);}
+
+/* ---------- drug card ---------- */
+.drug-list{display:grid;gap:11px;}
+.drug-card{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--shadow-sm);overflow:hidden;
+}
+.dc-head{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:12px 13px 10px;border-bottom:1px solid var(--line-2);
+}
+.dc-head .t{flex:1 1 auto;min-width:0;}
+.dc-name{font-size:1rem;font-weight:800;letter-spacing:.01em;line-height:1.3;}
+.dc-sub{font-size:.7rem;color:var(--ink-3);margin-top:2px;letter-spacing:.01em;}
+.badges{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;flex:0 0 auto;max-width:45%;}
+.badge{
+  font-size:.64rem;font-weight:700;padding:3px 8px;border-radius:999px;
+  border:1px solid transparent;white-space:nowrap;letter-spacing:.02em;
+}
+.badge.cat{background:var(--steel-soft);color:var(--steel);border-color:var(--line);}
+:root[data-theme="dark"] .badge.cat{color:var(--steel-2);}
+.badge.basis{background:var(--good-soft);color:var(--good);border-color:var(--good);cursor:pointer;}
+.badge.basis:hover{filter:brightness(.96);}
+.badge.alert{background:var(--accent-soft);color:var(--accent);border-color:var(--accent);}
+
+.dc-body{padding:11px 13px 13px;}
+.mode-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:7px;}
+.mode-label{font-size:.8rem;font-weight:700;color:var(--ink);}
+.mode-range{font-size:.72rem;color:var(--ink-3);font-family:var(--mono);}
+
+.dose-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px;}
+.dose-btn{
+  border:1px solid var(--line);background:var(--canvas);
+  color:var(--ink-2);border-radius:9px;padding:8px 12px;
+  font-family:var(--mono);font-size:.82rem;font-weight:700;
+  min-width:56px;text-align:center;transition:all .13s;
+}
+.dose-btn:hover{border-color:var(--steel);}
+.dose-btn.active{background:var(--fill);border-color:var(--fill);color:#fff;box-shadow:0 2px 8px rgba(51,112,143,.28);}
+.dose-btn .u{font-size:.62rem;font-weight:400;opacity:.75;display:block;line-height:1.1;}
+
+.form-row{display:flex;gap:9px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px;}
+.f-field{display:flex;flex-direction:column;gap:3px;flex:1 1 150px;min-width:0;}
+.f-field>label{font-size:.66rem;color:var(--ink-3);font-weight:600;letter-spacing:.02em;}
+.f-field select,.f-field input{
+  width:100%;padding:8px 9px;border-radius:9px;border:1px solid var(--line);
+  background:var(--canvas);font-size:.85rem;
+}
+.f-field select{font-family:inherit;}
+.f-field input{font-family:var(--mono);font-weight:700;}
+.f-field input:focus,.f-field select:focus{outline:none;border-color:var(--steel);background:var(--paper);}
+
+/* result */
+.result{
+  background:var(--good-soft);border:1.5px solid var(--good);border-radius:12px;
+  padding:12px 14px;box-shadow:0 1px 4px rgba(13,35,56,.08);
+}
+.result-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.result-main{display:flex;align-items:baseline;gap:5px;}
+.result-val{font-family:var(--mono);font-size:1.95rem;font-weight:700;color:var(--good);line-height:1.05;letter-spacing:-.02em;}
+.result-unit{font-size:.8rem;font-weight:700;color:var(--good);opacity:.9;}
+
+/* mL 表示：最高コントラストのダークバッジ（最重要情報） */
+.result-alt{
+  display:flex;align-items:baseline;gap:5px;
+  background:var(--navy-2);border:1px solid rgba(255,255,255,.24);
+  border-radius:11px;padding:5px 14px;
+  box-shadow:0 3px 12px rgba(6,20,32,.32);
+}
+.result-alt .v{
+  font-family:var(--mono);font-size:1.45rem;font-weight:700;
+  color:#fff;line-height:1.1;letter-spacing:-.01em;
+}
+.result-alt .u{font-size:.78rem;color:#c3dbeb;font-weight:700;letter-spacing:.03em;}
+
+.result-sub{
+  font-size:.71rem;color:var(--ink-2);margin-top:8px;line-height:1.6;
+  padding-top:7px;border-top:1px dashed var(--good);opacity:.92;
+}
+
+/* infusion result variant */
+.result.inf{background:var(--steel-soft);border-color:var(--steel);}
+.result.inf .result-val,.result.inf .result-unit{color:var(--steel);}
+:root[data-theme="dark"] .result.inf .result-val,
+:root[data-theme="dark"] .result.inf .result-unit{color:var(--steel-2);}
+.result.inf .result-sub{border-top-color:var(--steel);}
+
+/* warnings */
+.warn{
+  display:flex;gap:7px;align-items:flex-start;
+  background:var(--warn-soft);color:var(--warn);border:1px solid currentColor;
+  border-radius:9px;padding:7px 10px;font-size:.74rem;font-weight:600;line-height:1.5;margin-top:9px;
+}
+.warn.danger{background:var(--accent-soft);color:var(--accent);}
+.warn .k{font-weight:900;font-size:.72rem;flex:0 0 auto;}
+
+/* details */
+details.dc-detail{margin-top:10px;border-top:1px solid var(--line-2);padding-top:8px;}
+details.dc-detail>summary{
+  font-size:.75rem;font-weight:700;color:var(--steel);cursor:pointer;
+  list-style:none;display:flex;align-items:center;gap:5px;padding:2px 0;
+}
+:root[data-theme="dark"] details.dc-detail>summary{color:var(--steel-2);}
+details.dc-detail>summary::-webkit-details-marker{display:none;}
+details.dc-detail>summary::before{content:"▸";font-size:.7rem;transition:transform .15s;}
+details.dc-detail[open]>summary::before{transform:rotate(90deg);}
+.note-list{margin-top:8px;display:grid;gap:6px;}
+.note-list li{
+  font-size:.78rem;color:var(--ink-2);line-height:1.65;
+  padding-left:15px;position:relative;
+}
+.note-list li::before{
+  content:"";position:absolute;left:2px;top:.55em;
+  width:5px;height:5px;border-radius:50%;background:var(--steel);
+}
+.note-list li.caution{color:var(--accent);}
+.note-list li.caution::before{background:var(--accent);}
+.note-list li b{color:var(--ink);font-weight:700;}
+
+/* ---------- tables ---------- */
+.tbl-wrap{
+  overflow-x:auto;border-radius:11px;border:1px solid var(--line);
+  background:var(--paper);margin:6px 0 4px;-webkit-overflow-scrolling:touch;
+}
+table{width:100%;border-collapse:collapse;font-size:.8rem;min-width:100%;}
+th,td{border-bottom:1px solid var(--line-2);padding:8px 10px;text-align:center;vertical-align:middle;}
+th{
+  background:var(--fill);color:#fff;font-weight:700;font-size:.72rem;
+  position:sticky;top:0;letter-spacing:.02em;
+}
+tr:last-child td{border-bottom:0;}
+td:first-child{background:var(--canvas);font-weight:700;text-align:left;white-space:nowrap;}
+tbody tr:nth-child(even) td:not(:first-child){background:var(--canvas);}
+td.v{font-family:var(--mono);font-weight:700;color:var(--steel);}
+:root[data-theme="dark"] td.v{color:var(--steel-2);}
+td.left{text-align:left;white-space:normal;}
+table.compact td,table.compact th{padding:6px 8px;font-size:.75rem;}
+
+/* ---------- cards / misc ---------- */
+.card{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
+  padding:13px 14px;margin:10px 0;box-shadow:var(--shadow-sm);
+}
+.note{font-size:.76rem;color:var(--ink-2);line-height:1.7;margin:6px 0 0;}
+.caution-box{
+  background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent);
+  border-radius:10px;padding:9px 11px;font-size:.77rem;line-height:1.65;font-weight:600;margin:9px 0 0;
+}
+.info-box{
+  background:var(--steel-soft);color:var(--ink);border:1px solid var(--line);
+  border-radius:10px;padding:9px 11px;font-size:.77rem;line-height:1.65;margin:9px 0 0;
+}
+.b{font-weight:800;color:var(--ink);}
+.caution-text{color:var(--accent);font-weight:600;}
+
+/* ---------- calculator ---------- */
+.calc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
+.preset-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.preset-row button{
+  border:1px solid var(--line);background:var(--canvas);color:var(--ink-2);
+  border-radius:999px;padding:6px 12px;font-size:.73rem;font-weight:600;
+}
+.preset-row button.active{background:var(--fill);border-color:var(--fill);color:#fff;}
+.conc-line{
+  font-size:.78rem;color:var(--ink-2);margin-top:9px;
+  display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;
+}
+.conc-line b{font-family:var(--mono);font-size:.98rem;color:var(--steel);}
+:root[data-theme="dark"] .conc-line b{color:var(--steel-2);}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media (max-width:560px){.split{grid-template-columns:1fr;}}
+.calc-result{
+  margin-top:11px;border-radius:11px;padding:12px 14px;
+  background:var(--steel-soft);border:1px solid var(--steel);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+}
+.calc-result .lbl{font-size:.74rem;color:var(--ink-2);font-weight:600;}
+.calc-result .val{font-family:var(--mono);font-size:1.6rem;font-weight:700;color:var(--steel);line-height:1.1;}
+:root[data-theme="dark"] .calc-result .val{color:var(--steel-2);}
+.calc-result .val .u{font-size:.78rem;font-weight:700;opacity:.85;}
+.calc-result.good{background:var(--good-soft);border-color:var(--good);}
+.calc-result.good .val{color:var(--good);}
+
+/* ---------- log ---------- */
+.log-empty{
+  text-align:center;color:var(--ink-3);font-size:.82rem;
+  padding:34px 16px;border:1.5px dashed var(--line);border-radius:var(--r);background:var(--paper);
+}
+.log-list{display:grid;gap:9px;}
+.log-item{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
+  padding:11px 13px;box-shadow:var(--shadow-sm);
+}
+.log-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:7px;}
+.log-name{font-weight:800;font-size:.9rem;flex:1 1 auto;}
+.log-dose{font-family:var(--mono);font-size:.82rem;font-weight:700;color:var(--steel);}
+:root[data-theme="dark"] .log-dose{color:var(--steel-2);}
+.log-x{
+  border:0;background:none;color:var(--ink-3);font-size:1rem;line-height:1;
+  padding:2px 5px;border-radius:6px;
+}
+.log-x:hover{background:var(--accent-soft);color:var(--accent);}
+.bar{
+  height:8px;border-radius:999px;background:var(--canvas-2);overflow:hidden;position:relative;
+}
+.bar>i{display:block;height:100%;border-radius:999px;transition:width .4s linear,background .3s;}
+.bar.on>i{background:var(--good);}
+.bar.fading>i{background:#d9932f;}
+.bar.off>i{background:var(--accent);}
+.log-meta{
+  display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;
+  font-size:.7rem;color:var(--ink-3);margin-top:6px;
+}
+.log-meta .st{font-weight:800;}
+.log-meta .st.on{color:var(--good);}
+.log-meta .st.fading{color:#b8791f;}
+.log-meta .st.off{color:var(--accent);}
+.log-clear{
+  border:1px solid var(--accent);background:transparent;color:var(--accent);
+  border-radius:999px;padding:7px 15px;font-size:.75rem;font-weight:700;margin-top:12px;
+}
+
+/* ---------- flow ---------- */
+.flow{display:grid;gap:0;}
+.flow-step{
+  display:flex;gap:11px;padding:11px 0;
+  border-bottom:1px dashed var(--line);
+}
+.flow-step:last-child{border-bottom:0;}
+.flow-n{
+  flex:0 0 auto;width:26px;height:26px;border-radius:8px;
+  background:var(--fill);color:#fff;display:grid;place-items:center;
+  font-family:var(--mono);font-size:.76rem;font-weight:700;
+}
+.flow-c{flex:1 1 auto;min-width:0;}
+.flow-c h4{font-size:.85rem;font-weight:800;color:var(--ink);margin-bottom:3px;}
+.flow-c p{font-size:.79rem;color:var(--ink-2);line-height:1.7;}
+.flow-c p b{color:var(--ink);font-weight:700;}
+
+/* ---------- footer ---------- */
+footer{
+  text-align:center;color:var(--ink-3);font-size:.7rem;line-height:1.7;
+  padding:20px 14px calc(8px + env(safe-area-inset-bottom,0px));
+  border-top:1px solid var(--line);margin-top:18px;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width:600px){
+  body{font-size:14.5px;}
+  .badges{max-width:100%;}
+  .dc-head{flex-wrap:wrap;}
+  .badges{justify-content:flex-start;}
+  .derived-row{margin-left:0;width:100%;}
+  .result-val{font-size:1.6rem;}
+  .pfield input,.pfield select{width:68px;}
+}
+@media (max-width:380px){
+  .pfield input,.pfield select{width:60px;}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .app-header,.tabbar,.toolbar,.hdr-tools,footer,.log-x{display:none !important;}
+  body{background:#fff;font-size:11px;}
+  .panel{display:block !important;page-break-before:always;}
+  .drug-card,.card,.tbl-wrap{box-shadow:none;break-inside:avoid;}
+  details.dc-detail{display:block;}
+  details.dc-detail>summary{display:none;}
+}
+
+</style></head><body><header class="app-header"><div class="hdr-row"><div class="brand-mark" aria-hidden="true">麻</div><div class="brand-txt"><h1>全身麻酔 投与量・管理ツール</h1><p>体重基準を切替えて即時換算 ／ γ計算 ／ 作用時間トラッカー</p></div><div class="hdr-tools"><button class="icon-btn" id="btn-theme" type="button" title="テーマ切替" aria-label="テーマ切替">A</button><button class="icon-btn" type="button" onClick="window.print()" title="印刷・PDF保存" aria-label="印刷">⎙</button></div></div><div class="patient-strip"><div class="pfield"><label for="in-wt">体重 (kg)</label><input id="in-wt" type="number" inputMode="decimal" min="1" max="300" step="0.5" value="60"></div><div class="pfield"><label for="in-ht">身長 (cm)</label><input id="in-ht" type="number" inputMode="decimal" min="50" max="230" step="0.5" value="165"></div><div class="pfield"><label for="in-age">年齢 (歳)</label><input id="in-age" type="number" inputMode="numeric" min="0" max="120" step="1" value="50"></div><div class="pfield"><label for="in-sex">性別</label><select id="in-sex" value="male"><option value="male">男性</option><option value="female">女性</option></select></div><div class="derived-row"><span class="chip">BMI <b id="out-bmi">–</b></span><span class="chip">IBW <b id="out-ibw">–</b> kg</span><span class="chip" id="chip-basis">LBW <b id="out-lbw">–</b> kg</span></div></div></header><nav class="tabbar" aria-label="セクション"><button key="induction" type="button" data-tab="induction" class="active">導入薬</button><button key="analgesia" type="button" data-tab="analgesia" class="">鎮痛薬</button><button key="relax" type="button" data-tab="relax" class="">筋弛緩薬</button><button key="maintain" type="button" data-tab="maintain" class="">維持麻酔</button><button key="circulation" type="button" data-tab="circulation" class="">循環作動薬・γ計算</button><button key="redose" type="button" data-tab="redose" class="">反復投与</button><button key="monitor" type="button" data-tab="monitor" class="">モニター</button><button key="flow" type="button" data-tab="flow" class="">導入〜抜管</button><button key="log" type="button" data-tab="log" class="">記録</button><button key="tips" type="button" data-tab="tips" class="">臨床Tips</button></nav><main><section key="induction" class="panel active" id="p-induction"><h2 class="sec-title"><span class="n">1</span>導入薬（意識消失）</h2><p class="lead">体重基準（TBW / IBW / LBW / ABW）を切り替えて計算できます。用量ボタンを押すと即座に換算し、製剤規格から mL も併記します。</p><div class="toolbar" id="tool-induction"></div><div class="drug-list" id="list-induction"></div></section><section key="analgesia" class="panel" id="p-analgesia"><h2 class="sec-title"><span class="n">2</span>鎮痛薬（オピオイド）</h2><p class="lead">挿管刺激対策として導入前に投与することが多い薬剤です。持続投与は γ（μg/kg/分）から mL/時 へ自動換算します。</p><div class="toolbar" id="tool-analgesia"></div><div class="drug-list" id="list-analgesia"></div></section><section key="relax" class="panel" id="p-relax"><h2 class="sec-title"><span class="n">3</span>筋弛緩薬とその拮抗</h2><p class="lead">挿管用量・追加投与・持続投与。肥満例では IBW 基準が予測性に優れます。遮断深度は必ず TOF モニターで確認してください。</p><div class="toolbar" id="tool-relax"></div><div class="drug-list" id="list-relax"></div><h3 class="sub">TOF カウント・TOF 比と遮断深度</h3><div class="tbl-wrap"><table><thead><tr><th>指標</th><th>反応の状態</th><th>遮断の深さ</th><th>臨床的な意味</th></tr></thead><tbody><tr><td>PTC 0</td><td class="left">PTC 刺激にも反応なし</td><td class="left">極めて深い遮断</td><td class="left">挿管維持。拮抗には不向き</td></tr><tr><td>PTC 1〜2</td><td class="left">PTC 刺激にわずかに反応</td><td class="left">深い遮断</td><td class="left">スガマデクス 4 mg/kg の目安</td></tr><tr><td>TOF カウント 1〜2</td><td class="left">T1 のみ／T1・T2 のみ</td><td class="left">中等度の遮断</td><td class="left">手術に十分な弛緩</td></tr><tr><td>TOF カウント 3〜4</td><td class="left">T1〜T3／T1〜T4</td><td class="left">浅い遮断</td><td class="left">追加投与や拮抗の目安</td></tr><tr><td>TOF 比 ≧ 0.9</td><td class="left">T4/T1 が 0.9 以上</td><td class="left">回復良好</td><td class="left">抜管可能の目安</td></tr></tbody></table></div><p class="note">TOF 比は T4/T1。目視・触診では 0.4 程度までしか判定できないため、抜管前は 加速度感知式などの定量的モニターを推奨します。</p></section><section key="maintain" class="panel" id="p-maintain"><h2 class="sec-title"><span class="n">4</span>維持麻酔</h2><p class="lead">吸入麻酔薬は年齢補正した MAC を、静脈麻酔薬は持続投与量（mg/時 と mL/時）を計算します。</p><div class="toolbar" id="tool-maintain"></div><div class="drug-list" id="list-maintain"></div></section><section class="panel" id="p-circulation"><h2 class="sec-title"><span class="n">5</span>循環作動薬・γ計算</h2><p class="lead">昇圧薬・カテコラミン・抗コリン薬。用量ボタンを押すと即座に換算し、製剤規格から mL も併記します。 持続投与は γ（μg/kg/分）⇄ mL/時 を下の計算機で相互換算できます。</p><div class="toolbar" id="tool-circulation"></div><div class="drug-list" id="list-circulation"></div><h3 class="sub">シリンジポンプ γ 計算</h3><div class="card"><div class="preset-row" id="gamma-presets"></div><h3 class="sub">1. 希釈濃度の設定</h3><div class="split"><div class="f-field"><label for="g-mg">薬剤量 (mg)</label><input id="g-mg" type="number" step="0.01" min="0" value="2"></div><div class="f-field"><label for="g-ml">総液量 (mL)</label><input id="g-ml" type="number" step="1" min="0.1" value="50"></div></div><p class="conc-line">濃度 <b id="g-conc">–</b> μg/mL　／　計算に使用する体重 <b id="g-bw">–</b> kg</p><h3 class="sub">2. 目標 γ → 必要な流量</h3><div class="f-field"><label for="g-target">目標 γ (μg/kg/分)</label><input id="g-target" type="number" step="0.01" min="0" value="0.2"></div><div class="calc-result"><span class="lbl">必要な流量</span><span class="val"><span id="g-rate-out">–</span> <span class="u">mL/時</span></span></div><h3 class="sub">3. 現在の流量 → 実際の γ</h3><div class="f-field"><label for="g-rate">現在の流量 (mL/時)</label><input id="g-rate" type="number" step="0.1" min="0" value="6"></div><div class="calc-result good"><span class="lbl">実際の γ</span><span class="val"><span id="g-gamma-out">–</span> <span class="u">μg/kg/分</span></span></div><p class="note">計算式：流量（mL/時）＝ γ × 体重（kg） × 60 ÷ 濃度（μg/mL）。 体重はページ上部の入力値を使用します。</p></div><h3 class="sub">代表的な希釈と開始用量</h3><div class="tbl-wrap"><table class="compact"><thead><tr><th>薬剤</th><th>一般的な希釈</th><th>開始 γ</th><th>調節範囲</th></tr></thead><tbody><tr><td>ノルアドレナリン</td><td>1mg/50mL</td><td class="v">0.05</td><td>0.02〜0.3 μg/kg/分</td></tr><tr><td>フェニレフリン</td><td>1mg/50mL</td><td class="v">0.2</td><td>0.1〜0.5 μg/kg/分</td></tr><tr><td>ドパミン</td><td>600mg/200mL</td><td class="v">3</td><td>3〜10 μg/kg/分</td></tr><tr><td>ドブタミン</td><td>300mg/50mL</td><td class="v">3</td><td>2〜10 μg/kg/分</td></tr><tr><td>アドレナリン</td><td>1mg/50mL</td><td class="v">0.03</td><td>0.01〜0.1 μg/kg/分</td></tr><tr><td>レミフェンタニル</td><td>2mg/50mL</td><td class="v">0.2</td><td>0.1〜0.5 μg/kg/分</td></tr></tbody></table></div><h3 class="sub">循環作動薬の選択</h3><div class="tbl-wrap"><table class="compact"><thead><tr><th>状況</th><th>第一選択</th><th>代替・追加</th></tr></thead><tbody><tr><td>低血圧＋徐脈</td><td class="left">エフェドリン 4〜8 mg</td><td class="left">アドレナリン少量</td></tr><tr><td>低血圧＋頻脈</td><td class="left">フェニレフリン 50〜100 μg</td><td class="left">ノルアドレナリン持続</td></tr><tr><td>重症・遷延性低血圧</td><td class="left">ノルアドレナリン 0.05〜0.3γ</td><td class="left">アドレナリン持続</td></tr><tr><td>心収縮力低下</td><td class="left">ドブタミン 2〜10γ</td><td class="left">ドパミン 3〜10γ</td></tr><tr><td>徐脈</td><td class="left">アトロピン 0.5 mg</td><td class="left">アドレナリン少量</td></tr><tr><td>心停止（CPR）</td><td class="left">アドレナリン 1 mg 静注</td><td class="left">3〜5 分毎に繰り返す</td></tr></tbody></table></div><p class="caution-box">導入直後の低血圧は、まず輸液負荷と麻酔深度の見直しから行う。持続投与は中心静脈路が望ましく、 末梢投与時は血管外漏出による組織障害に注意する。</p></section><section class="panel" id="p-redose"><h2 class="sec-title"><span class="n">6</span>反復投与（追加投与）の目安</h2><p class="lead">手術時間が長くなる場合や、体動・血圧上昇などの刺激反応が見られたときに、各薬剤の作用時間を踏まえて追加します。 数値は目安であり、血行動態・BIS・TOF を見ながら調整してください。</p><div class="tbl-wrap"><table><thead><tr><th>薬剤</th><th>追加のタイミング</th><th>追加投与量</th><th>備考</th></tr></thead><tbody><tr><td>プロポフォール</td><td class="left">意識消失不十分・体動時</td><td class="v">初回量の 1/3〜1/2</td><td class="left">血圧低下・呼吸抑制に注意</td></tr><tr><td>フェンタニル</td><td class="left">強刺激前・血圧脈拍上昇時（30〜60分毎）</td><td class="v">0.5〜1 μg/kg</td><td class="left">総量増で覚醒遅延リスク</td></tr><tr><td>レミフェンタニル</td><td class="left">ボーラスでなく速度調整が基本</td><td class="v">0.05〜0.1 μg/kg/分ずつ</td><td class="left">作用時間 3〜5 分と短い</td></tr><tr><td>ロクロニウム</td><td class="left">TOF カウント 2〜3 まで回復時</td><td class="v">0.1〜0.2 mg/kg</td><td class="left">作用持続 30〜45 分。終了間際は控える</td></tr><tr><td>セボフルラン</td><td class="left">呼気終末濃度をみて持続調整</td><td class="v">MAC・BIS を指標</td><td class="left">浅い徴候で増量を検討</td></tr><tr><td>レミマゾラム</td><td class="left">覚醒徴候が認められた時</td><td class="v">最大 0.2 mg/kg</td><td class="left">添付文書記載</td></tr></tbody></table></div></section><section class="panel" id="p-monitor"><h2 class="sec-title"><span class="n">7</span>モニターの見方（ETCO2・麻酔器画面）</h2><h3 class="sub">ETCO2（カプノグラム）</h3><p class="note">正常値はおおむね 35〜45 mmHg。気管挿管の確認・換気状態の評価・回路トラブルの早期発見に不可欠。</p><div class="tbl-wrap"><table><thead><tr><th>所見</th><th>特徴</th><th>考えられる原因・対応</th></tr></thead><tbody><tr><td>正常波形</td><td class="left">35〜45 mmHg で安定</td><td class="left">換気良好</td></tr><tr><td>波形が平坦</td><td class="left">ETCO2 が 0 付近</td><td class="left">食道挿管・回路外れ・心停止を疑う</td></tr><tr><td>急激な低下</td><td class="left">数値が急に下降</td><td class="left">回路リーク・肺塞栓・心拍出量急低下</td></tr><tr><td>緩徐な低下</td><td class="left">数値が徐々に下降</td><td class="left">過換気・体温低下・肺血流低下</td></tr><tr><td>ETCO2 の上昇</td><td class="left">徐々／急に上昇</td><td class="left">低換気・CO2 吸収剤消耗・悪性高熱症</td></tr><tr><td>プラトー傾斜</td><td class="left">右肩上がり</td><td class="left">気管支攣縮・COPD</td></tr><tr><td>ベースライン上昇</td><td class="left">吸気時も 0 に戻らない</td><td class="left">CO2 再呼吸（吸収剤劣化・弁不良）</td></tr></tbody></table></div><h3 class="sub">麻酔器画面のその他の主要項目</h3><div class="tbl-wrap"><table><thead><tr><th>項目</th><th>内容</th><th>見るポイント</th></tr></thead><tbody><tr><td>SpO2</td><td class="left">動脈血酸素飽和度</td><td class="left">94〜100% 目安。波形も確認</td></tr><tr><td>気道内圧</td><td class="left">換気時の圧波形・最高値</td><td class="left">急上昇は閉塞・喘息・回路狭窄</td></tr><tr><td>換気量</td><td class="left">設定／実測</td><td class="left">リークで乖離することがある</td></tr><tr><td>FiO2</td><td class="left">吸入酸素濃度</td><td class="left">無気肺予防のため高すぎに注意</td></tr><tr><td>BIS</td><td class="left">麻酔深度（0〜100）</td><td class="left">40〜60 が適正深度の目安</td></tr><tr><td>NIBP／観血血圧</td><td class="left">血圧モニタリング</td><td class="left">急低下は出血・迷走神経反射等</td></tr><tr><td>体温</td><td class="left">深部体温／皮膚温</td><td class="left">低体温は覚醒遅延のリスク</td></tr><tr><td>尿量</td><td class="left">経時的尿量</td><td class="left">目安 0.5 mL/kg/時 以上</td></tr></tbody></table></div><p class="caution-box">見る順番の目安：① SpO2・波形 → ② ETCO2 → ③ 気道内圧 → ④ 血圧・脈拍 → ⑤ 麻酔深度 → ⑥ 体温・尿量</p></section><section class="panel" id="p-flow"><h2 class="sec-title"><span class="n">8</span>導入〜抜管までの流れ</h2><div class="card"><div class="flow"><div class="flow-step"><span class="flow-n">1</span><div class="flow-c"><h4>術前準備・モニタリング開始</h4><p>SpO2・心電図・非観血的血圧・BIS などを装着。静脈路確保。前酸素化（6 L/分・3〜5 分、EtO2 &gt; 90% 目標）。</p></div></div><div class="flow-step"><span class="flow-n">2</span><div class="flow-c"><h4>鎮痛薬・導入薬の投与</h4><p>フェンタニル <b>1〜3 μg/kg</b> を静注 → プロポフォール <b>1.5〜2.5 mg/kg</b>（またはレミマゾラム）で意識消失を確認。</p></div></div><div class="flow-step"><span class="flow-n">3</span><div class="flow-c"><h4>マスク換気の確認</h4><p>換気可能を確認してから筋弛緩薬を投与する（気道確保困難が疑われる場合は自発呼吸温存を検討）。</p></div></div><div class="flow-step"><span class="flow-n">4</span><div class="flow-c"><h4>筋弛緩薬投与・気管挿管</h4><p>ロクロニウム <b>0.6〜1.0 mg/kg</b> を静注。TOF カウント 0 など十分な弛緩を待って挿管し、カプノグラムで確認。</p></div></div><div class="flow-step"><span class="flow-n">5</span><div class="flow-c"><h4>維持麻酔へ移行</h4><p>セボフルラン <b>1〜3 vol%</b>、またはプロポフォール＋レミフェンタニル持続で TIVA 維持。BIS・血行動態・筋弛緩をモニタリング。</p></div></div><div class="flow-step"><span class="flow-n">6</span><div class="flow-c"><h4>術中管理</h4><p>出血・体液バランス管理、体温管理、必要に応じ筋弛緩追加。手術終了が近づけば漸減を開始。</p></div></div><div class="flow-step"><span class="flow-n">7</span><div class="flow-c"><h4>筋弛緩の拮抗</h4><p>TOF モニタリングで遮断深度を確認し、スガマデクス <b>2〜4 mg/kg</b>（深い遮断・緊急時は 16 mg/kg）で拮抗。</p></div></div><div class="flow-step"><span class="flow-n">8</span><div class="flow-c"><h4>覚醒・抜管</h4><p>自発呼吸の回復、意識清明、<b>TOF 比 ≧ 0.9</b> を確認してから抜管。抜管後は気道開通性・呼吸状態を継続観察。</p></div></div><div class="flow-step"><span class="flow-n">9</span><div class="flow-c"><h4>術後管理</h4><p>PACU／病棟で SpO2・呼吸状態・疼痛・PONV を評価。必要に応じ鎮痛薬・制吐薬を投与。</p></div></div></div></div><p class="caution-box">抜管基準は「自発呼吸の十分な回復」「意識清明」「TOF 比 ≧ 0.9」「循環動態の安定」「気道反射の回復」が 揃っていることを必ず確認する。</p></section><section class="panel" id="p-log"><h2 class="sec-title"><span class="n">9</span>投与記録・作用時間トラッカー</h2><p class="lead">投与した薬剤を記録すると、経過時間から作用の残存状況を推定して表示します。 あくまで目安であり、実際の判断は臨床所見とモニタリングに基づいてください。</p><div class="log-list" id="list-log"></div><button class="log-clear" type="button" data-act="clear-log">記録をすべて削除</button></section><section class="panel" id="p-tips"><h2 class="sec-title"><span class="n">10</span>臨床 Tips（経験に基づく工夫）</h2><p class="lead">標準的なプロトコルに加えて、症例や状況に応じた「さじ加減」の参考。数値・方針は症例ごとに調整が必要です。</p><h3 class="sub">麻酔維持法の選び方</h3><div class="card"><p class="note"><b class="b">プロポフォール導入＋セボフルラン維持：</b>最も扱いやすい基本パターン。緊急手術でもまずこの組み合わせでよい。</p><p class="note caution-text">ただし覚醒・離脱時に体動やせん妄様の興奮が出やすい点に注意。</p><p class="note"><b class="b">高齢者・ハイリスク患者：</b>レミマゾラム TIVA が有用。0.4 mg/kg/時 程度で BIS 50〜60 のやや浅めに維持するとコントロールしやすい。</p></div><h3 class="sub">鎮静</h3><div class="card"><p class="note">プロポフォールは少なめに入れて入眠さえ得られればよい。その後セボフルラン 2〜3% でマスク換気すれば深度は後から追いつく。</p><p class="note">レミマゾラムは体格によらずまず 5〜6 mg を緩徐に静注し、その後は IBW ベースの mg/時 で持続。BIS は低下しにくいため血圧・瞳孔で確認する。</p></div><h3 class="sub">筋弛緩</h3><div class="card"><p class="note">ロクロニウム 0.6 mg/kg を投与し、TOF がなかなか低下しなければ追加。整形外科領域は麻酔深度が適切ならほぼ追加不要で、難渋時は 10 mg 追加が目安。</p><p class="note">抜管前は必ず定量的 TOF モニターで TOF 比 ≧ 0.9 を確認する。目視・触診では 0.4 程度までしか判定できない。</p></div><h3 class="sub">鎮痛</h3><div class="card"><p class="note">マルチモーダル鎮痛を強化するほどフェンタニル総量を減らせる。1 時間超の手術なら 250 μg が目安、神経ブロック併用なら初回 100 μg のみでも可。</p><p class="note">覚醒時は血中濃度 0.6〜0.8 ng/mL の確保が疼痛予防の目安。</p></div><h3 class="sub">循環管理</h3><div class="card"><p class="note">全身麻酔では高確率で循環管理が必要になるため、循環作動薬の使い方は基本として押さえておくと安心（「循環作動薬・γ計算」タブ参照）。</p><p class="note">昇圧薬は「血圧低下＋徐脈ならエフェドリン」「血圧低下＋頻脈ならフェニレフリン」を第一に考えると迷いにくい。</p></div><p class="caution-box">本タブは特定の実践者の経験に基づく個人的な工夫であり、施設プロトコルや 科学的根拠に基づく標準的推奨に置き換わるものではありません。</p></section></main><footer>学習・臨床補助用ツール ／ 実際の投与は施設プロトコル・添付文書・指導医の確認を優先してください<br>用量は成人を基準としています。小児・妊産婦・臓器障害例では個別の調整が必要です。</footer><script>
+/* =============================================================================
+   麻酔 投与量・管理ツール  —  drug database
+   -----------------------------------------------------------------------------
+   出典方針:
+     src:'label'  = 添付文書（インタビューフォーム含む）に記載の用量
+     src:'std'    = 学会ガイドライン / 標準的教科書（Miller, Morgan & Mikhail 等）
+     src:'prac'   = 臨床で広く用いられる実用的用量（施設差あり）
+   ※ 用量はすべて「成人」を基準とする。
+   ============================================================================= */
+window.MASUI = window.MASUI || {};
+
+/* ---------- 体重基準 ---------- */
+MASUI.BASIS = {
+  tbw: { key: 'tbw', label: '実測体重', short: 'TBW', desc: '実測体重（Total Body Weight）' },
+  ibw: { key: 'ibw', label: '理想体重', short: 'IBW', desc: '理想体重（Devine 式：男性 50 + 0.91×(身長cm−152.4)、女性 45.5 + 0.91×(身長cm−152.4)）' },
+  lbw: { key: 'lbw', label: '除脂肪体重', short: 'LBW', desc: '除脂肪体重（Janmahasatian 式。肥満例で薬物動態の予測に優れる）' },
+  abw: { key: 'abw', label: '調整体重', short: 'ABW', desc: '調整体重（IBW + 0.4×(TBW − IBW)。肥満例の中間値）' },
+  fixed: { key: 'fixed', label: '固定量', short: 'FIX', desc: '体重によらず固定量で投与' }
+};
+
+/* ---------- カテゴリ ---------- */
+MASUI.CATS = [
+  { key: 'induction',   label: '導入薬',          icon: '①' },
+  { key: 'analgesia',   label: '鎮痛薬',          icon: '②' },
+  { key: 'relax',       label: '筋弛緩薬・拮抗',  icon: '③' },
+  { key: 'maintain',    label: '維持麻酔',        icon: '④' },
+  { key: 'circulation', label: '循環作動薬',      icon: '⑤' },
+  { key: 'monitor',     label: 'モニター',        icon: '⑥' },
+  { key: 'flow',        label: '手順',            icon: '⑦' },
+  { key: 'log',         label: '記録',            icon: '⑧' }
+];
+
+/* ---------- 薬剤 ---------- */
+MASUI.DRUGS = [
+
+/* ===================== 導入 ===================== */
+{
+  id: 'propofol',
+  name: 'プロポフォール',
+  sub: '1% 製剤 = 10 mg/mL（ディプリバン等）',
+  cat: 'induction', cls: '静脈麻酔薬',
+  basis: 'tbw', basisOpts: ['tbw', 'ibw', 'lbw', 'abw'],
+  modes: [
+    {
+      key: 'std', label: '標準導入', src: 'label',
+      range: '1.5〜2.5 mg/kg',
+      unit: 'mg/kg', kind: 'bolus', out: 'mg',
+      conc: { mg: 10, ml: 1 }, concLabel: '1%（10 mg/mL）',
+      presets: [1.5, 2.0, 2.5],
+      notes: [
+        '<b>添付文書：</b>2.0〜2.5 mg/kg を緩徐に静注（ASA 1〜2、若年）。',
+        '入眠が得られれば十分。その後セボフルラン 2〜3% のマスク換気で深度は後から追いつく。',
+        '血管痛・血圧低下・無呼吸に注意。前投薬やオピオイド併用時は減量。'
+      ],
+      caution: '循環動態不安定例・低循環血液量例では著明な血圧低下をきたす。'
+    },
+    {
+      key: 'elderly', label: '高齢者・循環不安定', src: 'prac',
+      range: '0.8〜1.5 mg/kg',
+      unit: 'mg/kg', kind: 'bolus', out: 'mg',
+      conc: { mg: 10, ml: 1 }, concLabel: '1%（10 mg/mL）',
+      presets: [0.8, 1.0, 1.5],
+      notes: [
+        '65歳以上では必要量が約 30〜40% 低下する。',
+        '1 mg/kg 前後から開始し、入眠・血圧を見ながら追加する漸増方式が安全。'
+      ]
+    },
+    {
+      key: 'peds', label: '小児', src: 'std',
+      range: '2.5〜3.5 mg/kg',
+      unit: 'mg/kg', kind: 'bolus', out: 'mg',
+      conc: { mg: 10, ml: 1 }, concLabel: '1%（10 mg/mL）',
+      presets: [2.5, 3.0, 3.5],
+      notes: ['小児は成人より必要量が多い。2.5〜3.5 mg/kg を緩徐に静注。']
+    }
+  ]
+},
+{
+  id: 'remimazolam',
+  name: 'レミマゾラム',
+  sub: 'アネレム静注用 20mg / 50mg',
+  cat: 'induction', cls: 'ベンゾジアゼピン系静脈麻酔薬',
+  basis: 'tbw', basisOpts: ['tbw', 'ibw', 'lbw'],
+  modes: [
+    {
+      key: 'label', label: '導入（添付文書）', src: 'label',
+      range: '12 mg/kg/時 持続',
+      unit: 'mg/kg/時', kind: 'infusion', out: 'mg/時',
+      conc: { mg: 5, ml: 1 }, concLabel: '溶解後 5 mg/mL（50mg/10mL）',
+      presets: [12],
+      notes: [
+        '<b>添付文書：</b>12 mg/kg/時 の速度で、意識消失が得られるまで持続注入。年齢・状態に応じ適宜減速。',
+        '12 mg/kg/時 ≒ 0.2 mg/kg/分。60 kg なら約 12 mg/分 となり、実用上の「5〜6 mg を30〜60秒で」とほぼ一致する。',
+        '意識消失後は直ちに維持投与へ移行する（ボーラスで終わらせない）。'
+      ],
+      caution: '高齢者・低体重者では初回投与量および追加投与量を減らすこと。'
+    },
+    {
+      key: 'prac', label: '導入（実用的な固定量）', src: 'prac',
+      range: '5〜6 mg を緩徐に静注',
+      unit: 'mg', kind: 'fixed', out: 'mg',
+      presets: [5, 6],
+      notes: [
+        '体格によらずまず 5〜6 mg を緩徐に静注するのが実用的。',
+        'BIS は低下しにくいため、血圧・瞳孔所見（縮瞳）・体動で入眠を判断する。',
+        '換気可能であれば、あわてず待つ。'
+      ]
+    },
+    {
+      key: 'bolus', label: '体重ベース（0.2 mg/kg 相当）', src: 'prac',
+      range: '0.1〜0.3 mg/kg 緩徐',
+      unit: 'mg/kg', kind: 'bolus', out: 'mg',
+      conc: { mg: 5, ml: 1 }, concLabel: '溶解後 5 mg/mL',
+      presets: [0.1, 0.2, 0.3],
+      notes: ['体重ベースでは 0.1〜0.3 mg/kg を緩徐に静注（目安：約 1 mg/kg/分 の速度）。']
+    }
+  ]
+},
+/* ===================== 鎮痛薬 ===================== */
+{
+  id: 'fentanyl',
+  name: 'フェンタニル',
+  sub: 'フェンタニル注 0.1mg/2mL（50 μg/mL）',
+  cat: 'analgesia', cls: 'オピオイド（μ作動薬）',
+  basis: 'tbw', basisOpts: ['tbw', 'ibw', 'lbw', 'abw'],
+  modes: [
+    {
+      key: 'induction', label: '導入時', src: 'std',
+      range: '1〜3 μg/kg',
+      unit: 'μg/kg', kind: 'bolus', out: 'μg',
+      conc: { mg: 0.1, ml: 2 }, concLabel: '50 μg/mL（0.1mg/2mL）',
+      presets: [1, 2, 3],
+      notes: [
+        '挿管刺激対策として、導入前に投与することが多い。',
+        'マルチモーダル鎮痛を強化するほど総量を減らせる。',
+        '1時間超の手術なら 250 μg 程度が目安。神経ブロック併用なら導入時 100 μg のみでも可。'
+      ],
+      caution: '総投与量が増えると覚醒遅延・術後呼吸抑制のリスクが上がる。'
+    },
+    {
+      key: 'redose', label: '追加投与', src: 'std',
+      range: '0.5〜1 μg/kg',
+      unit: 'μg/kg', kind: 'bolus', out: 'μg',
+      conc: { mg: 0.1, ml: 2 }, concLabel: '50 μg/mL',
+      presets: [0.5, 0.75, 1],
+      notes: ['強刺激前・血圧脈拍上昇時（目安 30〜60 分毎）に追加。']
+    }
+  ]
+},
+{
+  id: 'remifentanil',
+  name: 'レミフェンタニル',
+  sub: 'アルチバ静注用 2mg / 5mg（要溶解）',
+  cat: 'analgesia', cls: 'オピオイド（超短時間作用型）',
+  basis: 'ibw', basisOpts: ['tbw', 'ibw', 'lbw', 'abw'],
+  modes: [
+    {
+      key: 'ind', label: '導入時', src: 'prac',
+      range: '0.25〜0.5 μg/kg/分',
+      unit: 'μg/kg/分', kind: 'gamma', out: 'mL/時',
+      conc: { mg: 2, ml: 50 }, concLabel: '2mg/50mL = 40 μg/mL',
+      presets: [0.25, 0.3, 0.5],
+      notes: ['導入時の血圧上昇・挿管反応を抑える。意識消失前から開始してよい。']
+    },
+    {
+      key: 'main', label: '維持', src: 'std',
+      range: '0.1〜0.5 μg/kg/分',
+      unit: 'μg/kg/分', kind: 'gamma', out: 'mL/時',
+      conc: { mg: 2, ml: 50 }, concLabel: '2mg/50mL = 40 μg/mL',
+      presets: [0.05, 0.1, 0.2, 0.3, 0.5],
+      notes: [
+        '手術侵襲・体動に応じて 0.05〜0.1 μg/kg/分 ずつ増減する（ボーラスは避ける）。',
+        '作用時間 3〜5 分と極めて短いため、術終了 5 分前には減量・中止。',
+        '肥満例では除脂肪体重（LBW）基準が予測性に優れる。'
+      ],
+      caution: '急速なボーラス投与は胸壁硬直・徐脈・重度低血圧をきたす。'
+    }
+  ]
+},
+/* ===================== 筋弛緩薬・拮抗 ===================== */
+{
+  id: 'rocuronium',
+  name: 'ロクロニウム',
+  sub: 'エスラックス静注液 50mg/5mL（10 mg/mL）',
+  cat: 'relax', cls: '非脱分極性筋弛緩薬',
+  basis: 'ibw', basisOpts: ['tbw', 'ibw', 'lbw', 'abw'],
+  modes: [
+    {
+      key: 'std', label: '挿管用量', src: 'label',
+      range: '0.6 mg/kg',
+      unit: 'mg/kg', kind: 'bolus', out: 'mg',
+      conc: { mg: 10, ml: 1 }, concLabel: '10 mg/mL',
+      presets: [0.6],
+      notes: ['<b>添付文書：</b>0.6 mg/kg を静注。約 90 秒で挿管可能な条件が得られる。']
+    },
+    {
+      key: 'rsi', label: '迅速導入（RSI）', src: 'std',
+      range: '0.9〜1.2 mg/kg',
+      unit: 'mg/kg', kind: 'bolus', out: 'mg',
+      conc: { mg: 10, ml: 1 }, concLabel: '10 mg/mL',
+      presets: [0.9, 1.0, 1.2],
+      notes: ['挿管条件を早めるため高用量を用いる。作用時間が延長する点に注意。'],
+      caution: '喉頭痙攣予防のため、挿管前は TOF カウント 0〜1 まで確実に待つ。'
+    }
+  ]
+},
+
+/* ===================== 維持 ===================== */
+{
+  id: 'propofol-tiva',
+  name: 'プロポフォール（維持）',
+  sub: 'TIVA 持続投与 / 1% = 10 mg/mL',
+  cat: 'maintain', cls: '静脈麻酔薬',
+  basis: 'tbw', basisOpts: ['tbw', 'ibw', 'lbw', 'abw'],
+  modes: [
+    {
+      key: 'tiva', label: 'TIVA 維持', src: 'label',
+      range: '4〜10 mg/kg/時',
+      unit: 'mg/kg/時', kind: 'infusion', out: 'mg/時',
+      conc: { mg: 10, ml: 1 }, concLabel: '1%（10 mg/mL）',
+      presets: [4, 6, 8, 10],
+      notes: [
+        '<b>添付文書：</b>4〜10 mg/kg/時 の持続静注。',
+        '一般的には BIS 40〜60 を目標に 6〜8 mg/kg/時 前後で維持することが多い。',
+        '高齢者・オピオイド併用時は 3〜5 mg/kg/時 まで減量する。'
+      ]
+    },
+    {
+      key: 'low', label: '高齢者・鎮静主体', src: 'prac',
+      range: '2〜4 mg/kg/時',
+      unit: 'mg/kg/時', kind: 'infusion', out: 'mg/時',
+      conc: { mg: 10, ml: 1 }, concLabel: '1%（10 mg/mL）',
+      presets: [2, 3, 4],
+      notes: ['セボフルラン少量併用やレミフェンタニル併用下での低用量維持。']
+    }
+  ]
+},
+{
+  id: 'remimazolam-main',
+  name: 'レミマゾラム（維持）',
+  sub: 'アネレム静注用 20mg / 50mg',
+  cat: 'maintain', cls: 'ベンゾジアゼピン系静脈麻酔薬',
+  basis: 'ibw', basisOpts: ['tbw', 'ibw', 'lbw'],
+  modes: [
+    {
+      key: 'label', label: '維持（添付文書）', src: 'label',
+      range: '1 mg/kg/時 開始（上限 2）',
+      unit: 'mg/kg/時', kind: 'infusion', out: 'mg/時',
+      conc: { mg: 5, ml: 1 }, concLabel: '溶解後 5 mg/mL',
+      presets: [1, 1.5, 2],
+      notes: [
+        '<b>添付文書：</b>1 mg/kg/時 で開始し、麻酔深度を見て調節。上限は 2 mg/kg/時。',
+        '覚醒徴候が認められた場合は、最大 0.2 mg/kg を追加静注してもよい。',
+        '添付文書どおりでは覚醒が遷延しやすいため、実際は下の「実用的用量」を用いる施設が多い。'
+      ]
+    },
+    {
+      key: 'prac', label: '実用的用量', src: 'prac',
+      range: '0.2〜0.4 mg/kg/時',
+      unit: 'mg/kg/時', kind: 'infusion', out: 'mg/時',
+      conc: { mg: 5, ml: 1 }, concLabel: '溶解後 5 mg/mL',
+      presets: [0.2, 0.3, 0.4],
+      notes: [
+        'BIS 50〜60 のやや浅めに維持するとコントロールしやすい。',
+        '不足時はセボフルラン 0.2〜0.4% を上乗せする方法が使いやすい。'
+      ]
+    },
+    {
+      key: 'aged', label: '高齢者（添付文書の至適域）', src: 'label',
+      range: '0.4〜1.0 mg/kg/時',
+      unit: 'mg/kg/時', kind: 'infusion', out: 'mg/時',
+      conc: { mg: 5, ml: 1 }, concLabel: '溶解後 5 mg/mL',
+      presets: [0.4, 0.6, 1.0],
+      notes: [
+        '臨床試験での高齢者（65歳以上）の至適投与速度は 0.4〜1.0 mg/kg/時。',
+        '非高齢者（20〜64歳）は 0.8〜2.0 mg/kg/時。'
+      ]
+    }
+  ]
+},
+{
+  id: 'sevoflurane',
+  name: 'セボフルラン',
+  sub: '吸入麻酔薬 / 呼気終末濃度（vol%）',
+  cat: 'maintain', cls: 'ハロゲン化吸入麻酔薬',
+  basis: 'tbw', basisOpts: ['tbw'],
+  modes: [
+    {
+      key: 'mac', label: '年齢別 MAC 換算', src: 'std',
+      range: 'MAC 値（年齢補正）',
+      unit: 'vol%', kind: 'mac', out: 'vol%',
+      presets: [1.0, 1.3, 1.5],
+      notes: [
+        'MAC（最小肺胞内濃度）＝ 50% の患者が体動を示さない呼気終末濃度。',
+        'MAC は 40 歳を基準に 1 歳あたり約 6% 低下する（Mapleson の式）。',
+        '臨床では 1.0〜1.3 MAC を目安に、BIS 40〜60・血行動態を見て調節する。',
+        '亜酸化窒素やオピオイド併用時は MAC が低下するため減量できる。'
+      ]
+    },
+    {
+      key: 'vol', label: '臨床使用域', src: 'label',
+      range: '1〜3 vol%',
+      unit: 'vol%', kind: 'fixed', out: 'vol%',
+      presets: [1.0, 1.5, 2.0, 2.5, 3.0],
+      notes: ['維持は 1〜3 vol%（呼気終末濃度）。導入時のマスク換気では 2〜3 vol% を用いる。']
+    }
+  ]
+},
+
+{
+  id: 'rocuronium-maint',
+  name: 'ロクロニウム（維持）',
+  sub: 'エスラックス静注液 10 mg/mL',
+  cat: 'relax', cls: '非脱分極性筋弛緩薬',
+  basis: 'ibw', basisOpts: ['tbw', 'ibw', 'lbw', 'abw'],
+  modes: [
+    {
+      key: 'bolus', label: '追加投与', src: 'label',
+      range: '0.1〜0.2 mg/kg',
+      unit: 'mg/kg', kind: 'bolus', out: 'mg',
+      conc: { mg: 10, ml: 1 }, concLabel: '10 mg/mL',
+      presets: [0.1, 0.15, 0.2],
+      notes: [
+        '<b>添付文書：</b>術中必要に応じて 0.1〜0.2 mg/kg を追加投与。',
+        'TOF カウント 2〜3 まで回復したら追加の目安（作用持続 30〜45 分）。',
+        '整形外科領域では麻酔深度が適切なら追加はほぼ不要。バッキング・気道内圧上昇・体動時に 10 mg 追加が目安。'
+      ],
+      caution: '手術終了間際の追加は避ける（残存遮断のリスク）。'
+    },
+    {
+      key: 'inf', label: '持続投与', src: 'std',
+      range: '0.3〜0.6 mg/kg/時',
+      unit: 'mg/kg/時', kind: 'infusion', out: 'mg/時',
+      conc: { mg: 10, ml: 1 }, concLabel: '10 mg/mL',
+      presets: [0.3, 0.45, 0.6],
+      notes: ['長時間手術では持続投与で安定した弛緩が得られる。TOF で必ず確認する。']
+    }
+  ]
+},
+
+{
+  id: 'sugammadex',
+  name: 'スガマデクス',
+  sub: 'ブリディオン静注 200mg/2mL（100 mg/mL）',
+  cat: 'relax', cls: '選択的筋弛緩回復剤（γ-シクロデキストリン）',
+  basis: 'tbw', basisOpts: ['tbw', 'ibw', 'lbw', 'abw'],
+  modes: [
+    {
+      key: 'mod', label: '中等度〜浅い遮断', src: 'label',
+      range: '2 mg/kg（TOF カウント 1〜2 の回復後）',
+      unit: 'mg/kg', kind: 'bolus', out: 'mg',
+      conc: { mg: 100, ml: 1 }, concLabel: '100 mg/mL',
+      presets: [2],
+      notes: [
+        '<b>添付文書：</b>筋弛緩状態から回復が認められた場合（TOF カウント 1〜2）は 2 mg/kg。',
+        'TOF 比 0.9 までの回復は約 2 分。'
+      ]
+    },
+    {
+      key: 'deep', label: '深い遮断', src: 'label',
+      range: '4 mg/kg（PTC 1〜2）',
+      unit: 'mg/kg', kind: 'bolus', out: 'mg',
+      conc: { mg: 100, ml: 1 }, concLabel: '100 mg/mL',
+      presets: [4],
+      notes: ['深い遮断（PTC 1〜2）からの拮抗は 4 mg/kg。']
+    },
+    {
+      key: 'emerg', label: '緊急拮抗', src: 'label',
+      range: '16 mg/kg（挿管用量の即時拮抗）',
+      unit: 'mg/kg', kind: 'bolus', out: 'mg',
+      conc: { mg: 100, ml: 1 }, concLabel: '100 mg/mL',
+      presets: [16],
+      notes: ['ロクロニウムの挿管用量（0.6 mg/kg）直後の緊急拮抗は 16 mg/kg。'],
+      caution: '16 mg/kg は添付文書上の上限。深い遮断では TOF 比 0.9 到達を必ず定量モニターで確認する。'
+    }
+  ]
+},
+
+/* ===================== 循環作動薬 ===================== */
+{
+  id: 'ephedrine',
+  name: 'エフェドリン',
+  sub: 'エフェドリン注 40mg/1mL',
+  cat: 'circulation', cls: '昇圧薬（α/β 間接刺激）',
+  basis: 'fixed', basisOpts: ['fixed', 'tbw'],
+  modes: [
+    {
+      key: 'bolus', label: '1回量（ボーラス）', src: 'label',
+      range: '4〜8 mg 静注',
+      unit: 'mg', kind: 'fixed', out: 'mg',
+      presets: [4, 5, 8],
+      notes: [
+        '<b>添付文書：</b>麻酔時の血圧降下には 1 回 4〜8 mg を静注。',
+        '血圧低下＋徐脈の組み合わせで第一選択となりやすい。',
+        '間接作用のため、反復投与で効果が減弱する（タキフィラキシー）。総量 40〜50 mg を超える頃には効きにくくなる。'
+      ],
+      caution: '脊髄麻酔後やカテコラミン枯渇状態では効果不十分。その場合はフェニレフリンやノルアドレナリンへ切替。'
+    }
+  ]
+},
+{
+  id: 'phenylephrine',
+  name: 'フェニレフリン',
+  sub: 'ネオシネジン注 1mg/1mL',
+  cat: 'circulation', cls: '昇圧薬（α1 選択的）',
+  basis: 'tbw', basisOpts: ['tbw', 'ibw', 'lbw'],
+  modes: [
+    {
+      key: 'bolus', label: '1回量（ボーラス）', src: 'prac',
+      range: '50〜100 μg 静注',
+      unit: 'μg', kind: 'fixed', out: 'μg',
+      presets: [50, 100, 200],
+      notes: [
+        '50〜100 μg ずつ静注。頻脈を伴う低血圧で使いやすい。',
+        '反射性徐脈をきたすことがある。'
+      ]
+    },
+    {
+      key: 'inf', label: '持続投与', src: 'label',
+      range: '0.1〜1.0 μg/kg/分',
+      unit: 'μg/kg/分', kind: 'gamma', out: 'mL/時',
+      conc: { mg: 1, ml: 50 }, concLabel: '1mg/50mL = 20 μg/mL',
+      presets: [0.1, 0.2, 0.5, 1.0],
+      notes: [
+        '0.1〜0.5 μg/kg/分 から開始し、0.1〜1.0 の範囲で調節する。',
+        '末梢投与時は血管外漏出に注意（組織壊死をきたす）。中心静脈路が望ましい。'
+      ]
+    }
+  ]
+},
+{
+  id: 'noradrenaline',
+  name: 'ノルアドレナリン',
+  sub: 'ノルアドリナリン注 1mg/1mL',
+  cat: 'circulation', cls: '昇圧薬（α1 優位 + β1）',
+  basis: 'tbw', basisOpts: ['tbw', 'ibw', 'lbw'],
+  modes: [
+    {
+      key: 'inf', label: '持続投与', src: 'label',
+      range: '0.02〜0.3 μg/kg/分',
+      unit: 'μg/kg/分', kind: 'gamma', out: 'mL/時',
+      conc: { mg: 1, ml: 50 }, concLabel: '1mg/50mL = 20 μg/mL',
+      presets: [0.03, 0.05, 0.1, 0.2, 0.3],
+      notes: [
+        '0.05 μg/kg/分 前後から開始し、0.02〜0.3 の範囲で調節する（施設により上限は異なる）。',
+        'α1 優位の強力な血管収縮作用。重度・遷延する低血圧で用いる。',
+        '末梢投与は血管外漏出で組織壊死をきたすため、必ず中心静脈路から投与する。'
+      ],
+      caution: '投与中止時は急激な血圧低下をきたすため、漸減して中止する。'
+    }
+  ]
+},
+{
+  id: 'dopamine',
+  name: 'ドパミン',
+  sub: 'イノバン注 600mg/200mL 等',
+  cat: 'circulation', cls: 'カテコラミン（用量依存性）',
+  basis: 'tbw', basisOpts: ['tbw', 'ibw', 'lbw'],
+  modes: [
+    {
+      key: 'inf', label: '持続投与', src: 'label',
+      range: '3〜10 μg/kg/分',
+      unit: 'μg/kg/分', kind: 'gamma', out: 'mL/時',
+      conc: { mg: 600, ml: 200 }, concLabel: '600mg/200mL = 3000 μg/mL',
+      presets: [3, 5, 7, 10],
+      notes: [
+        '低用量（1〜3）：腎・腸間膜血管拡張／中用量（3〜10）：心収縮力・心拍出量増加／高用量（10〜20）：血管収縮。',
+        '現在は「腎保護目的の低用量ドパミン」は推奨されない。',
+        '心収縮力低下＋低血圧の組み合わせで用いる。頻脈・不整脈に注意。'
+      ],
+      caution: '血管外漏出で組織壊死をきたす。確実な静脈路・中心静脈路から投与する。'
+    }
+  ]
+},
+{
+  id: 'dobutamine',
+  name: 'ドブタミン',
+  sub: 'ドブトレックス注 300mg/50mL 等',
+  cat: 'circulation', cls: 'カテコラミン（β1 優位）',
+  basis: 'tbw', basisOpts: ['tbw', 'ibw', 'lbw'],
+  modes: [
+    {
+      key: 'inf', label: '持続投与', src: 'label',
+      range: '2〜10 μg/kg/分',
+      unit: 'μg/kg/分', kind: 'gamma', out: 'mL/時',
+      conc: { mg: 300, ml: 50 }, concLabel: '300mg/50mL = 6000 μg/mL',
+      presets: [2, 3, 5, 7, 10],
+      notes: [
+        '心拍出量低下（心収縮力低下）に対して用いる。',
+        'β1 優位のため昇圧作用は弱く、低血圧が主体ならノルアドレナリンを併用する。',
+        '頻脈・不整脈・血圧低下（β2 血管拡張）に注意。'
+      ]
+    }
+  ]
+},
+{
+  id: 'adrenaline',
+  name: 'アドレナリン',
+  sub: 'アドレナリン注 1mg/1mL（ボスミン）',
+  cat: 'circulation', cls: 'カテコラミン（α/β 強力刺激）',
+  basis: 'tbw', basisOpts: ['tbw', 'ibw', 'lbw'],
+  modes: [
+    {
+      key: 'bolus', label: '1回量（ボーラス）', src: 'std',
+      range: '5〜10 μg（0.05〜0.1 mg）ずつ',
+      unit: 'μg', kind: 'fixed', out: 'μg',
+      presets: [5, 10, 20],
+      notes: ['0.05〜0.1 mg ずつ静注。重症低血圧・アナフィラキシーで用いる。']
+    },
+    {
+      key: 'inf', label: '持続投与', src: 'std',
+      range: '0.01〜0.1 μg/kg/分',
+      unit: 'μg/kg/分', kind: 'gamma', out: 'mL/時',
+      conc: { mg: 1, ml: 50 }, concLabel: '1mg/50mL = 20 μg/mL',
+      presets: [0.01, 0.03, 0.05, 0.1],
+      notes: ['0.01〜0.1 μg/kg/分 の持続投与。心原性ショック・重症アナフィラキシーで用いる。']
+    },
+    {
+      key: 'cpr', label: '心停止（CPR）', src: 'label',
+      range: '1 mg 静注 / 3〜5 分毎',
+      unit: 'mg', kind: 'fixed', out: 'mg',
+      presets: [1],
+      notes: ['心停止時は 1 mg を静注し、3〜5 分毎に繰り返す。']
+    }
+  ]
+},
+{
+  id: 'atropine',
+  name: 'アトロピン',
+  sub: 'アトロピン硫酸塩注 0.5mg/1mL',
+  cat: 'circulation', cls: '抗コリン薬（徐脈）',
+  basis: 'tbw', basisOpts: ['tbw', 'ibw', 'abw'],
+  modes: [
+    {
+      key: 'bolus', label: '1回量', src: 'label',
+      range: '0.5 mg 静注（最大 0.02 mg/kg）',
+      unit: 'mg', kind: 'fixed', out: 'mg',
+      max: { val: 1.4, unit: 'mg' },
+      presets: [0.5, 1.0],
+      notes: [
+        '<b>添付文書：</b>1 回 0.5 mg を静注。最大 0.02 mg/kg（体重 70 kg で 1.4 mg）まで。',
+        '0.5 mg 未満の投与は逆説的徐脈をきたすため避ける。',
+        '筋弛緩拮抗時の徐脈に対しては 0.02 mg/kg を併用する。'
+      ]
+    }
+  ]
+},
+];
+
+</script><script>
+/* =============================================================================
+   麻酔 投与量・管理ツール  —  application logic
+   ============================================================================= */
+(function () {
+  'use strict';
+
+  var M = window.MASUI;
+  if (!M || !M.DRUGS) { console.error('[masui] data.js not loaded'); return; }
+
+  /* ============================ state ============================ */
+  var LSKEY = 'masui_v3';
+  var S = {
+    wt: 60, ht: 165, sex: 'male', age: 50,
+    basis: {}, mode: {}, dose: {}, custom: {},
+    log: [], theme: 'auto'
+  };
+
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(LSKEY);
+      if (!raw) return;
+      var o = JSON.parse(raw);
+      Object.keys(S).forEach(function (k) { if (k in o) S[k] = o[k]; });
+    } catch (e) {}
+  }
+  function saveState() {
+    try {
+      localStorage.setItem(LSKEY, JSON.stringify({
+        wt: S.wt, ht: S.ht, sex: S.sex, age: S.age,
+        basis: S.basis, mode: S.mode, dose: S.dose, custom: S.custom,
+        log: S.log, theme: S.theme
+      }));
+    } catch (e) {}
+  }
+
+  /* ============================ helpers ============================ */
+  function num(v) { var n = parseFloat(v); return isFinite(n) ? n : 0; }
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+  function fmt(n) {
+    if (!isFinite(n)) return '–';
+    var a = Math.abs(n);
+    if (a === 0) return '0';
+    if (a >= 1000) return n.toFixed(0);
+    if (a >= 100) return n.toFixed(1);
+    if (a >= 10) return n.toFixed(2).replace(/0$/, '').replace(/\.$/, '');
+    if (a >= 1) return n.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
+    return n.toFixed(3);
+  }
+  function fmt1(n) { return isFinite(n) ? n.toFixed(1) : '–'; }
+  function fmt2(n) { return isFinite(n) ? n.toFixed(2) : '–'; }
+
+  /* ---------- 体重基準 ---------- */
+  function weights() {
+    var w = S.wt, h = S.ht, male = S.sex === 'male';
+    var bmi = (w > 0 && h > 0) ? w / Math.pow(h / 100, 2) : 0;
+    var ibw = h > 0 ? (male ? 50 + 0.91 * (h - 152.4) : 45.5 + 0.91 * (h - 152.4)) : 0;
+    var lbw = 0;
+    if (w > 0 && bmi > 0) {
+      lbw = male ? (9270 * w) / (6680 + 216 * bmi) : (9270 * w) / (8780 + 244 * bmi);
+    }
+    var abw = (ibw > 0 && w > 0) ? ibw + 0.4 * (w - ibw) : 0;
+    return { tbw: w, ibw: Math.max(ibw, 0), lbw: lbw, abw: abw, bmi: bmi };
+  }
+
+  /* ---------- 濃度の補完（アンプル規格） ---------- */
+  var AMP = {
+    'ephedrine': { mg: 40, ml: 1 },
+    'phenylephrine': { mg: 1, ml: 1 },
+    'adrenaline': { mg: 1, ml: 1 },
+    'atropine': { mg: 0.5, ml: 1 },
+    'sugammadex': { mg: 100, ml: 1 }
+  };
+  function concOf(drug, mode) {
+    if (mode && mode.conc) return mode.conc;
+    if (AMP[drug.id]) return AMP[drug.id];
+    return null;
+  }
+  function concMgPerMl(c) { return (c && c.ml > 0) ? c.mg / c.ml : 0; }
+  function isUg(unit) { return /μg|ug/.test(unit || ''); }
+
+  /* ---------- MAC ---------- */
+  var MAC40 = { sevoflurane: 1.8 };
+  function macAt(age, base) {
+    return base * Math.pow(10, -0.00269 * (age - 40));
+  }
+
+  /* ---------- 作用持続時間の目安（分） ---------- */
+  var DUR = {
+    'fentanyl': 40, 'remifentanil': 5, 'rocuronium': 40, 'rocuronium-maint': 40,
+    'sugammadex': 130, 'ephedrine': 15, 'phenylephrine': 15, 'atropine': 30,
+    'adrenaline': 10, 'propofol': 10, 'propofol-tiva': 10,
+    'remimazolam': 10, 'remimazolam-main': 10
+  };
+
+  /* ============================ selection helpers ============================ */
+  function drugById(id) {
+    for (var i = 0; i < M.DRUGS.length; i++) if (M.DRUGS[i].id === id) return M.DRUGS[i];
+    return null;
+  }
+  function curMode(drug) {
+    var k = S.mode[drug.id];
+    if (k) { for (var i = 0; i < drug.modes.length; i++) if (drug.modes[i].key === k) return drug.modes[i]; }
+    return drug.modes[0];
+  }
+  function curBasis(drug) {
+    var k = S.basis[drug.id];
+    if (k && M.BASIS[k]) return k;
+    return drug.basis;
+  }
+  function curDose(drug, mode) {
+    if (S.custom[drug.id] != null && S.custom[drug.id] !== '') return num(S.custom[drug.id]);
+    if (S.dose[drug.id] != null) return num(S.dose[drug.id]);
+    if (mode.kind === 'fixed' || mode.kind === 'mac') return num(mode.presets[0]);
+    return num(mode.presets[Math.min(1, mode.presets.length - 1)]);
+  }
+  function isCustom(drug) {
+    return S.custom[drug.id] != null && S.custom[drug.id] !== '';
+  }
+
+  /* ============================ core calculation ============================ */
+  function compute(drug, mode, dose) {
+    var W = weights();
+    var bk = curBasis(drug);
+    var bw = W[bk] || W.tbw;
+    var r = {
+      kind: mode.kind, basis: bk, bw: bw, value: NaN, unit: mode.out || '',
+      alt: NaN, altUnit: '', gamma: NaN, detail: '', warn: [], capped: false
+    };
+
+    if (mode.kind === 'mac') {
+      var base = MAC40[drug.id] || 2.0;
+      var mac = macAt(S.age, base);
+      r.value = mac * dose;
+      r.unit = 'vol%';
+      r.detail = 'MAC（' + S.age + '歳）= ' + fmt2(mac) + ' vol% × ' + dose + ' = ' + fmt2(r.value) + ' vol%';
+      r.basis = 'fixed';
+      r.bw = 0;
+      return r;
+    }
+
+    if (mode.kind === 'fixed') {
+      r.value = dose;
+      r.basis = 'fixed';
+      r.bw = 0;
+      r.detail = '固定量 ' + fmt(dose) + ' ' + (mode.out || '');
+    } else if (mode.kind === 'gamma') {
+      var cUg = concMgPerMl(concOf(drug, mode)) * 1000;
+      r.gamma = dose;
+      if (cUg > 0 && bw > 0) r.value = (dose * bw * 60) / cUg;
+      r.unit = 'mL/時';
+      r.detail = 'γ ' + fmt(dose) + ' μg/kg/分 × ' + fmt1(bw) + ' kg × 60 ÷ '
+        + fmt(cUg) + ' μg/mL = ' + fmt1(r.value) + ' mL/時';
+    } else {
+      /* bolus / infusion : dose × 体重 */
+      r.value = dose * bw;
+      var c = concOf(drug, mode);
+      var cMg = concMgPerMl(c);
+      if (mode.kind === 'infusion' && isFinite(r.value) && r.value > 0) {
+        /* 持続投与は「分あたり」も併記すると滴定しやすい */
+        r.alt = r.value / 60;
+        r.altUnit = 'mg/分';
+        r.detail = M.BASIS[bk].short + ' ' + fmt1(bw) + ' kg × ' + fmt(dose) + ' ' + mode.unit
+          + ' = ' + fmt(r.value) + ' ' + mode.out
+          + '（' + fmt(r.alt) + ' mg/分）';
+        if (cMg > 0) {
+          r.detail += ' ／ ' + (mode.concLabel || '') + ' → ' + fmt1(r.value / cMg) + ' mL/時';
+        }
+      } else if (cMg > 0 && r.value > 0) {
+        r.alt = isUg(mode.unit) ? (r.value / (cMg * 1000)) : (r.value / cMg);
+        r.altUnit = 'mL';
+        r.detail = M.BASIS[bk].short + ' ' + fmt1(bw) + ' kg × ' + fmt(dose) + ' ' + mode.unit
+          + ' = ' + fmt(r.value) + ' ' + mode.out
+          + ' ／ ' + (mode.concLabel || '') + ' → ' + fmt1(r.alt) + ' mL';
+      } else {
+        r.detail = M.BASIS[bk].short + ' ' + fmt1(bw) + ' kg × ' + fmt(dose) + ' ' + mode.unit
+          + ' = ' + fmt(r.value) + ' ' + mode.out;
+      }
+    }
+
+    /* 上限チェック */
+    if (mode.max && r.value > mode.max.val) {
+      r.capped = true;
+      r.uncapped = r.value;
+      r.value = mode.max.val;
+      r.warn.push('上限を超えています（計算値 ' + fmt(r.uncapped) + ' ' + mode.out
+        + ' → 上限 ' + fmt(mode.max.val) + ' ' + mode.max.unit + ' に制限）');
+    }
+    if (mode.caution) r.warn.push(mode.caution);
+    return r;
+  }
+
+  /* ============================ rendering : header ============================ */
+  function renderPatient() {
+    var W = weights();
+    var set = function (id, v) { var e = document.getElementById(id); if (e) e.textContent = v; };
+    set('out-bmi', W.bmi > 0 ? fmt1(W.bmi) : '–');
+    set('out-ibw', W.ibw > 0 ? fmt1(W.ibw) : '–');
+    set('out-lbw', W.lbw > 0 ? fmt1(W.lbw) : '–');
+    var chip = document.getElementById('chip-basis');
+    if (chip) chip.classList.toggle('is-on', W.bmi >= 30);
+  }
+
+  /* ============================ rendering : drug card ============================ */
+  function srcBadge(src) {
+    var map = {
+      label: { t: '添付文書準拠', c: '' },
+      std: { t: '標準的用量', c: '' },
+      prac: { t: '実用的用量', c: '' }
+    };
+    var m = map[src] || map.std;
+    return '<span class="badge cat">' + m.t + '</span>';
+  }
+
+  function doseLabel(mode, v) {
+    if (mode.kind === 'mac') return '×' + v + ' MAC';
+    if (mode.kind === 'fixed') return fmt(v);
+    return fmt(v);
+  }
+  function doseUnitShort(mode) {
+    if (mode.kind === 'mac') return '';
+    if (mode.kind === 'fixed') return mode.unit || mode.out;
+    if (mode.kind === 'gamma') return 'μg/kg/分';
+    return mode.unit;
+  }
+
+  function drugCard(drug) {
+    var mode = curMode(drug);
+    var bk = curBasis(drug);
+    var dose = curDose(drug, mode);
+    var r = compute(drug, mode, dose);
+    var W = weights();
+    var basisW = W[bk] || 0;
+
+    /* badges */
+    var catLabel = (M.CATS.filter(function (c) { return c.key === drug.cat; })[0] || {}).label || '';
+    var badges = '<span class="badge cat">' + esc(drug.cls) + '</span>';
+    if (mode.src) badges += srcBadge(mode.src);
+    if (drug.basisOpts.length > 1) {
+      badges += '<button class="badge basis" data-act="basis" data-id="' + drug.id + '" title="'
+        + esc(M.BASIS[bk].desc) + '">体重基準：' + M.BASIS[bk].short + ' ⟳</button>';
+    } else {
+      badges += '<span class="badge basis" style="cursor:default">' + M.BASIS[bk].short + '</span>';
+    }
+
+    /* mode selector */
+    var modeHTML = '';
+    if (drug.modes.length > 1) {
+      modeHTML = '<div class="dose-row" role="tablist">' + drug.modes.map(function (m) {
+        return '<button class="dose-btn' + (m.key === mode.key ? ' active' : '')
+          + '" data-act="mode" data-id="' + drug.id + '" data-key="' + m.key + '"'
+          + ' style="font-family:inherit;font-size:.75rem;font-weight:700">' + esc(m.label) + '</button>';
+      }).join('') + '</div>';
+    }
+
+    /* dose selector */
+    var doseHTML = '';
+    if (mode.kind === 'mac' || mode.kind === 'fixed' || mode.kind === 'bolus' || mode.kind === 'gamma') {
+      doseHTML = '<div class="dose-row">' + mode.presets.map(function (v) {
+        var on = !isCustom(drug) && Math.abs(num(S.dose[drug.id] != null ? S.dose[drug.id] : dose) - v) < 1e-9;
+        return '<button class="dose-btn' + (on ? ' active' : '') + '" data-act="dose" data-id="' + drug.id
+          + '" data-val="' + v + '">' + doseLabel(mode, v)
+          + (doseUnitShort(mode) ? '<span class="u">' + esc(doseUnitShort(mode)) + '</span>' : '')
+          + '</button>';
+      }).join('') + '</div>';
+    }
+
+    /* custom input */
+    var customHTML = '';
+    if (mode.kind === 'bolus' || mode.kind === 'infusion' || mode.kind === 'gamma') {
+      customHTML = '<div class="form-row">'
+        + '<div class="f-field"><label>任意の用量を入力（' + esc(mode.unit) + '）</label>'
+        + '<input type="number" step="any" min="0" inputmode="decimal" data-act="custom" data-id="' + drug.id
+        + '" value="' + (isCustom(drug) ? esc(S.custom[drug.id]) : '') + '" placeholder="' + fmt(mode.presets[0]) + '"></div>'
+        + '</div>';
+    }
+
+    /* result */
+    var altHTML = '';
+    if (r.altUnit && isFinite(r.alt)) {
+      altHTML = '<div class="result-alt"><span class="v">' + fmt1(r.alt) + '</span>'
+        + '<span class="u">mL</span></div>';
+    }
+    var resClass = (mode.kind === 'gamma' || mode.kind === 'infusion') ? 'result inf' : 'result';
+    var resultHTML = '<div class="' + resClass + '">'
+      + '<div class="result-head">'
+      + '<div class="result-main"><span class="result-val">' + fmt(r.value) + '</span>'
+      + '<span class="result-unit">' + esc(r.unit) + '</span></div>'
+      + altHTML
+      + '</div>'
+      + '<div class="result-sub">' + esc(r.detail) + '</div>'
+      + '</div>';
+
+    /* warnings */
+    var warnHTML = r.warn.map(function (w) {
+      return '<div class="warn danger"><span class="k">!</span><span>' + w + '</span></div>';
+    }).join('');
+
+    /* notes */
+    var notesHTML = '';
+    if (mode.notes && mode.notes.length) {
+      notesHTML = '<details class="dc-detail"><summary>用法・注意点を表示</summary><ul class="note-list">'
+        + mode.notes.map(function (n) { return '<li>' + n + '</li>'; }).join('')
+        + (mode.caution ? '<li class="caution">' + mode.caution + '</li>' : '')
+        + '</ul></details>';
+    }
+
+    var rangeLine = '<div class="mode-row"><span class="mode-label">' + esc(mode.label) + '</span>'
+      + '<span class="mode-range">' + esc(mode.range) + '</span></div>';
+
+    return '<article class="drug-card" data-card="' + drug.id + '">'
+      + '<div class="dc-head"><div class="t">'
+      + '<h4 class="dc-name">' + esc(drug.name) + '</h4>'
+      + '<div class="dc-sub">' + esc(drug.sub) + '</div>'
+      + '</div><div class="badges">' + badges + '</div></div>'
+      + '<div class="dc-body">'
+      + modeHTML + rangeLine + doseHTML + customHTML + resultHTML + warnHTML
+      + '<div class="dose-row" style="margin-top:10px">'
+      + '<button class="dose-btn" data-act="log" data-id="' + drug.id + '" style="font-family:inherit;font-size:.74rem">＋ 記録に追加</button>'
+      + '</div>'
+      + notesHTML
+      + '</div></article>';
+  }
+
+  /* ============================ rendering : panels ============================ */
+  var DRUG_CATS = ['induction', 'analgesia', 'relax', 'maintain', 'circulation'];
+
+  function drugsOf(cat) {
+    return M.DRUGS.filter(function (d) { return d.cat === cat; });
+  }
+
+  function renderDrugPanel(cat, query) {
+    var host = document.getElementById('list-' + cat);
+    if (!host) return;
+    var list;
+    if (query) {
+      var q = query.toLowerCase();
+      list = M.DRUGS.filter(function (d) {
+        return (d.name + ' ' + d.sub + ' ' + d.cls).toLowerCase().indexOf(q) >= 0;
+      });
+    } else {
+      list = drugsOf(cat);
+    }
+    if (!list.length) {
+      host.innerHTML = '<div class="log-empty">該当する薬剤が見つかりません</div>';
+      return;
+    }
+    host.innerHTML = list.map(function (d) {
+      if (query && d.cat !== cat) {
+        var cl = (M.CATS.filter(function (c) { return c.key === d.cat; })[0] || {}).label || '';
+        return '<div data-catnote="' + cl + '">' + drugCard(d) + '</div>';
+      }
+      return drugCard(d);
+    }).join('');
+  }
+
+  function renderAllDrugPanels() {
+    DRUG_CATS.forEach(function (cat) {
+      var inp = document.getElementById('search-' + cat);
+      renderDrugPanel(cat, inp ? inp.value.trim() : '');
+    });
+  }
+
+  /* ============================ gamma calculator ============================ */
+  var GAMMA_PRESETS = [
+    { id: 'remifentanil', name: 'レミフェンタニル', mg: 2, ml: 50, unit: 'μg' },
+    { id: 'noradrenaline', name: 'ノルアドレナリン', mg: 1, ml: 50, unit: 'μg' },
+    { id: 'phenylephrine', name: 'フェニレフリン', mg: 1, ml: 50, unit: 'μg' },
+    { id: 'adrenaline', name: 'アドレナリン', mg: 1, ml: 50, unit: 'μg' },
+    { id: 'dopamine', name: 'ドパミン', mg: 600, ml: 200, unit: 'μg' },
+    { id: 'dobutamine', name: 'ドブタミン', mg: 300, ml: 50, unit: 'μg' }
+  ];
+
+  function initGamma() {
+    var row = document.getElementById('gamma-presets');
+    if (row) {
+      row.innerHTML = GAMMA_PRESETS.map(function (p) {
+        return '<button data-gp="' + p.id + '" data-mg="' + p.mg + '" data-ml="' + p.ml + '">'
+          + esc(p.name) + ' ' + p.mg + 'mg/' + p.ml + 'mL</button>';
+      }).join('');
+    }
+    var ids = ['g-mg', 'g-ml', 'g-target', 'g-rate'];
+    ids.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('input', gammaCalc);
+    });
+    if (row) {
+      row.addEventListener('click', function (e) {
+        var b = e.target.closest('button[data-gp]');
+        if (!b) return;
+        Array.prototype.forEach.call(row.querySelectorAll('button'), function (x) { x.classList.remove('active'); });
+        b.classList.add('active');
+        document.getElementById('g-mg').value = b.getAttribute('data-mg');
+        document.getElementById('g-ml').value = b.getAttribute('data-ml');
+        var p = GAMMA_PRESETS.filter(function (x) { return x.id === b.getAttribute('data-gp'); })[0];
+        if (p && p.id === 'noradrenaline') document.getElementById('g-target').value = '0.05';
+        if (p && p.id === 'phenylephrine') document.getElementById('g-target').value = '0.3';
+        if (p && p.id === 'remifentanil') document.getElementById('g-target').value = '0.2';
+        gammaCalc();
+      });
+    }
+    gammaCalc();
+  }
+
+  function gammaCalc() {
+    var mg = num(document.getElementById('g-mg').value);
+    var ml = num(document.getElementById('g-ml').value);
+    var conc = (ml > 0) ? (mg * 1000) / ml : 0;      /* μg/mL */
+    var W = weights();
+    var bw = W.tbw;
+
+    document.getElementById('g-conc').textContent = conc > 0 ? fmt(conc) : '–';
+
+    var target = num(document.getElementById('g-target').value);
+    var rateOut = document.getElementById('g-rate-out');
+    if (conc > 0 && bw > 0 && target > 0) {
+      rateOut.textContent = fmt1((target * bw * 60) / conc);
+    } else { rateOut.textContent = '–'; }
+
+    var rateIn = num(document.getElementById('g-rate').value);
+    var gOut = document.getElementById('g-gamma-out');
+    if (conc > 0 && bw > 0 && rateIn > 0) {
+      gOut.textContent = fmt2((rateIn * conc) / (bw * 60));
+    } else { gOut.textContent = '–'; }
+
+    var bwNote = document.getElementById('g-bw');
+    if (bwNote) bwNote.textContent = fmt1(bw);
+  }
+
+  /* ============================ infusion log ============================ */
+  function addLog(drug, mode, dose) {
+    var r = compute(drug, mode, dose);
+    var kind = (mode.kind === 'gamma' || mode.kind === 'infusion') ? 'infusion' : 'bolus';
+    var doseText;
+    if (mode.kind === 'fixed') doseText = fmt(r.value) + ' ' + r.unit;
+    else if (mode.kind === 'mac') doseText = fmt2(r.value) + ' vol%';
+    else if (mode.kind === 'gamma') doseText = fmt(r.value) + ' mL/時（γ ' + fmt(dose) + '）';
+    else doseText = fmt(r.value) + ' ' + r.unit + (r.altUnit ? '（' + fmt1(r.alt) + ' mL）' : '');
+
+    S.log.unshift({
+      lid: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+      drug: drug.name,
+      mode: mode.label,
+      dose: doseText,
+      ts: Date.now(),
+      kind: kind,
+      dur: DUR[drug.id] || (kind === 'bolus' ? 30 : 0)
+    });
+    if (S.log.length > 60) S.log.length = 60;
+    saveState();
+    renderLog();
+    var tab = document.querySelector('.tabbar button[data-tab="log"]');
+    if (tab) tab.classList.add('flash');
+    setTimeout(function () { if (tab) tab.classList.remove('flash'); }, 900);
+  }
+
+  function stateOf(item) {
+    if (item.kind === 'infusion') return { cls: 'on', label: '投与中', pct: 100 };
+    var el = (Date.now() - item.ts) / 60000;
+    var p = item.dur > 0 ? el / item.dur : 0;
+    if (p < 0.6) return { cls: 'on', label: '効果発現中', pct: Math.min(p / 0.6 * 100, 100) };
+    if (p < 1) return { cls: 'fading', label: '効果減弱中', pct: (p - 0.6) / 0.4 * 100 };
+    return { cls: 'off', label: '作用消失の目安', pct: 100 };
+  }
+
+  function renderLog() {
+    var host = document.getElementById('list-log');
+    if (!host) return;
+    if (!S.log.length) {
+      host.innerHTML = '<div class="log-empty">記録はまだありません。<br>各薬剤カードの「＋ 記録に追加」で、投与した薬剤と経過時間を追跡できます。</div>';
+      return;
+    }
+    var now = Date.now();
+    host.innerHTML = S.log.map(function (it) {
+      var st = stateOf(it);
+      var el = Math.floor((now - it.ts) / 60000);
+      var hh = Math.floor(el / 60), mm = el % 60;
+      var elTxt = hh > 0 ? (hh + '時間' + mm + '分') : (mm + '分');
+      var barHTML = it.kind === 'infusion'
+        ? '<div class="bar on"><i style="width:100%"></i></div>'
+        : '<div class="bar ' + st.cls + '"><i style="width:' + st.pct.toFixed(1) + '%"></i></div>';
+      var metaRight = it.kind === 'infusion'
+        ? '持続投与中'
+        : ('作用持続の目安 ' + it.dur + '分');
+      return '<div class="log-item" data-lid="' + it.lid + '">'
+        + '<div class="log-top"><span class="log-name">' + esc(it.drug) + '</span>'
+        + '<span class="log-dose">' + esc(it.dose) + '</span>'
+        + '<button class="log-x" data-act="del" data-lid="' + it.lid + '" title="削除">✕</button></div>'
+        + '<div style="font-size:.68rem;color:var(--ink-3);margin-bottom:5px">' + esc(it.mode) + '</div>'
+        + barHTML
+        + '<div class="log-meta"><span class="st ' + st.cls + '">' + st.label + '</span>'
+        + '<span>経過 ' + elTxt + ' ／ ' + metaRight + '</span></div>'
+        + '</div>';
+    }).join('');
+  }
+
+  /* ============================ tabs ============================ */
+  function activateTab(key) {
+    Array.prototype.forEach.call(document.querySelectorAll('.tabbar button'), function (b) {
+      b.classList.toggle('active', b.getAttribute('data-tab') === key);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.panel'), function (p) {
+      p.classList.toggle('active', p.id === 'p-' + key);
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function initTabs() {
+    var bar = document.querySelector('.tabbar');
+    if (!bar) return;
+    bar.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-tab]');
+      if (b) activateTab(b.getAttribute('data-tab'));
+    });
+  }
+
+  /* ============================ events ============================ */
+  function initPatient() {
+    var map = [['in-wt', 'wt'], ['in-ht', 'ht'], ['in-age', 'age'], ['in-sex', 'sex']];
+    map.forEach(function (p) {
+      var el = document.getElementById(p[0]);
+      if (!el) return;
+      el.value = S[p[1]];
+      el.addEventListener('input', function () {
+        S[p[1]] = (p[1] === 'sex') ? el.value : num(el.value);
+        saveState(); renderPatient(); renderAllDrugPanels(); gammaCalc();
+      });
+      el.addEventListener('change', function () {
+        S[p[1]] = (p[1] === 'sex') ? el.value : num(el.value);
+        saveState(); renderPatient(); renderAllDrugPanels(); gammaCalc();
+      });
+    });
+  }
+
+  function initDelegation() {
+    document.addEventListener('click', function (e) {
+      var t = e.target.closest('[data-act]');
+      if (!t) return;
+      var act = t.getAttribute('data-act');
+      var id = t.getAttribute('data-id');
+      var drug = id ? drugById(id) : null;
+
+      if (act === 'basis' && drug) {
+        var opts = drug.basisOpts || [drug.basis];
+        var i = opts.indexOf(curBasis(drug));
+        S.basis[drug.id] = opts[(i + 1) % opts.length];
+        saveState(); renderAllDrugPanels();
+      } else if (act === 'mode' && drug) {
+        S.mode[drug.id] = t.getAttribute('data-key');
+        delete S.custom[drug.id];
+        saveState(); renderAllDrugPanels();
+      } else if (act === 'dose' && drug) {
+        S.dose[drug.id] = num(t.getAttribute('data-val'));
+        delete S.custom[drug.id];
+        saveState(); renderAllDrugPanels();
+      } else if (act === 'log' && drug) {
+        var mode = curMode(drug);
+        addLog(drug, mode, curDose(drug, mode));
+        t.textContent = '✓ 記録しました';
+        setTimeout(function () { renderAllDrugPanels(); }, 800);
+      } else if (act === 'del') {
+        var lid = t.getAttribute('data-lid');
+        S.log = S.log.filter(function (x) { return x.lid !== lid; });
+        saveState(); renderLog();
+      } else if (act === 'clear-log') {
+        if (window.confirm('記録をすべて削除しますか？')) {
+          S.log = []; saveState(); renderLog();
+        }
+      }
+    });
+
+    document.addEventListener('input', function (e) {
+      var t = e.target;
+      if (t.getAttribute && t.getAttribute('data-act') === 'custom') {
+        var id = t.getAttribute('data-id');
+        if (t.value === '') delete S.custom[id]; else S.custom[id] = t.value;
+        saveState();
+        var card = t.closest('[data-card]');
+        if (card) {
+          var drug = drugById(id);
+          var html = drugCard(drug);
+          var tmp = document.createElement('div');
+          tmp.innerHTML = html;
+          card.replaceWith(tmp.firstChild);
+          var nc = document.querySelector('[data-card="' + id + '"] input[data-act="custom"]');
+          if (nc) { nc.focus(); try { nc.setSelectionRange(nc.value.length, nc.value.length); } catch (x) {} }
+        }
+      }
+    });
+
+    document.addEventListener('input', function (e) {
+      var t = e.target;
+      if (t.id && t.id.indexOf('search-') === 0) {
+        var cat = t.id.replace('search-', '');
+        renderDrugPanel(cat, t.value.trim());
+      }
+    });
+  }
+
+  function initTheme() {
+    var btn = document.getElementById('btn-theme');
+    var order = ['auto', 'light', 'dark'];
+    var icons = { auto: 'A', light: '☀', dark: '☾' };
+    var titles = { auto: 'テーマ：自動（端末設定に追従）', light: 'テーマ：ライト', dark: 'テーマ：ダーク' };
+
+    function apply() {
+      if (S.theme === 'auto') document.documentElement.removeAttribute('data-theme');
+      else document.documentElement.setAttribute('data-theme', S.theme);
+      if (btn) { btn.textContent = icons[S.theme]; btn.title = titles[S.theme]; }
+    }
+    if (btn) {
+      btn.addEventListener('click', function () {
+        S.theme = order[(order.indexOf(S.theme) + 1) % 3];
+        saveState(); apply();
+      });
+    }
+    apply();
+  }
+
+  /* ============================ boot ============================ */
+  function buildToolbars() {
+    DRUG_CATS.forEach(function (cat) {
+      var host = document.getElementById('tool-' + cat);
+      if (!host) return;
+      host.innerHTML = '<div class="search-wrap">'
+        + '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">'
+        + '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>'
+        + '<input class="search-input" id="search-' + cat + '" type="search" '
+        + 'placeholder="全薬剤から検索（薬剤名・分類）" autocomplete="off">'
+        + '</div>';
+    });
+  }
+
+  function initStickyOffset() {
+    /* ヘッダー高さを CSS 変数に反映し、タブバーがヘッダーの直下に固定されるようにする */
+    var hdr = document.querySelector('.app-header');
+    if (!hdr) return;
+    function sync() {
+      var h = Math.round(hdr.getBoundingClientRect().height);
+      document.documentElement.style.setProperty('--hdr-h', h + 'px');
+    }
+    sync();
+    if (window.ResizeObserver) {
+      new ResizeObserver(sync).observe(hdr);
+    } else {
+      window.addEventListener('resize', sync);
+    }
+  }
+
+  function init() {
+    loadState();
+    buildToolbars();
+    initPatient();
+    initTabs();
+    initDelegation();
+    initTheme();
+    initGamma();
+    renderPatient();
+    renderAllDrugPanels();
+    renderLog();
+    initStickyOffset();
+    setInterval(renderLog, 30000);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+</script></body></html>

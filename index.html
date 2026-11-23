@@ -342,6 +342,12 @@
     .soc-warn{margin-top:10px;padding:8px 10px;border-radius:8px;border:.5px solid #FCA5A5;background:#FEF2F2;color:#991B1B;font-size:11px;line-height:1.6}
     @media(prefers-color-scheme:dark){.soc-warn{border-color:#7F1D1D;background:#450A0A;color:#FCA5A5}}
     .soc-note{font-size:10.5px;color:var(--text-muted);line-height:1.7;margin-top:12px}
+    .tool-frame iframe{display:block;width:100%;height:calc(100dvh - 150px);min-height:520px;border:0;border-radius:var(--radius-lg);background:var(--bg)}
+    .tool-open{text-align:right;font-size:12px;margin-top:6px}.tool-open a{color:var(--accent)}
+    .rehab-card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:1.2rem;margin-top:.5rem}
+    .rehab-card h2{font-size:17px;margin-bottom:.4rem}.rehab-card p{margin:.5rem 0;color:var(--text-secondary)}
+    .rehab-card .btn{display:inline-block;background:var(--accent);color:#fff;padding:10px 18px;border-radius:var(--radius);text-decoration:none;font-weight:700}
+    .rehab-note{font-size:12px;color:var(--text-muted)!important}
   </style>
 </head>
 <body>
@@ -382,6 +388,10 @@
       <i class="ti ti-calendar-month" aria-hidden="true"></i>学会カレンダー<span class="tab-badge" id="calBadge"></span>
     </button>
     <button class="mode-btn" id="btnKj" onclick="setMode('kj')" aria-pressed="false">手術・処置コード</button>
+    <button class="mode-btn" id="btnSantei" onclick="setMode('santei')" aria-pressed="false"><i class="ti ti-calculator" aria-hidden="true"></i>算定計算</button>
+    <button class="mode-btn" id="btnTools" onclick="setMode('tools')" aria-pressed="false"><i class="ti ti-bone" aria-hidden="true"></i>臨床ツール</button>
+    <button class="mode-btn" id="btnRehab" onclick="setMode('rehab')" aria-pressed="false"><i class="ti ti-walk" aria-hidden="true"></i>術後リハ</button>
+    <button class="mode-btn" id="btnAnes" onclick="setMode('anes')" aria-pressed="false"><i class="ti ti-vaccine" aria-hidden="true"></i>全身麻酔</button>
   </div>
 </div>
 
@@ -1275,6 +1285,7 @@ async function retryImplants(){
 }
 function render(){
   updateBadge();
+  {const c=document.getElementById("content");if(c&&!FRAME_TOOLS[currentMode]&&c.dataset.frame){c.dataset.frame="";}}
   const fab = document.querySelector(".fab-wrap");
   if(currentMode==="papers"){
     document.getElementById("subtabsWrap").style.display="";
@@ -1288,6 +1299,8 @@ function render(){
     document.getElementById("subtabsWrap").style.display="none";
     if(fab) fab.style.display="none";
     if(currentMode==="kj") renderKj();
+    else if(FRAME_TOOLS[currentMode]) renderFrameTool(currentMode);
+    else if(currentMode==="rehab") renderRehab();
     else renderSocieties();
   }
 }
@@ -1300,6 +1313,7 @@ async function setMode(mode){
   const kjTab=document.getElementById("btnKj");
   kjTab.classList.toggle("active",mode==="kj");
   kjTab.setAttribute("aria-pressed",String(mode==="kj"));
+  [["btnSantei","santei"],["btnTools","tools"],["btnRehab","rehab"],["btnAnes","anes"]].forEach(([id,m])=>{const b=document.getElementById(id);if(b){b.classList.toggle("active",mode===m);b.setAttribute("aria-pressed",String(mode===m));}});
   if(mode==="implants" && !implantData){
     showNotice("loading","インプラントニュースを読み込み中...");
     await loadImplants();
@@ -1308,6 +1322,22 @@ async function setMode(mode){
   render();
 }
 function selectSp(sp){ currentSp=sp; expandedId=null; try{ window.scrollTo(0,0); }catch(e){} renderSubtabs(); renderPapers(); }
+
+/* ──── 組み込みツール（算定計算・臨床ツール・全身麻酔） ──── */
+const FRAME_TOOLS={santei:{src:"santei.html",title:"手術料 算定計算"},tools:{src:"clinical.html",title:"整形外科 臨床ツール"},anes:{src:"anesthesia.html",title:"全身麻酔 投与量・管理ツール"}};
+const REHAB_URL="https://claude.ai/artifact/Q6bYCZGMBCntJAyKDEW9MR";
+function renderFrameTool(mode){
+  document.getElementById("countLabel").textContent="";document.getElementById("subLabel").textContent="";
+  const t=FRAME_TOOLS[mode];const content=document.getElementById("content");
+  if(content.dataset.frame===mode) return;
+  content.dataset.frame=mode;
+  content.innerHTML=`<section class="tool-frame"><iframe src="${t.src}" title="${t.title}" loading="lazy"></iframe><p class="tool-open"><a href="${t.src}" target="_blank" rel="noopener">新しいタブで開く</a></p></section>`;
+}
+function renderRehab(){
+  document.getElementById("countLabel").textContent="";document.getElementById("subLabel").textContent="";
+  const content=document.getElementById("content");content.dataset.frame="";
+  content.innerHTML=`<section class="rehab-card"><h2>術後リハ プロトコル帳</h2><p>腱板修復・腱・各骨折の後療法スケジュール（46件）。編集・追加ができる本体は Claude のアーティファクトにあり、サインインした本人だけが開けます。</p><p><a class="btn" href="${REHAB_URL}" target="_blank" rel="noopener">プロトコル帳を開く</a></p><p class="rehab-note">書籍を要約したプロトコルを含むため、公開リポジトリには置いていません。</p></section>`;
+}
 
 /* ──── K・Jコード早見表 ──── */
 const kjState={query:"",group:"all",fav:new Set(),catalog:null,master:null,pending:null,error:false};
