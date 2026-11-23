@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>術後リハ プロトコル帳</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light dark;--bg:light-dark(#F0F4F8,#0F172A);--surface:light-dark(#fff,#1E293B);--sunk:light-dark(#E8EEF5,#162036);--border:light-dark(#E2E8F0,#334155);--ink:light-dark(#0F172A,#F1F5F9);--mute:light-dark(#475569,#94A3B8);--accent:light-dark(#1D4ED8,#93C5FD);--accent-bg:light-dark(#EFF6FF,#1E3A8A);
+--st-protect:light-dark(#c0563b,#f0937a);--st-mobility:light-dark(#2f6fb3,#7fb0ea);--st-strength:light-dark(#3a8a4c,#7cc98d);--st-return:light-dark(#b07f12,#e6bb52);
+--st-protect-soft:light-dark(#f6e3dd,#4a2a22);--st-mobility-soft:light-dark(#dfe9f5,#1f3550);--st-strength-soft:light-dark(#e0efe2,#1f3d27);--st-return-soft:light-dark(#f5ecd6,#45391a)}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 'Noto Sans JP',system-ui,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:14px 14px 40px}
+h1{font-size:20px;margin:0}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.top p{margin:2px 0 0;color:var(--mute);font-size:13px}
+button{font:inherit;cursor:pointer;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--ink);padding:0 14px;min-height:40px;font-size:14px}
+button.pri{background:var(--accent);color:var(--surface);border-color:var(--accent);font-weight:700}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input{font:16px 'Noto Sans JP',sans-serif;width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:9px;background:var(--bg);color:var(--ink);min-height:44px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px}
+.gate{max-width:420px;margin:40px auto}.gate h2{font-size:18px;margin:0 0 6px}.gate p{color:var(--mute);font-size:14px;margin:0 0 14px}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px;margin:10px 0;color:var(--mute)}.chk input{width:18px;height:18px;min-height:0}
+.err{color:light-dark(#b91c1c,#fca5a5);font-size:14px;min-height:1.4em;margin:8px 0 0}
+.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:16px;align-items:start}
+aside{position:sticky;top:10px;display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 20px);overflow:auto}
+.group h3{font-size:12px;letter-spacing:.1em;color:var(--mute);margin:8px 0 4px}
+.group ul{list-style:none;margin:0;padding:0}
+.group li button{width:100%;text-align:left;border:0;background:transparent;padding:8px 10px;border-radius:8px;display:flex;flex-direction:column;min-height:0}
+.group li button:hover{background:var(--sunk)}.group li button[aria-current=true]{background:var(--accent-bg)}
+.group .t{font-weight:700;font-size:14px;line-height:1.4}.group .s{font-size:12px;color:var(--mute)}
+.src{display:inline-block;margin-left:6px;font-size:11px;font-weight:700;padding:0 6px;border-radius:4px;border:1px solid var(--border);color:var(--mute)}
+.count{font-size:13px;color:var(--mute)}
+.chip{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--accent-bg);color:var(--accent)}
+.dh h2{font-size:21px;line-height:1.35;margin:8px 0 4px;text-wrap:balance}
+.indic{color:var(--mute);margin:0;font-size:14px}.cite{font-size:13px;color:var(--mute);margin:4px 0 0}
+.chart{margin:18px 0 6px}.track{position:relative;height:32px;border-radius:6px;background:var(--sunk);overflow:hidden}
+.seg{position:absolute;top:0;bottom:0;display:flex;align-items:center;padding:0 6px;font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-right:2px solid var(--surface)}
+.ticks{position:relative;height:18px;font-size:11px;color:var(--mute)}.ticks span{position:absolute;top:2px;transform:translateX(-50%)}.ticks span:first-child{transform:none}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--mute)}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
+.phases{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.phase{display:grid;grid-template-columns:118px minmax(0,1fr);gap:14px;border:1px solid var(--border);border-left:5px solid var(--sc);border-radius:10px;padding:12px 14px;background:var(--surface)}
+.when{font-weight:700;font-size:16px;line-height:1.3}.when small{display:block;font-weight:400;font-size:12px;color:var(--mute)}
+.pill{display:inline-block;margin-top:6px;font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--scs);color:var(--sc)}
+.phase h4{margin:0 0 6px;font-size:15px}
+.phase dl{margin:0;display:grid;grid-template-columns:7em minmax(0,1fr);gap:4px 12px;font-size:14px}.phase dt{color:var(--mute);font-size:13px;padding-top:1px}.phase dd{margin:0;white-space:pre-wrap}
+.notes{margin-top:14px;padding:12px;border-radius:8px;background:var(--sunk);font-size:13px;color:var(--mute);white-space:pre-wrap}.notes b{color:var(--ink)}
+.back{display:none;margin-bottom:10px}
+.empty{color:var(--mute);text-align:center;padding:40px 10px}
+@media(max-width:760px){.layout{grid-template-columns:minmax(0,1fr)}aside{position:static;max-height:none}.layout.sel aside{display:none}.layout:not(.sel) main{display:none}.back{display:inline-block}.phase{grid-template-columns:minmax(0,1fr);gap:6px}.phase dl{grid-template-columns:minmax(0,1fr);gap:0}.phase dt{padding-top:6px}}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top"><div><h1>術後リハ プロトコル帳</h1><p>腱板・腱・骨折ごとの後療法スケジュール（閲覧用）</p></div><button id="lock" hidden>ロックする</button></div>
+
+<div class="card gate" id="gate">
+<h2>パスワードを入力してください</h2>
+<p>このページの内容は暗号化されています。パスワードを知っている人だけが閲覧できます。</p>
+<form id="gf"><input id="pw" type="password" autocomplete="current-password" aria-label="パスワード">
+<label class="chk"><input type="checkbox" id="remember"> この端末で記憶する（共用端末では使わないでください）</label>
+<button class="pri" type="submit" style="width:100%">開く</button>
+<p class="err" id="err" role="alert"></p></form>
+</div>
+
+<div class="layout" id="layout" hidden>
+<aside><input type="search" id="q" placeholder="術式・疾患名で検索" aria-label="検索"><div id="list"></div></aside>
+<main id="detail"></main>
+</div>
+</div>
+<script>
+{
+const RUB64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function rehabDecrypt(blob,pw){const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
+ const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:RUB64(blob.salt),iterations:blob.iter,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+ const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:RUB64(blob.iv)},key,RUB64(blob.data));return JSON.parse(new TextDecoder().decode(pt))}
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const CATS=['腱板','腱','上肢骨折','下肢骨折','脊椎骨折','骨折','その他'];
+const STAGES={protect:'保護期',mobility:'可動域期',strength:'筋力強化期',return:'復帰期'};
+const FIELDS=[['fixation','固定・装具'],['rom','可動域'],['exercise','運動療法'],['load','荷重・ADL'],['criteria','次段階の目安']];
+const KEY='ortho_rehab_pw';
+let P=[],sel=null,query='',blob=null;
+const num=v=>(v===''||v==null||isNaN(+v))?null:+v;
+const period=p=>{const f=num(p.from)??0,t=num(p.to);return t==null?`${f}週〜`:`${f}–${t}週`};
+const narrow=()=>matchMedia('(max-width:760px)').matches;
+const stk=s=>STAGES[s]?s:'protect';
+function chart(ph){if(!ph.length)return'';let max=0;for(const p of ph){const f=num(p.from)??0,t=num(p.to);max=Math.max(max,t??f+Math.max(4,f*.35))}max=Math.max(max,4);
+ const step=max<=14?2:max<=30?4:max<=60?8:12;
+ const segs=ph.map(p=>{const f=num(p.from)??0,t=num(p.to),end=t??max,k=stk(p.stage);return `<div class="seg" style="left:${f/max*100}%;width:${Math.max(.5,(end-f)/max*100)}%;background:var(--st-${k}-soft);box-shadow:inset 0 3px 0 var(--st-${k})">${esc(p.title||STAGES[k])}</div>`}).join('');
+ let ticks='';for(let x=0;x<=max+.01;x+=step){if(x/max>.97&&x!==0)continue;ticks+=`<span style="left:${x/max*100}%">${x}</span>`}ticks+=`<span style="left:100%;transform:translateX(-100%)">${Math.round(max)}週</span>`;
+ const used=[...new Set(ph.map(p=>stk(p.stage)))];
+ return `<div class="chart"><div class="track">${segs}</div><div class="ticks">${ticks}</div><div class="legend">${Object.keys(STAGES).filter(k=>used.includes(k)).map(k=>`<span><i style="background:var(--st-${k})"></i>${STAGES[k]}</span>`).join('')}</div></div>`}
+function renderList(){const q=query.trim().toLowerCase();const items=P.filter(p=>!q||(p.title+(p.indication||'')+(p.category||'')+(p.source||'')).toLowerCase().includes(q));
+ let h=`<p class="count">${items.length} 件</p>`;
+ for(const c of CATS){const g=items.filter(p=>(CATS.includes(p.category)?p.category:'その他')===c);if(!g.length)continue;
+  h+=`<div class="group"><h3>${c}</h3><ul>`+g.map(p=>{const ph=p.phases||[],last=ph[ph.length-1];return `<li><button data-id="${esc(p.id)}" aria-current="${p.id===sel}"><span class="t">${esc(p.title)}${p.source?'<span class="src">書籍</span>':''}</span><span class="s">${ph.length}段階 · ${last?esc(period({from:ph[0].from,to:last.to})):''}</span></button></li>`}).join('')+'</ul></div>'}
+ if(!items.length)h+='<p class="count">一致するプロトコルがありません。</p>';$('#list').innerHTML=h}
+function renderDetail(){const p=P.find(x=>x.id===sel);$('#layout').classList.toggle('sel',!!p);
+ if(!p){$('#detail').innerHTML='<div class="card empty">左の一覧からプロトコルを選んでください。</div>';return}
+ const ph=p.phases||[];const u=p.updatedAt?new Date(p.updatedAt):null;
+ $('#detail').innerHTML=`<button class="back" data-back>← 一覧へ</button><div class="card"><div class="dh"><span class="chip">${esc(p.category||'その他')}</span><h2>${esc(p.title)}</h2>${p.indication?`<p class="indic">${esc(p.indication)}</p>`:''}${p.source?`<p class="cite">出典：<b>${esc(p.source)}</b>${p.pages?' '+esc(p.pages):''}</p>`:''}${u&&!isNaN(u)?`<p class="cite">最終更新 ${u.getFullYear()}/${u.getMonth()+1}/${u.getDate()}</p>`:''}</div>
+ ${chart(ph)}<div class="phases">${ph.map(x=>{const k=stk(x.stage);const rows=FIELDS.filter(([f])=>x[f]).map(([f,l])=>`<dt>${l}</dt><dd>${esc(x[f])}</dd>`).join('');
+  return `<section class="phase" style="--sc:var(--st-${k});--scs:var(--st-${k}-soft)"><div><div class="when"><small>術後</small>${esc(period(x))}</div><span class="pill">${STAGES[k]}</span></div><div>${x.title?`<h4>${esc(x.title)}</h4>`:''}${rows?`<dl>${rows}</dl>`:''}</div></section>`}).join('')}</div>
+ ${p.notes?`<div class="notes"><b>備考</b>\n${esc(p.notes)}</div>`:''}</div>`}
+function show(){$('#gate').hidden=true;$('#layout').hidden=false;$('#lock').hidden=false;if(!sel&&!narrow()&&P.length)sel=P[0].id;renderList();renderDetail()}
+async function load(){if(blob)return blob;const r=await fetch('rehab-data.json',{cache:'no-cache'});if(!r.ok)throw new Error('data');blob=await r.json();return blob}
+async function unlock(pw,quiet){try{const b=await load();P=(await rehabDecrypt(b,pw)).slice().sort((a,b)=>(a.title||'').localeCompare(b.title||'','ja'));return true}
+ catch(e){if(!quiet)$('#err').textContent=e.message==='data'?'データを読み込めませんでした。時間をおいて再度お試しください':'パスワードが違います';return false}}
+$('#gf').addEventListener('submit',async e=>{e.preventDefault();const pw=$('#pw').value;if(!pw)return;$('#err').textContent='確認しています…';
+ if(await unlock(pw)){$('#err').textContent='';try{if($('#remember').checked)localStorage.setItem(KEY,pw)}catch(_){}$('#pw').value='';show()}});
+$('#lock').addEventListener('click',()=>{try{localStorage.removeItem(KEY)}catch(_){}P=[];sel=null;$('#layout').hidden=true;$('#lock').hidden=true;$('#gate').hidden=false;$('#list').innerHTML='';$('#detail').innerHTML=''});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-id]');if(b){sel=b.dataset.id;renderList();renderDetail();if(narrow())scrollTo({top:0})}if(e.target.closest('[data-back]')){sel=null;renderList();renderDetail()}});
+$('#q').addEventListener('input',e=>{query=e.target.value;renderList()});
+(async()=>{let pw=null;try{pw=localStorage.getItem(KEY)}catch(_){}if(pw&&await unlock(pw,true))show();else try{localStorage.removeItem(KEY)}catch(_){}})();
+}
+</script>
+</body>
+</html>

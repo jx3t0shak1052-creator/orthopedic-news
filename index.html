@@ -1324,7 +1324,7 @@ async function setMode(mode){
 function selectSp(sp){ currentSp=sp; expandedId=null; try{ window.scrollTo(0,0); }catch(e){} renderSubtabs(); renderPapers(); }
 
 /* ──── 組み込みツール（算定計算・臨床ツール・全身麻酔） ──── */
-const FRAME_TOOLS={santei:{src:"santei.html",title:"手術料 算定計算"},tools:{src:"clinical.html",title:"整形外科 臨床ツール"},anes:{src:"anesthesia.html",title:"全身麻酔 投与量・管理ツール"}};
+const FRAME_TOOLS={santei:{src:"santei.html",title:"手術料 算定計算"},tools:{src:"clinical.html",title:"整形外科 臨床ツール"},anes:{src:"anesthesia.html",title:"全身麻酔 投与量・管理ツール"},rehab:{src:"rehab.html",title:"術後リハ プロトコル帳"}};
 const REHAB_URL="https://claude.ai/artifact/Q6bYCZGMBCntJAyKDEW9MR";
 function renderFrameTool(mode){
   document.getElementById("countLabel").textContent="";document.getElementById("subLabel").textContent="";
