@@ -1,0 +1,32 @@
+name: K・Jコード公式マスター更新
+
+on:
+  schedule:
+    - cron: '37 0 1 1,7 *' # 1月1日・7月1日 09:37 JST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: kj-master
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: 公式資料の確認と更新
+        run: python update_kj_master.py
+      - name: 変更がある場合だけ公開データを更新
+        run: |
+          git add -- data/kj-master.json
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Update official K/J fee master'
+          git pull --rebase origin main
+          git push origin HEAD:main
