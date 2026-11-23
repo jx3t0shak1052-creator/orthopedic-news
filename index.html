@@ -44,6 +44,35 @@
     .mode-inner{max-width:760px;margin:0 auto;padding:.5rem 1rem;display:flex;gap:8px}
     .mode-btn{display:flex;align-items:center;gap:6px;padding:7px 16px;border-radius:20px;font-size:13px;font-weight:500;border:.5px solid var(--border);background:var(--surface);color:var(--text-secondary);cursor:pointer;font-family:inherit}
     .mode-btn.active{background:var(--accent-bg);border-color:var(--accent);color:var(--accent-text)}
+    .mode-inner{flex-wrap:wrap}
+    #kjPanel{display:grid;gap:12px}
+    .kj-head{border:1px solid var(--border);border-left:4px solid var(--accent);background:var(--surface);border-radius:var(--radius);padding:13px 15px}
+    .kj-head h2{font-size:19px;margin:0 0 4px;color:var(--text-primary)}
+    .kj-head p,.kj-footer{font-size:12px;color:var(--text-secondary);line-height:1.65;margin:0}
+    .kj-head a,.kj-footer a{color:var(--accent-text);text-underline-offset:2px}
+    #kjWarning:empty{display:none}
+    #kjWarning:not(:empty){margin-top:6px;font-weight:700;color:var(--text-primary)}
+    .kj-search{display:flex;gap:7px;align-items:stretch}
+    .kj-search input{min-width:0;flex:1;font:inherit;font-size:16px;color:var(--text-primary);background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius);padding:9px 10px}
+    #kjPanel :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .kj-filters{display:flex;flex-wrap:wrap;gap:6px}
+    .kj-filters button[aria-pressed=true]{background:var(--accent-bg);border-color:var(--accent);color:var(--accent-text)}
+    #kjCount{color:var(--text-secondary);font-size:12px;margin:0}
+    .kj-group{margin:12px 0 6px;font-size:13px;color:var(--text-secondary)}
+    .kj-row{position:relative;margin:0 0 7px;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius)}
+    .kj-row summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:75px minmax(0,1fr) auto;align-items:center;gap:6px;padding:10px 52px 10px 11px;min-height:47px;font-size:13px}
+    .kj-row summary::-webkit-details-marker{display:none}
+    .kj-code{font:700 12px ui-monospace,monospace;color:var(--accent-text);font-variant-numeric:tabular-nums}
+    .kj-points{font-weight:700;color:var(--accent-text);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+    .kj-fav{position:absolute;right:4px;top:3px;min-width:40px;min-height:40px;border:0;background:none;color:var(--text-secondary);cursor:pointer;font-size:20px}
+    .kj-fav[aria-pressed=true]{color:var(--accent-text)}
+    .kj-body{padding:8px 11px 11px;border-top:1px solid var(--border);font-size:12px;line-height:1.6}
+    .kj-body ul{padding:0;list-style:none;margin:0 0 8px}
+    .kj-body li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)}
+    .kj-body small{display:block;color:var(--text-secondary)}
+    .kj-body details>summary{display:list-item;list-style:revert;min-height:0;padding:6px 4px;color:var(--accent-text)}
+    .kj-body details{margin-bottom:8px}
+    @media(max-width:480px){.mode-btn{padding:6px 10px;font-size:11px;gap:4px}.mode-inner{gap:5px}.kj-row summary{grid-template-columns:minmax(0,1fr) auto}.kj-code{grid-column:1}.kj-name{grid-column:1/-1}.kj-row .kj-points{grid-row:1;grid-column:2}}
     .subtabs-wrap{background:var(--surface);border-bottom:.5px solid var(--border);position:sticky;top:110px;z-index:90}
     .subtabs{max-width:760px;margin:0 auto;padding:.5rem 1rem;display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch}
     .subtabs::-webkit-scrollbar{display:none}
@@ -352,6 +381,7 @@
     <button class="mode-btn" id="btnCalendar" onclick="setMode('societies')">
       <i class="ti ti-calendar-month" aria-hidden="true"></i>学会カレンダー<span class="tab-badge" id="calBadge"></span>
     </button>
+    <button class="mode-btn" id="btnKj" onclick="setMode('kj')" aria-pressed="false">手術・処置コード</button>
   </div>
 </div>
 
@@ -1099,7 +1129,7 @@ async function toggleDetail(id){
 
 /* ──── レンダリング ──── */
 function updateBadge(){
-  const upd = currentMode==="papers" ? papersUpdated : implantsUpdated;
+  const upd = currentMode==="kj" ? "" : currentMode==="papers" ? papersUpdated : implantsUpdated;
   document.getElementById("updateBadge").textContent = upd ? upd+"更新" : "";
 }
 function renderSubtabs(){
@@ -1257,7 +1287,8 @@ function render(){
   } else {
     document.getElementById("subtabsWrap").style.display="none";
     if(fab) fab.style.display="none";
-    renderSocieties();
+    if(currentMode==="kj") renderKj();
+    else renderSocieties();
   }
 }
 async function setMode(mode){
@@ -1266,6 +1297,9 @@ async function setMode(mode){
   document.getElementById("btnPapers").classList.toggle("active", mode==="papers");
   document.getElementById("btnImplants").classList.toggle("active", mode==="implants");
   document.getElementById("btnCalendar").classList.toggle("active", mode==="societies");
+  const kjTab=document.getElementById("btnKj");
+  kjTab.classList.toggle("active",mode==="kj");
+  kjTab.setAttribute("aria-pressed",String(mode==="kj"));
   if(mode==="implants" && !implantData){
     showNotice("loading","インプラントニュースを読み込み中...");
     await loadImplants();
@@ -1274,6 +1308,100 @@ async function setMode(mode){
   render();
 }
 function selectSp(sp){ currentSp=sp; expandedId=null; try{ window.scrollTo(0,0); }catch(e){} renderSubtabs(); renderPapers(); }
+
+/* ──── K・Jコード早見表 ──── */
+const kjState={query:"",group:"all",fav:new Set(),catalog:null,master:null,pending:null,error:false};
+try{
+  const saved=JSON.parse(localStorage.getItem("ortho_kj_favorites")||localStorage.getItem("kfav")||"[]");
+  if(Array.isArray(saved)) kjState.fav=new Set(saved.filter(x=>typeof x==="string"));
+}catch(e){}
+const kjMasterPage="https://www.hpdx.or.jp/smph/seikyushiharai/tensuhyo/kihonmasta/kihonmasta_01.html";
+const kjNoticePage="https://www.mhlw.go.jp/stf/newpage_67729.html";
+const kjEsc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const kjNorm=s=>String(s).normalize("NFKC").toLowerCase().replace(/[‐‑−–－]/g,"-").trim();
+const kjFmt=new Intl.NumberFormat("ja-JP",{maximumFractionDigits:2});
+const kjDay=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts().filter(p=>p.type!=="literal").reduce((a,p)=>(a[p.type]=p.value,a),{});
+function kjDateKey(){const p=kjDay();return p.year+p.month+p.day;}
+function kjRows(code,day){return (kjState.master?.codes?.[code]||[]).filter(r=>r[4]>=day);}
+function kjCard(d,day,open){
+  const [code,name,,,reference,notes]=d;
+  const rows=kjRows(code,day);
+  const pts=(reference||rows.filter(r=>!/加算|減算|準用/.test(r[1]))).map(r=>r[2]);
+  const lo=Math.min(...pts),hi=Math.max(...pts);
+  const total=pts.length?`${kjFmt.format(lo)}${lo!==hi?"〜"+kjFmt.format(hi):""}点`:rows.length?"内訳参照":"原典確認";
+  const ref=reference?`<strong>添付の早見表（固定）</strong><ul>${reference.map(r=>`<li><span>${r[0]?`${kjEsc(r[0])}　`:""}${kjEsc(r[1])}</span><strong>${kjFmt.format(r[2])}点</strong></li>`).join("")}</ul>${notes?.length?`<ul>${notes.map(([label,value])=>`<li><span>注：${kjEsc(label)}</span><strong>${kjEsc(value)}${/^\+\d[\d,]*$/.test(value)?"点":""}</strong></li>`).join("")}</ul>`:""}`:"";
+  const official=rows.length?`<ul>${rows.map(r=>`<li><span>${kjEsc(r[1])}<small>${r[0]?`項番 ${kjEsc(r[0])} ・ `:""}診療行為コード ${kjEsc(r[3])}</small></span><strong>${kjFmt.format(r[2])}点</strong></li>`).join("")}</ul>`:`<p>対応するマスター行を表示できません。厚労省の原典をご確認ください。</p>`;
+  return `<article class="kj-row"><details${open?" open":""}><summary><span class="kj-code">${kjEsc(code)}</span><span class="kj-name">${kjEsc(name)}</span><span class="kj-points">${total}</span></summary><div class="kj-body">${ref}${reference?`<details><summary>公式マスターの点数を照合する</summary>${official}</details>`:official}<button type="button" class="btn" data-kj-copy="${kjEsc(code)}">コードと名称をコピー</button></div></details><button type="button" class="kj-fav" data-kj-fav="${kjEsc(code)}" aria-label="${kjEsc(code)} をお気に入りに登録" aria-pressed="${kjState.fav.has(code)}">${kjState.fav.has(code)?"★":"☆"}</button></article>`;
+}
+function kjResults(){
+  const list=document.getElementById("kjResults");
+  if(!list || !kjState.catalog) return;
+  const groups=kjState.catalog.groups, day=kjDateKey();
+  const preferred=kjState.catalog.rows;
+  const known=new Set(preferred.map(r=>r[0]));
+  const other=Object.entries(kjState.master?.codes||{}).filter(([c])=>!known.has(c)).map(([c,r])=>[c,r[0][1],"other",""]);
+  const tokens=kjNorm(kjState.query).split(/\s+/).filter(Boolean);
+  const display=(kjState.group==="other"||kjState.group==="fav"||tokens.length)?preferred.concat(other):preferred;
+  const matches=display.filter(d=>(kjState.group==="all"||(kjState.group==="fav"?kjState.fav.has(d[0]):d[2]===kjState.group))&&tokens.every(t=>kjNorm(d.join(" ")+" "+kjRows(d[0],day).map(r=>r[1]).join(" ")).includes(t)));
+  document.getElementById("kjCount").textContent=`${matches.length}件${matches.length>120?"（先頭120件。検索または分類で絞り込み）":""}`;
+  if(!matches.length){list.innerHTML=`<p class="empty">${kjState.group==="fav"?"☆を押してコードを登録できます。":"該当するコードがありません。"}</p>`;return;}
+  if(!tokens.length&&kjState.group==="all"){
+    list.innerHTML=Object.entries(groups).map(([id,label])=>`<h3 class="kj-group">${kjEsc(label)}</h3>`+matches.filter(r=>r[2]===id).map(r=>kjCard(r,day,false)).join("")).join("");
+    document.getElementById("kjCount").textContent=`整形外科 ${matches.length}件`;
+  }else list.innerHTML=matches.slice(0,120).map(d=>kjCard(d,day,tokens.length>0&&matches.length<=3)).join("");
+}
+function kjPaint(){
+  const panel=document.getElementById("kjPanel");
+  if(!panel) return;
+  const m=kjState.master, catalog=kjState.catalog;
+  const n=m?.notice;
+  const safeNotice=typeof n?.url==="string"&&/^https:\/\/www\.mhlw\.go\.jp\/stf\/[a-zA-Z0-9_/.]+\.html$/.test(n.url)?n.url:kjNoticePage;
+  document.getElementById("kjNoticeLink").href=safeNotice;
+  document.getElementById("kjVersion").textContent=m?`令和${n.edition}年度告示関連資料 ／ マスター版：${m.version}`:kjState.error?"データを取得できませんでした。":"公式データを読み込んでいます…";
+  document.getElementById("kjWarning").textContent=[kjState.error?(m?"公式マスターの最新版を取得できなかったため、取得済みの版を表示しています。":"公式マスターを取得できません。添付版と原典をご確認ください。"):"",
+    n?.review?"告示・通知ページに変更がありました。マスター未反映の改定や算定要件は原典をご確認ください。":"",
+    m?.deferred?.length?"適用日前の行は表示していません。切替日の点数は原典をご確認ください。":""].filter(Boolean).join(" ");
+  if(!catalog) return;
+  const tabs=document.getElementById("kjFilters");
+  tabs.replaceChildren(...[["all","すべて"],["fav","お気に入り"],...Object.entries(catalog.groups),["other","その他の公式コード"]].map(([id,name])=>{
+    const b=document.createElement("button");b.type="button";b.className="stab";b.textContent=name;b.setAttribute("aria-pressed",String(id===kjState.group));
+    b.onclick=()=>{kjState.group=id;tabs.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));kjResults();};return b;
+  }));
+  kjResults();
+}
+function kjLoad(){
+  if(kjState.pending) return kjState.pending;
+  kjState.error=false;
+  const json=async path=>{const r=await fetch(path,{cache:"no-store",signal:AbortSignal.timeout(9000)});if(!r.ok) throw Error(String(r.status));return r.json();};
+  const publicMaster="https://raw.githubusercontent.com/jx3t0shak1052-creator/orthopedic-news/main/data/kj-master.json";
+  const check=m=>{if(m.schema!==1||!m.notice||!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(m.version)||Object.keys(m.codes||{}).length<800) throw Error("KJ_DATA");return m;};
+  const source=location.protocol==="https:"?json(publicMaster).then(check).then(m=>[m,false]).catch(()=>json("data/kj-master.json").then(check).then(m=>[m,true])):json("data/kj-master.json").then(check).then(m=>[m,false]);
+  kjState.pending=Promise.all([kjState.catalog||json("data/kj-catalog.json"),source.catch(()=>[null,true])]).then(([c,[m,fallback]])=>{
+    if(!c.groups||!Array.isArray(c.rows)) throw Error("KJ_DATA");
+    if(m&&(!kjState.master||m.version>=kjState.master.version)) kjState.master=m;
+    kjState.catalog=c;kjState.error=fallback;
+  }).catch(()=>{kjState.error=true;}).finally(()=>{kjState.pending=null;if(currentMode==="kj") kjPaint();});
+  return kjState.pending;
+}
+function renderKj(){
+  document.getElementById("countLabel").textContent="";
+  document.getElementById("subLabel").textContent="";
+  const content=document.getElementById("content");
+  if(document.getElementById("kjPanel")) return;
+  content.innerHTML=`<section id="kjPanel" aria-labelledby="kjTitle"><div class="kj-head"><h2 id="kjTitle">整形外科 手術・処置コード早見表</h2><p>添付版の点数・注記と、更新される公式マスターを分けて表示します。</p><p id="kjVersion" role="status"></p><p id="kjWarning" role="status"></p><p><a id="kjNoticeLink" href="${kjNoticePage}" target="_blank" rel="noopener">厚労省の告示・通知</a> ／ <a href="${kjMasterPage}" target="_blank" rel="noopener">公式マスター</a></p></div><div class="kj-search"><input id="kjQuery" type="search" aria-label="手術・処置コードの検索" placeholder="例：K046、腱板、腕神経叢" autocomplete="off"><button type="button" class="btn" id="kjClear">消去</button><button type="button" class="btn" id="kjRefresh">再読込</button></div><div id="kjFilters" class="kj-filters" role="group" aria-label="分類"></div><p id="kjCount" role="status"></p><div id="kjResults"></div><p class="kj-footer">一覧の点数は添付版（未収録のコードは公式マスター）です。改定後は添付版と公式値が異なる場合があります。通則・加算の適用、施設基準、請求の可否は厚労省の原典をご確認ください。</p></section>`;
+  const query=document.getElementById("kjQuery");query.value=kjState.query;
+  query.oninput=()=>{kjState.query=query.value;kjResults();};
+  document.getElementById("kjClear").onclick=()=>{query.value="";query.oninput();query.focus();};
+  document.getElementById("kjRefresh").onclick=()=>{document.getElementById("kjVersion").textContent="公式データの更新を確認中…";kjLoad();};
+  document.getElementById("kjResults").onclick=async e=>{
+    const fav=e.target.closest("[data-kj-fav]"),copy=e.target.closest("[data-kj-copy]");
+    if(fav){const id=fav.dataset.kjFav;if(kjState.fav.has(id)) kjState.fav.delete(id);else kjState.fav.add(id);
+      try{localStorage.setItem("ortho_kj_favorites",JSON.stringify([...kjState.fav]));}catch(err){}
+      if(kjState.group==="fav") kjResults();else{fav.setAttribute("aria-pressed",String(kjState.fav.has(id)));fav.textContent=kjState.fav.has(id)?"★":"☆";}}
+    if(copy){const name=copy.closest(".kj-row").querySelector(".kj-name").textContent;const text=copy.dataset.kjCopy+" "+name;try{await navigator.clipboard.writeText(text);copy.textContent="コピーしました";}catch(err){copy.textContent=text;}}
+  };
+  kjPaint();kjLoad();
+}
 function togglePaper(id){
   expandedId = expandedId===id ? null : id;
   if(expandedId===id){
@@ -2429,6 +2557,5 @@ async function ghPullNow(){
   setTimeout(()=>{ socCheckDeadlines(false); socNotifyMarkup(); }, 1200);
 })();
 </script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
