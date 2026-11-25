@@ -312,6 +312,23 @@ function klPanel(g){return (c,p)=>{
     if(g>=2)spur(94,jy-gapL/2-1,1,0.2);if(g>=3)spur(94,jy+gapL/2+1,1,-0.2);if(g>=3)spur(60,jy-gapL/2-7,0,-0.1)}
   line(c,Offset(20,jy-gapM/2),Offset(20,jy+gapM/2),strokePaint(ZONEL,1.6));
 }}
+
+/* Frankel 分類の図解：人の輪郭、損傷高位（赤線）より下の機能を色で示す */
+function frankelPanel(g){return (c,p)=>{
+  const body=Path().addOval(Rect.fromCircle({center:Offset(60,16),radius:10}))
+   .addRRect(RRect.fromRectAndRadius(Rect.fromLTRB(44,28,76,78),Radius.circular(8)))
+   .addRRect(RRect.fromRectAndRadius(Rect.fromLTRB(32,30,42,74),Radius.circular(5))).addRRect(RRect.fromRectAndRadius(Rect.fromLTRB(78,30,88,74),Radius.circular(5)))
+   .addRRect(RRect.fromRectAndRadius(Rect.fromLTRB(45,76,58,134),Radius.circular(5))).addRRect(RRect.fromRectAndRadius(Rect.fromLTRB(62,76,75,134),Radius.circular(5)));
+  const LV=50;c.drawPath(body,fillPaint(SKIN));
+  const col=[Color(0xFF90A4AE),Color(0xFFB0BEC5),Color(0xFFFFCC80),Color(0xFFA5D6A7),SKIN][g];
+  c.save();c.clipPath(body);c.drawRect(Rect.fromLTRB(0,LV,120,140),fillPaint(col));
+  if(g===1||g===2){for(let y=LV+6;y<136;y+=7)for(let x=30;x<92;x+=7)c.drawCircle(Offset(x+((y/7)%2)*3,y),1.1,fillPaint(Color(0xFF1E88E5)))}
+  if(g===2||g===3){const w=g===2?1.4:2.6;for(const x of [51,68])line(c,Offset(x,LV+8),Offset(x,128),strokePaint(Color(g===2?0xFFBF360C:0xFF1B5E20),w))}
+  c.restore();c.drawPath(body,strokePaint(SKINL,1.2));
+  c.drawPath(Path().moveTo(60,28).lineTo(60,76),strokePaint(Color(0xFF8D6E63),1.6));
+  if(g<4)drawCrack(c,p,[Offset(26,LV),Offset(94,LV)]);
+}}
+_registry.frankel={caption:'赤線が損傷高位。青い点は感覚、縦線は運動（太いほど実用的）を表す模式図',panels:[['A','完全麻痺'],['B','感覚のみ'],['C','運動・非実用'],['D','運動・実用'],['E','正常']].map(([k,l],i)=>({code:k,label:l,paint:frankelPanel(i)}))};
 Object.assign(_registry,{
  kl:{caption:'立位正面像：内側の関節裂隙（橙）が狭くなり、骨棘が大きくなる',panels:[0,1,2,3,4].map(g=>({code:'Grade '+g,label:['正常','疑い','軽度','中等度','高度'][g],paint:klPanel(g)}))},
  tamai:{caption:'背側から見た指。橙が各 Zone、赤線はその Zone での切断の例',panels:[['I','爪根部より遠位',3,17,12],['II','DIP〜爪根部',17,27,22],['III','中節部',27,48,38],['IV','基節部',48,76,62],['V','手掌部',76,108,92]].map(([z,l,a,b,cut])=>({code:'Zone '+z,label:l,paint:handPanel(a,b,{nail:true,cut})}))},
@@ -343,6 +360,16 @@ const EXTRA=[
 /* 追加分（膝・手の腱）を同じ形式に変換して「その他」としてまとめる */
 FX.push({id:'extra',name:'膝・手指（追加分）',englishName:'',group:'extra',overview:'',classifications:EXTRA.map((c,i)=>({id:c.id||'x'+i,name:c.n,region:c.s,shortDesc:'',entries:c.r.map(r=>({code:r[0],name:r[1],desc:'',children:[]})),notes:[c.x]}))});
 FXG.extra='膝・手指';
+/* 脊髄損傷の重症度（Frankel 分類） */
+FX.push({id:'sci',name:'脊髄損傷',englishName:'Spinal Cord Injury',group:'spine',overview:'損傷高位より下の運動・感覚がどれだけ残っているかで重症度を表す。',classifications:[{id:'frankel',name:'Frankel 分類',region:'脊髄損傷の重症度',shortDesc:'損傷高位以下の運動・感覚機能で A〜E の5段階に分ける。',entries:[
+ {code:'A',name:'Complete（完全麻痺）',desc:'損傷高位以下の運動・感覚が完全に消失',children:[]},
+ {code:'B',name:'Sensory only（感覚のみ残存）',desc:'運動は完全麻痺、感覚はある程度残存',children:[]},
+ {code:'C',name:'Motor useless（運動不全・実用性なし）',desc:'運動機能は残存するが、実用性がない',children:[]},
+ {code:'D',name:'Motor useful（運動不全・実用性あり）',desc:'実用的な運動機能が残存し、補助具の有無を問わず歩行できることが多い',children:[]},
+ {code:'E',name:'Recovery（正常）',desc:'運動・感覚とも正常（反射の異常は残ってもよい）',children:[]}],
+ notes:['現在は改良版の ASIA Impairment Scale（AIS）が国際標準。AIS では仙髄領域（S4-5）の感覚・肛門括約筋の随意収縮の有無で完全／不完全を判定し、C と D は損傷高位以下の key muscle の半数以上が MMT 3 以上かどうかで分ける。','受傷直後は脊髄ショックで完全麻痺に見えることがあり、球海綿体反射の回復後に再評価する。'],
+ reference:'Frankel HL, et al. Paraplegia 1969;7:179-192'}]});
+
 
 let fxGroup='all';const fxOpen=new Set();
 const fxN=s=>String(s).normalize('NFKC').toLowerCase();
