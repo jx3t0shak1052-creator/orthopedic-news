@@ -41,7 +41,13 @@ td:first-child{white-space:nowrap;font-weight:700;width:4.5em}
 .chips{display:flex;gap:6px;overflow-x:auto;margin-top:10px;scrollbar-width:none}
 .chips button{flex:none;border:1px solid var(--border);border-radius:999px;background:var(--bg);color:var(--ink);font:13px 'Noto Sans JP',sans-serif;padding:0 12px;min-height:36px;cursor:pointer}
 .chips button[aria-pressed=true]{background:var(--accent);color:var(--surface);border-color:var(--accent)}
-.fx-bone{display:flex;align-items:baseline;gap:8px;margin:18px 0 2px;font-size:15px}.fx-bone:first-child{margin-top:0}.fx-bone small{color:var(--mute);font-weight:400;font-size:12px}
+.fx-bone{display:flex;align-items:baseline;gap:8px;margin:22px 0 6px;padding:7px 12px;border-radius:8px;font-size:16px;background:var(--accent);color:light-dark(#fff,#0B1220)}
+h3.fx-bone>small{color:inherit!important;opacity:.85;font-weight:400;font-size:12px}
+.fx-bone+.pt{margin:0 0 6px 4px}
+details.cl{margin-left:10px;padding:10px 0 10px 12px;border-left:3px solid var(--border)}
+details.cl[open]{border-left-color:var(--accent)}
+details.cl>summary span::before{content:'▸ ';color:var(--accent)}
+details.cl[open]>summary span::before{content:'▾ '}.fx-bone:first-child{margin-top:0}.fx-bone small{color:var(--mute);font-weight:400;font-size:12px}
 .fx-panels{display:flex;gap:8px;overflow-x:auto;padding:8px 0 4px;scroll-snap-type:x mandatory}
 .fx-panels figure{flex:none;margin:0;width:128px;background:#fbfaf7;border:1px solid #e5e1d8;border-radius:10px;padding:4px;scroll-snap-align:start}
 .fx-panels canvas{display:block;margin:0 auto}
